@@ -5,7 +5,7 @@
         <img src="{{ asset('image/dropcore-sidebar.png') }}"
              alt="Logo Dropcore"
              class="img-fluid d-none d-md-block"
-             style="max-height: 120px; object-fit: contain;">
+             style="max-height: 60px; object-fit: contain;">
         <img src="{{ asset('image/dropcore-sidebar.png') }}"
              alt="Logo Mini Dropcore"
              class="img-fluid d-block d-md-none"
@@ -48,6 +48,13 @@
                     <a href="{{ url('user') }}" class="nav-link">
                         <i class="nav-icon fas fa-users-cog"></i>
                         <p>Manajemen Pengguna</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ url('category') }}" class="nav-link">
+                        <i class="nav-icon fas fa-tags"></i>
+                        <p>Manajemen Kategori</p>
                     </a>
                 </li>
 
