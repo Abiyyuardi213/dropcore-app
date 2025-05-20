@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -14,3 +15,4 @@ Route::post('role/{id}/toggle-status', [RoleController::class, 'toggleStatus'])-
 Route::resource('role', RoleController::class);
 Route::resource('user', UserController::class);
 Route::resource('category', CategoryController::class);
+Route::resource('product', ProductController::class);
