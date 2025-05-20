@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Produk</title>
+    <title>Ubah Produk</title>
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -20,7 +20,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Tambah Data Produk</h1>
+                            <h1 class="m-0">Ubah Data Produk</h1>
                         </div>
                     </div>
                 </div>
@@ -28,41 +28,42 @@
 
             <section class="content">
                 <div class="container-fluid">
-                    <div class="card card-primary">
+                    <div class="card card-warning">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-plus-circle"></i> Form Tambah Produk</h3>
+                            <h3 class="card-title"><i class="fas fa-edit"></i> Form Ubah Data Produk</h3>
                         </div>
                         <div class="card-body">
                             @if(session('error'))
                                 <div class="alert alert-danger">{{ session('error') }}</div>
                             @endif
 
-                            <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('product.update', $product->id) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
+                                @method('PUT')
                                 <div class="row">
                                     <!-- Kiri -->
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="sku">SKU</label>
-                                            <input type="text" class="form-control @error('sku') is-invalid @enderror" name="sku" value="{{ old('sku') }}" required>
+                                            <label for="sku">SKU Barang</label>
+                                            <input type="text" class="form-control @error('sku') is-invalid @enderror" name="sku" value="{{ old('sku', $product->sku) }}" required>
                                             @error('sku')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
                                             <label for="name">Nama Barang</label>
-                                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required>
+                                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name', $product->name) }}" required>
                                             @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
                                             <label for="description">Deskripsi</label>
-                                            <textarea class="form-control @error('description') is-invalid @enderror" name="description" required>{{ old('description') }}</textarea>
+                                            <textarea class="form-control @error('description') is-invalid @enderror" name="description" required>{{ old('description', $product->description) }}</textarea>
                                             @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
                                             <label for="stock">Jumlah Stok</label>
-                                            <input type="number" class="form-control @error('stock') is-invalid @enderror" name="stock" value="{{ old('stock') }}">
+                                            <input type="number" class="form-control @error('stock') is-invalid @enderror" name="stock" value="{{ old('stock', $product->stock) }}">
                                             @error('stock')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
                                     </div>
@@ -71,19 +72,19 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="price">Harga Barang</label>
-                                            <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ old('price') }}">
+                                            <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ old('price', $product->price) }}">
                                             @error('price')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="category_id">Kategori Barang</label>
+                                            <label for="category_id">Role</label>
                                             <select name="category_id" id="category_id" class="form-control @error('category_id') is-invalid @enderror">
-                                                <option value="">-- Pilih Kategori --</option>
+                                                <option value="">-- Pilih Role --</option>
                                                 @foreach($categories as $category)
-                                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->category_name }}</option>
+                                                    <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>{{ $category->category_name }}</option>
                                                 @endforeach
                                             </select>
-                                            @error('role_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                            @error('category_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
@@ -91,10 +92,10 @@
                                             <select name="uom_id" id="uom_id" class="form-control @error('uom_id') is-invalid @enderror">
                                                 <option value="">-- Pilih Satuan --</option>
                                                 @foreach($uoms as $uom)
-                                                    <option value="{{ $uom->id }}" {{ old('uom_id') == $uom->id ? 'selected' : '' }}>{{ $uom->name }}</option>
+                                                    <option value="{{ $uom->id }}" {{ old('uom_id', $product->uom_id) == $uom->id ? 'selected' : '' }}>{{ $uom->name }}</option>
                                                 @endforeach
                                             </select>
-                                            @error('role_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                            @error('uom_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
                                     </div>
 
@@ -106,15 +107,14 @@
                                             @error('image')<div class="text-danger">{{ $message }}</div>@enderror
                                         </div>
                                         <div style="width: 300px; height: 300px; border: 2px dashed #ccc; margin: auto; display: flex; align-items: center; justify-content: center;">
-                                            <img id="preview" src="https://via.placeholder.com/300x300?text=Preview" class="img-fluid rounded" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                            <img id="preview" src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/300x300?text=Preview' }}" class="img-fluid rounded" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                                         </div>
                                         <input type="hidden" name="cropped_image" id="cropped_image">
                                     </div>
                                 </div>
 
-                                <!-- Tombol -->
                                 <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
+                                    <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Simpan Perubahan</button>
                                     <a href="{{ route('product.index') }}" class="btn btn-secondary">Batal</a>
                                 </div>
                             </form>
@@ -132,8 +132,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script>
         $(document).ready(function () {
@@ -162,7 +160,6 @@
                         canvas.toBlob((blob) => {
                             const formData = new FormData();
                             formData.append('cropped_image', blob);
-                            // Opsional: preview bisa diupload via AJAX kalau ingin disimpan langsung
                         });
                     }
                 });
