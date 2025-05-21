@@ -59,7 +59,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('lokasi-gudang') }}" class="nav-link">
+                    <a href="{{ url('gudang') }}" class="nav-link">
                         <i class="nav-icon fas fa-map-marker-alt"></i>
                         <p>Lokasi Gudang</p>
                     </a>
