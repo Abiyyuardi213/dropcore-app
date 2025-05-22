@@ -58,11 +58,37 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a href="{{ url('gudang') }}" class="nav-link">
-                        <i class="nav-icon fas fa-map-marker-alt"></i>
-                        <p>Lokasi Gudang</p>
+                @php
+                    $isGudang = request()->is('dashboardGudang*') || request()->is('gudang*') || request()->is('areaGudang*');
+                @endphp
+                <li class="nav-item has-treeview {{ $isGudang ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ $isGudang ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-warehouse"></i> {{-- ganti dari fa-map-marker-alt --}}
+                        <p>
+                            Gudang
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview" style="{{ $isGudang ? 'display: block;' : '' }}">
+                        <li class="nav-item">
+                            <a href="{{ url('dashboardGudang') }}" class="nav-link">
+                                <i class="nav-icon fas fa-chart-pie"></i> {{-- lebih representatif untuk dashboard --}}
+                                <p>Dashboard Gudang</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('gudang') }}" class="nav-link">
+                                <i class="nav-icon fas fa-building"></i> {{-- tetap relevan untuk gudang --}}
+                                <p>Gudang</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('areaGudang.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-th-large"></i> {{--  --}}
+                                <p>Area Gudang</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <li class="nav-item">

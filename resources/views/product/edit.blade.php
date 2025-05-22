@@ -60,12 +60,6 @@
                                             <textarea class="form-control @error('description') is-invalid @enderror" name="description" required>{{ old('description', $product->description) }}</textarea>
                                             @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
-
-                                        <div class="form-group">
-                                            <label for="stock">Jumlah Stok</label>
-                                            <input type="number" class="form-control @error('stock') is-invalid @enderror" name="stock" value="{{ old('stock', $product->stock) }}">
-                                            @error('stock')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                        </div>
                                     </div>
 
                                     <!-- Tengah -->

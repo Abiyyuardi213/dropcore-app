@@ -78,10 +78,6 @@
                                                 <td>{{ $product->description }}</td>
                                             </tr>
                                             <tr>
-                                                <th>Jumlah Stok Produk</th>
-                                                <td>{{ $product->stock }}</td>
-                                            </tr>
-                                            <tr>
                                                 <th>Harga Produk</th>
                                                 <td>{{ $product->price }}</td>
                                             </tr>

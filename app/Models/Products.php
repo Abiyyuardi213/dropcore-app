@@ -14,7 +14,6 @@ class Products extends Model
         'sku',
         'name',
         'description',
-        'stock',
         'price',
         'category_id',
         'uom_id',
@@ -36,7 +35,6 @@ class Products extends Model
             'sku' => $data['sku'],
             'name' => $data['name'],
             'description' => $data['description'],
-            'stock' => $data['stock'],
             'price' => str_replace(',', '', $data['price']), // bersihkan kalau pakai format ribuan
             'category_id' => $data['category_id'],
             'uom_id' => $data['uom_id'],
@@ -50,7 +48,6 @@ class Products extends Model
             'sku' => $data['sku'] ?? $this->sku,
             'name' => $data['name'] ?? $this->name,
             'description' => $data['description'] ?? $this->description,
-            'stock' => $data['stock'] ?? $this->stock,
             'price' => isset($data['price']) ? str_replace(',', '', $data['price']) : $this->price,
             'category_id' => $data['category_id'] ?? $this->category_id,
             'uom_id' => $data['uom_id'] ?? $this->uom_id,
