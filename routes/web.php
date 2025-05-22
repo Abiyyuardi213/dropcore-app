@@ -9,6 +9,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\AreaGudangController;
+use App\Http\Controllers\RakController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,3 +25,5 @@ Route::resource('gudang', GudangController::class);
 Route::post('areaGudang/{id}/toggle-status', [AreaGudangController::class, 'toggleStatus'])->name('areaGudang.toggleStatus');
 Route::resource('areaGudang', AreaGudangController::class);
 Route::get('dashboardGudang', [DashboardGudangController::class, 'index'])->name('dashboardGudang');
+Route::post('rak-gudang/{id}/toggle-status', [RakController::class, 'toggleStatus'])->name('rak-gudang.toggleStatus');
+Route::resource('rak-gudang', RakController::class);

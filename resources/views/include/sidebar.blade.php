@@ -59,7 +59,7 @@
                 </li>
 
                 @php
-                    $isGudang = request()->is('dashboardGudang*') || request()->is('gudang*') || request()->is('areaGudang*');
+                    $isGudang = request()->is('dashboardGudang*') || request()->is('gudang*') || request()->is('areaGudang*') || request()->is('rak-gudang*');
                 @endphp
                 <li class="nav-item has-treeview {{ $isGudang ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ $isGudang ? 'active' : '' }}">
@@ -86,6 +86,12 @@
                             <a href="{{ route('areaGudang.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-th-large"></i> {{--  --}}
                                 <p>Area Gudang</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('rak-gudang.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-layer-group"></i> {{--  --}}
+                                <p>Rak Gudang</p>
                             </a>
                         </li>
                     </ul>
