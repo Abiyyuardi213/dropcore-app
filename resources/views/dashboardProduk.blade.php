@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dropcore - Dashboard Gudang</title>
+    <title>Dropcore - Dashboard Produk</title>
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -12,12 +12,6 @@
     <style>
         body {
             font-family: 'Source Sans Pro', sans-serif !important;
-        }
-        .fc-daygrid-day-number {
-            color: white !important;
-        }
-        .fc-daygrid-day {
-            border: none !important;
         }
     </style>
 </head>
@@ -36,7 +30,7 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ url('dashboardGudang') }}">Home</a></li>
-                            <li class="breadcrumb-item active">Dashboard Gudang</li>
+                            <li class="breadcrumb-item active">Dashboard Produk</li>
                         </ol>
                     </div>
                 </div>
@@ -49,39 +43,26 @@
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-info">
                             <div class="inner">
-                                <h3>{{ $totalGudang ?? 0 }}</h3>
-                                <p>Total Gudang Aktif</p>
+                                <h3>{{ $totalProduk ?? 0 }}</h3>
+                                <p>Total Produk Tersedia</p>
                             </div>
                             <div class="icon">
                                 <i class="fas fa-warehouse"></i>
                             </div>
-                            <a href="{{ url('gudang') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{ url('product') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
 
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-success">
                             <div class="inner">
-                                <h3>{{ $totalAreaGudang ?? 0 }}</h3>
-                                <p>Total Area Gudang Aktif</p>
+                                <h3>{{ $totalStok ?? 0 }}</h3>
+                                <p>Total Stok Produk Keseluruhan</p>
                             </div>
                             <div class="icon">
                                 <i class="fas fa-th-large"></i>
                             </div>
-                            <a href="{{ url('areaGudang') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-warning">
-                            <div class="inner">
-                                <h3>{{ $totalRakGudang ?? 0 }}</h3>
-                                <p>Total Rak Gudang Aktif</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-layer-group"></i>
-                            </div>
-                            <a href="{{ url('rak-gudang') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{ url('stok') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                 </div>

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardGudangController;
+use App\Http\Controllers\DashboardProdukController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
@@ -10,6 +11,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\AreaGudangController;
 use App\Http\Controllers\RakController;
+use App\Http\Controllers\StokController;
+use Whoops\Run;
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,3 +30,5 @@ Route::resource('areaGudang', AreaGudangController::class);
 Route::get('dashboardGudang', [DashboardGudangController::class, 'index'])->name('dashboardGudang');
 Route::post('rak-gudang/{id}/toggle-status', [RakController::class, 'toggleStatus'])->name('rak-gudang.toggleStatus');
 Route::resource('rak-gudang', RakController::class);
+Route::get('dashboardProduk', [DashboardProdukController::class, 'index'])->name('dashboardProduk');
+Route::resource('stok', StokController::class);

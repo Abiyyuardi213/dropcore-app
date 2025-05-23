@@ -2,7 +2,7 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Logo -->
     <a href="#" class="brand-link d-flex flex-column align-items-center p-2" style="overflow: hidden;">
-        <img src="{{ asset('image/dropcore-sidebar.png') }}"
+        <img src="{{ asset('image/logo-gfs.png') }}"
              alt="Logo Dropcore"
              class="img-fluid d-none d-md-block"
              style="max-height: 60px; object-fit: contain;">
@@ -97,11 +97,37 @@
                     </ul>
                 </li>
 
-                <li class="nav-item">
-                    <a href="{{ url('product') }}" class="nav-link">
-                        <i class="nav-icon fas fa-boxes"></i>
-                        <p>Produk</p>
+                @php
+                    $isProduk = request()->is('dashboardProduk*') || request()->is('product*') || request()->is('stok*');
+                @endphp
+                <li class="nav-item has-treeview {{ $isProduk ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ $isProduk ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-boxes"></i> {{-- Ikon untuk grup produk secara umum --}}
+                        <p>
+                            Produk
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview" style="{{ $isProduk ? 'display: block;' : '' }}">
+                        <li class="nav-item">
+                            <a href="{{ url('dashboardProduk') }}" class="nav-link">
+                                <i class="nav-icon fas fa-tachometer-alt"></i> {{-- Ikon dashboard --}}
+                                <p>Dashboard Produk</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('product') }}" class="nav-link">
+                                <i class="nav-icon fas fa-box"></i> {{-- Representasi satu produk --}}
+                                <p>Produk</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('stok.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-warehouse"></i> {{-- Representasi stok/gudang --}}
+                                <p>Stok Produk</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <li class="nav-item">
