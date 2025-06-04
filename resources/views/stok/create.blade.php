@@ -104,7 +104,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Simpan
                             </button>
-                            <a href="{{ route('rak-gudang.index') }}" class="btn btn-secondary">Batal</a>
+                            <a href="{{ route('stok.index') }}" class="btn btn-secondary">Batal</a>
                         </div>
                     </form>
                     </div>

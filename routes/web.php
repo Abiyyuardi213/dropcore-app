@@ -12,6 +12,9 @@ use App\Http\Controllers\GudangController;
 use App\Http\Controllers\AreaGudangController;
 use App\Http\Controllers\RakController;
 use App\Http\Controllers\StokController;
+use App\Http\Controllers\MutasiStokController;
+use App\Http\Controllers\ProvinsiController;
+use App\Http\Controllers\WilayahController;
 use Whoops\Run;
 
 Route::get('/', function () {
@@ -32,3 +35,9 @@ Route::post('rak-gudang/{id}/toggle-status', [RakController::class, 'toggleStatu
 Route::resource('rak-gudang', RakController::class);
 Route::get('dashboardProduk', [DashboardProdukController::class, 'index'])->name('dashboardProduk');
 Route::resource('stok', StokController::class);
+Route::get('/stok/produk/{produk_id}', [MutasiStokController::class, 'getStokByProduk']);
+Route::resource('mutasi-stok', MutasiStokController::class);
+Route::post('wilayah/{id}/toggle-status', [WilayahController::class, 'toggleStatus'])->name('wilayah.toggleStatus');
+Route::resource('wilayah', WilayahController::class);
+Route::post('provinsi/{id}/toggle-status', [ProvinsiController::class, 'toggleStatus'])->name('provinsi.toggleStatus');
+Route::resource('provinsi', ProvinsiController::class);

@@ -52,22 +52,22 @@ class Stok extends Model
 
     public function produk()
     {
-        return $this->belongsTo(Products::class);
+        return $this->belongsTo(Products::class, 'produk_id');
     }
 
     public function gudang()
     {
-        return $this->belongsTo(Gudang::class);
+        return $this->belongsTo(Gudang::class, 'gudang_id');
     }
 
     public function area()
     {
-        return $this->belongsTo(AreaGudang::class);
+        return $this->belongsTo(AreaGudang::class, 'area_id');
     }
 
     public function rak()
     {
-        return $this->belongsTo(RakGudang::class);
+        return $this->belongsTo(RakGudang::class, 'rak_id');
     }
 
     public function deleteStok()

@@ -2,11 +2,11 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Logo -->
     <a href="#" class="brand-link d-flex flex-column align-items-center p-2" style="overflow: hidden;">
-        <img src="{{ asset('image/logo-gfs.png') }}"
+        <img src="{{ asset('image/garuda-fiber.png') }}"
              alt="Logo Dropcore"
              class="img-fluid d-none d-md-block"
-             style="max-height: 60px; object-fit: contain;">
-        <img src="{{ asset('image/dropcore-sidebar.png') }}"
+             style="max-height: 40px; object-fit: contain;">
+        <img src="{{ asset('image/garuda-fiber.png') }}"
              alt="Logo Mini Dropcore"
              class="img-fluid d-block d-md-none"
              style="max-height: 100px; object-fit: contain;">
@@ -37,25 +37,53 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a href="{{ route('role.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-user-shield"></i>
-                        <p>Manajemen Peran</p>
+                @php
+                    $isMaster = request()->is('role*') ||
+                                request()->is('user*') ||
+                                request()->is('category*') ||
+                                request()->is('wilayah*') ||
+                                request()->is('provinsi*');
+                @endphp
+                <li class="nav-item has-treeview {{ $isMaster ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ $isMaster ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-folder-open"></i>
+                        <p>
+                            Master Data
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ url('user') }}" class="nav-link">
-                        <i class="nav-icon fas fa-users-cog"></i>
-                        <p>Manajemen Pengguna</p>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ url('category') }}" class="nav-link">
-                        <i class="nav-icon fas fa-tags"></i>
-                        <p>Manajemen Kategori</p>
-                    </a>
+                    <ul class="nav nav-treeview" style="{{ $isMaster ? 'display: block;' : '' }}">
+                        <li class="nav-item">
+                            <a href="{{ url('role') }}" class="nav-link">
+                                <i class="nav-icon fas fa-user-shield"></i>
+                                <p>Manajemen Peran</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('user') }}" class="nav-link">
+                                <i class="nav-icon fas fa-users-cog"></i>
+                                <p>Manajemen Pengguna</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('areaGudang.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-tags"></i>
+                                <p>Manajemen Kategori</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('wilayah.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-globe"></i>
+                                <p>Manajemen Wilayah</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('provinsi.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-map"></i>
+                                <p>Manajemen Provinsi</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 @php
@@ -131,9 +159,9 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('stok') }}" class="nav-link">
-                        <i class="nav-icon fas fa-layer-group"></i>
-                        <p>Stok Barang</p>
+                    <a href="{{ url('mutasi-stok') }}" class="nav-link">
+                        <i class="nav-icon fas fa-exchange-alt"></i>
+                        <p>Mutasi Stok</p>
                     </a>
                 </li>
 
