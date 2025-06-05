@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\AreaGudangController;
+use App\Http\Controllers\KotaController;
 use App\Http\Controllers\RakController;
 use App\Http\Controllers\StokController;
 use App\Http\Controllers\MutasiStokController;
@@ -41,3 +42,4 @@ Route::post('wilayah/{id}/toggle-status', [WilayahController::class, 'toggleStat
 Route::resource('wilayah', WilayahController::class);
 Route::post('provinsi/{id}/toggle-status', [ProvinsiController::class, 'toggleStatus'])->name('provinsi.toggleStatus');
 Route::resource('provinsi', ProvinsiController::class);
+Route::resource('kota', KotaController::class);

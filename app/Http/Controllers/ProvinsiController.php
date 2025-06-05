@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Provinsi;
-use app\Models\Wilayah;
+use App\Models\Wilayah;
 
 class ProvinsiController extends Controller
 {
     public function index()
     {
+        $wilayahs = Wilayah::where('status_wilayah', 1)->get();
         $provinsis = Provinsi::orderBy('created_at', 'asc')->get();
-        return view('provinsi.index', compact('provinsis'));
+        return view('provinsi.index', compact('provinsis', 'wilayahs'));
     }
 
     public function create()
@@ -38,7 +39,7 @@ class ProvinsiController extends Controller
     {
         $provinsi = Provinsi::findOrFail($id);
         $wilayahs = Wilayah::all();
-        return view('provinsi.edit', compact('provinsi', 'wilayahs'));
+        return view('provinsi.index', compact('provinsi', 'wilayahs'));
     }
 
     public function update(Request $request, $id)
