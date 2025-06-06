@@ -43,7 +43,8 @@
                                 request()->is('category*') ||
                                 request()->is('wilayah*') ||
                                 request()->is('provinsi*') ||
-                                request()->is('kota*');
+                                request()->is('kota*') ||
+                                request()->is('kecamatan*');
                 @endphp
                 <li class="nav-item has-treeview {{ $isMaster ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ $isMaster ? 'active' : '' }}">
@@ -88,6 +89,12 @@
                             <a href="{{ route('kota.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-city"></i>
                                 <p>Manajemen Kota</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('kecamatan.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-map"></i>
+                                <p>Manajemen Kecamatan</p>
                             </a>
                         </li>
                     </ul>
