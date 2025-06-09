@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\AreaGudangController;
 use App\Http\Controllers\KecamatanController;
+use App\Http\Controllers\KelurahanController;
 use App\Http\Controllers\KotaController;
 use App\Http\Controllers\RakController;
 use App\Http\Controllers\StokController;
@@ -45,3 +46,4 @@ Route::post('provinsi/{id}/toggle-status', [ProvinsiController::class, 'toggleSt
 Route::resource('provinsi', ProvinsiController::class);
 Route::resource('kota', KotaController::class);
 Route::resource('kecamatan', KecamatanController::class);
+Route::resource('kelurahan', KelurahanController::class);

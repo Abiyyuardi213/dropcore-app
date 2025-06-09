@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dropcore - Kecamatan</title>
+    <title>Dropcore - Kelurahan</title>
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -20,7 +20,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Manajemen Kecamatan</h1>
+                            <h1 class="m-0">Manajemen Kelurahan</h1>
                         </div>
                     </div>
                 </div>
@@ -30,45 +30,47 @@
                 <div class="container-fluid">
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title">Daftar Kecamatan</h3>
-                            <a href="#" class="btn btn-primary btn-sm ml-auto" data-toggle="modal" data-target="#addKecamatanModal">
-                                <i class="fas fa-plus"></i> Tambah Kecamatan
+                            <h3 class="card-title">Daftar Kelurahan</h3>
+                            <a href="#" class="btn btn-primary btn-sm ml-auto" data-toggle="modal" data-target="#addKelurahanModal">
+                                <i class="fas fa-plus"></i> Tambah Kelurahan
                             </a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="kecamatanTable" class="table table-bordered table-striped">
+                                <table id="kelurahanTable" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Nama Kecamatan</th>
-                                            <th>Nama Kota</th>
+                                            <th>Kelurahan</th>
+                                            <th>Kecamatan</th>
+                                            <th>Kota</th>
                                             <th>Provinsi</th>
                                             <th>Wilayah/Negara</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($kecamatans as $index => $kecamatan)
+                                        @foreach($kelurahans as $index => $kelurahan)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>{{ $kecamatan->kecamatan }}</td>
-                                                <td>{{ $kecamatan->kota->kota }}</td>
-                                                <td>{{ $kecamatan->kota->provinsi->provinsi }}</td>
-                                                <td>{{ $kecamatan->kota->provinsi->wilayah->negara }}</td>
+                                                <td>{{ $kelurahan->kelurahan }}</td>
+                                                <td>{{ $kelurahan->kecamatan->kecamatan }}</td>
+                                                <td>{{ $kelurahan->kecamatan->kota->kota }}</td>
+                                                <td>{{ $kelurahan->kecamatan->kota->provinsi->provinsi }}</td>
+                                                <td>{{ $kelurahan->kecamatan->kota->provinsi->wilayah->negara }}</td>
                                                 <td class="text-center">
-                                                    <button class="btn btn-warning btn-sm edit-kecamatan-btn"
+                                                    <button class="btn btn-warning btn-sm edit-kelurahan-btn"
                                                         data-toggle="modal"
-                                                        data-target="#editKecamatanModal"
-                                                        data-id="{{ $kecamatan->id }}"
-                                                        data-kota-id="{{ $kecamatan->kota->id }}"
-                                                        data-kecamatan="{{ $kecamatan->kecamatan }}">
+                                                        data-target="#editKelurahanModal"
+                                                        data-id="{{ $kelurahan->id }}"
+                                                        data-kecamatan-id="{{ $kelurahan->kecamatan->id }}"
+                                                        data-kelurahan="{{ $kelurahan->kelurahan }}">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </button>
-                                                    <button class="btn btn-danger btn-sm delete-kecamatan-btn"
+                                                    <button class="btn btn-danger btn-sm delete-kelurahan-btn"
                                                         data-toggle="modal"
-                                                        data-target="#deletepKecamatanModal"
-                                                        data-kecamatan-id="{{ $kecamatan->id }}">
+                                                        data-target="#deletepKelurahanModal"
+                                                        data-kelurahan-id="{{ $kelurahan->id }}">
                                                         <i class="fas fa-trash"></i> Hapus
                                                     </button>
                                                 </td>
@@ -88,17 +90,17 @@
     </div>
 
     <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteKecamatanModal" tabindex="-1" aria-labelledby="deleteKecamatanModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteKelurahanModal" tabindex="-1" aria-labelledby="deleteKelurahanModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteKecamatanModalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
+                    <h5 class="modal-title" id="deleteKelurahanModalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus Kecamatan ini? Tindakan ini tidak dapat dibatalkan.
+                    Apakah Anda yakin ingin menghapus Kelurahan ini? Tindakan ini tidak dapat dibatalkan.
                 </div>
                 <form id="deleteForm" method="POST">
                     @csrf
@@ -112,34 +114,34 @@
         </div>
     </div>
 
-    <!-- Modal Tambah Kecamatan -->
-    <div class="modal fade" id="addKecamatanModal" tabindex="-1" role="dialog" aria-labelledby="addKecamatanModalLabel" aria-hidden="true">
+    <!-- Modal Tambah Kelurahan -->
+    <div class="modal fade" id="addKelurahanModal" tabindex="-1" role="dialog" aria-labelledby="addKelueahanModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <form action="{{ route('kecamatan.store') }}" method="POST">
+            <form action="{{ route('kelurahan.store') }}" method="POST">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="addKecamatanModalLabel">Tambah Kecamatan Baru</h5>
+                        <h5 class="modal-title" id="addKelurahanModalLabel">Tambah Kelurahan Baru</h5>
                         <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="kota_id">Kota</label>
-                            <select name="kota_id" id="kota_id" class="form-control @error('kota_id') is-invalid @enderror" required>
-                                <option value="">-- Pilih Kota --</option>
-                                @foreach($kotas as $kota)
-                                    <option value="{{ $kota->id }}" {{ old('kota_id') == $kota->id ? 'selected' : '' }}>
-                                        {{ $kota->kota }}
+                            <label for="kelurahan_id">Kota</label>
+                            <select name="kecamatan_id" id="kecamatan_id" class="form-control @error('kecamatan_id') is-invalid @enderror" required>
+                                <option value="">-- Pilih Kecamatan --</option>
+                                @foreach($kecamatans as $kecamatan)
+                                    <option value="{{ $kecamatan->id }}" {{ old('kecamatan_id') == $kecamatan->id ? 'selected' : '' }}>
+                                        {{ $kecamatan->kecamatan }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('kota_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            @error('kecamatan_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="form-group">
-                            <label for="kecamatan">Nama Kecamatan</label>
-                            <input type="text" name="kecamatan" class="form-control" required>
+                            <label for="kelurahan">Nama Kelurahan</label>
+                            <input type="text" name="kelurahan" class="form-control" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -151,32 +153,32 @@
         </div>
     </div>
 
-    <!-- Modal Edit Kecamatan -->
-    <div class="modal fade" id="editKecamatanModal" tabindex="-1" aria-labelledby="editKecamatanLabel" aria-hidden="true">
+    <!-- Modal Edit Kelurahan -->
+    <div class="modal fade" id="editKelurahanModal" tabindex="-1" aria-labelledby="editKelurahanLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <form id="editKecamatanForm" method="POST">
+            <form id="editKelurahanForm" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="modal-content">
                     <div class="modal-header bg-warning text-white">
-                        <h5 class="modal-title" id="editKecamatanLabel"><i class="fas fa-edit"></i> Ubah Kecamatan</h5>
+                        <h5 class="modal-title" id="editKelurahanLabel"><i class="fas fa-edit"></i> Ubah Kelurahan</h5>
                         <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="kota_id">Kota</label>
-                            <select name="kota_id" id="kota_id" class="form-control @error('kota_id') is-invalid @enderror" required>
-                                <option value="">-- Pilih Kota --</option>
-                                @foreach($kotas as $kota)
-                                    <option value="{{ $kota->id }}" {{ old('kota_id', $kecamatan->kota_id) == $kota->id ? 'selected' : '' }}>
-                                        {{ $kota->kota }}
+                            <label for="kecamatan_id">Kecamatan</label>
+                            <select name="kecamatan_id" id="kecamatan_id" class="form-control @error('kecamatan_id') is-invalid @enderror" required>
+                                <option value="">-- Pilih Kecamatan --</option>
+                                @foreach($kecamatans as $kecamatan)
+                                    <option value="{{ $kecamatan->id }}" {{ old('kecamatan_id', $kelurahan->kecamatan_id) == $kecamatan->id ? 'selected' : '' }}>
+                                        {{ $kecamatan->kecamatan }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Nama Kecamatan</label>
-                            <input type="text" name="kecamatan" id="editKecamatan" class="form-control" required>
+                            <label>Nama Kelurahan</label>
+                            <input type="text" name="kelurahan" id="editKelurahan" class="form-control" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -199,7 +201,7 @@
     <script src="{{ asset('js/ToastScript.js') }}"></script>
     <script>
         $(document).ready(function () {
-            $("#kecamatanTable").DataTable({
+            $("#kelurahanTable").DataTable({
                 "paging": true,
                 "lengthChange": false,
                 "searching": true,
@@ -211,9 +213,9 @@
         });
 
         $(document).ready(function () {
-            $('.delete-kecamatan-btn').click(function () {
-                let kecamatanId = $(this).data('kecamatan-id');
-                let deleteUrl = "{{ url('kecamatan') }}/" + kecamatanId;
+            $('.delete-kelurahan-btn').click(function () {
+                let kelurahanId = $(this).data('kelurahan-id');
+                let deleteUrl = "{{ url('kelurahan') }}/" + kelurahanId;
                 $('#deleteForm').attr('action', deleteUrl);
             });
         });
@@ -227,22 +229,22 @@
             @endif
         });
 
-        $('#addWKecamatanModal').on('hidden.bs.modal', function () {
+        $('#addWKelurahanModal').on('hidden.bs.modal', function () {
             $(this).find('form')[0].reset();
         });
 
-        $(document).on('click', '.edit-kecamatan-btn', function () {
+        $(document).on('click', '.edit-kelurahan-btn', function () {
             let id = $(this).data('id');
-            let kotaId = $(this).data('kota_id');
             let kecamatanId = $(this).data('kecamatan_id');
-            let kecamatan = $(this).data('kecamatan');
+            let kelurahanId = $(this).data('kelurahan_id');
+            let kelurahan = $(this).data('kelurahan');
 
-            $('#editKecamatanId').val(id);
-            $('#edit_kota_id').val(kotaId);
-            $('#editKecamatan').val(kecamatan);
+            $('#editKelurahanId').val(id);
+            $('#edit_kecamatan_id').val(kecamatanId);
+            $('#editKelurahan').val(kelurahan);
 
-            let actionUrl = "{{ url('kecamatan') }}/" + id;
-            $('#editKecamatanForm').attr('action', actionUrl);
+            let actionUrl = "{{ url('kelurahan') }}/" + id;
+            $('#editKelurahanForm').attr('action', actionUrl);
         });
     </script>
 </body>

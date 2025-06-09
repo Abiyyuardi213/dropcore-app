@@ -68,7 +68,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('areaGudang.index') }}" class="nav-link">
+                            <a href="{{ route('category.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-tags"></i>
                                 <p>Manajemen Kategori</p>
                             </a>
@@ -95,6 +95,12 @@
                             <a href="{{ route('kecamatan.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-map"></i>
                                 <p>Manajemen Kecamatan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('kelurahan.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-map"></i>
+                                <p>Manajemen Kelurahan</p>
                             </a>
                         </li>
                     </ul>
