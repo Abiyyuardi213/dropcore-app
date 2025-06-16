@@ -55,7 +55,7 @@ class User extends Authenticatable
             'username'        => $data['username'],
             'email'           => $data['email'],
             'no_telepon'      => $data['no_telepon'],
-            'password'        => bcrypt($data['password']),
+            'password'        => $data['password'],
             'profile_picture' => $data['profile_picture'] ?? null,
             'role_id'         => $data['role_id'],
         ]);

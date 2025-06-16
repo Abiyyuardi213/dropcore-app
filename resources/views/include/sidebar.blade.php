@@ -17,13 +17,19 @@
         <!-- User Info -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
             <div class="image">
-                <img src="#" class="img-circle elevation-2" alt="User"
-                     style="width: 45px; height: 45px; object-fit: cover; border: 2px solid white;">
+                <img src="{{ Auth::user()->profile_picture ? asset('uploads/profile/' . Auth::user()->profile_picture) : asset('image/default-user.png') }}"
+                    class="img-circle elevation-2"
+                    alt="User"
+                    style="width: 45px; height: 45px; object-fit: cover; border: 2px solid white;">
             </div>
             <div class="info">
-                <a href="#" class="d-block text-white font-weight-bold">username</a>
+                <a href="#" class="d-block text-white font-weight-bold">
+                    {{ Auth::user()->username }}
+                </a>
                 <span class="badge badge-success">Online</span>
-                <span class="d-block" style="color: #f39c12; font-size: 14px; font-weight: 600;">role name</span>
+                <span class="d-block" style="color: #f39c12; font-size: 14px; font-weight: 600;">
+                    {{ Auth::user()->role->role_name ?? 'Tanpa Role' }}
+                </span>
             </div>
         </div>
 
@@ -33,7 +39,7 @@
                 <li class="nav-item">
                     <a href="{{ url('dashboard') }}" class="nav-link">
                         <i class="nav-icon fas fa-warehouse"></i>
-                        <p>Dashboard Gudang</p>
+                        <p>Dashboard Utama</p>
                     </a>
                 </li>
 
@@ -57,50 +63,56 @@
                     <ul class="nav nav-treeview" style="{{ $isMaster ? 'display: block;' : '' }}">
                         <li class="nav-item">
                             <a href="{{ url('role') }}" class="nav-link">
+                                <i class="nav-icon fas fa-warehouse"></i>
+                                <p>Dashboard Master</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('role') }}" class="nav-link">
                                 <i class="nav-icon fas fa-user-shield"></i>
-                                <p>Manajemen Peran</p>
+                                <p>Master Peran</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ url('user') }}" class="nav-link">
                                 <i class="nav-icon fas fa-users-cog"></i>
-                                <p>Manajemen Pengguna</p>
+                                <p>Master Pengguna</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('category.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-tags"></i>
-                                <p>Manajemen Kategori</p>
+                                <p>Master Kategori</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('wilayah.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-globe"></i>
-                                <p>Manajemen Wilayah</p>
+                                <p>Master Wilayah</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('provinsi.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-map"></i>
-                                <p>Manajemen Provinsi</p>
+                                <p>Master Provinsi</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('kota.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-city"></i>
-                                <p>Manajemen Kota</p>
+                                <p>Master Kota</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('kecamatan.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-map"></i>
-                                <p>Manajemen Kecamatan</p>
+                                <p>Master Kecamatan</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('kelurahan.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-map"></i>
-                                <p>Manajemen Kelurahan</p>
+                                <p>Master Kelurahan</p>
                             </a>
                         </li>
                     </ul>

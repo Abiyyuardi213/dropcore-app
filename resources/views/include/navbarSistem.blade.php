@@ -9,7 +9,7 @@
     <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
-                {{-- <i class="fas fa-user-circle"></i> {{ Auth::user()->username }} --}}
+                <i class="fas fa-user-circle"></i>{{ Auth::user()->username }}
             </a>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                 <li>
