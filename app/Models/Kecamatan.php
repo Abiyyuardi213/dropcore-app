@@ -60,4 +60,9 @@ class Kecamatan extends Model
     {
         return $this->delete();
     }
+
+    public function suppliers()
+    {
+        return $this->hasMany(Supplier::class, 'kecamatan_id');
+    }
 }

@@ -59,4 +59,9 @@ class Kelurahan extends Model
     {
         return $this->delete();
     }
+
+    public function suppliers()
+    {
+        return $this->hasMany(Supplier::class, 'kelurahan_id');
+    }
 }

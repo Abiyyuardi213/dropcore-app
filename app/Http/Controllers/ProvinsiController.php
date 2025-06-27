@@ -11,7 +11,7 @@ class ProvinsiController extends Controller
     public function index()
     {
         $wilayahs = Wilayah::where('status_wilayah', 1)->get();
-        $provinsis = Provinsi::orderBy('created_at', 'asc')->get();
+        $provinsis = Provinsi::orderBy('provinsi', 'asc')->get();
         return view('provinsi.index', compact('provinsis', 'wilayahs'));
     }
 

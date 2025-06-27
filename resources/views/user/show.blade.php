@@ -14,14 +14,36 @@
         }
         .profile-img {
             width: 100%;
-            max-width: 180px;
+            max-width: 200px;
             height: auto;
             object-fit: cover;
-            border: 3px solid #dee2e6;
+            border: 4px solid #fff;
             border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .table th {
+        .user-info {
             background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .user-info .info-item {
+            margin-bottom: 15px;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .info-value {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .btn-back {
+            font-weight: 500;
         }
         @media (max-width: 768px) {
             .card {
@@ -31,78 +53,72 @@
     </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
-        @include('include.navbarSistem')
-        @include('include.sidebar')
+<div class="wrapper">
+    @include('include.navbarSistem')
+    @include('include.sidebar')
 
-        <div class="content-wrapper">
-            <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-12">
-                            <h1 class="m-0">Detail Pengguna</h1>
-                        </div>
-                    </div>
-                </div>
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <h1 class="m-0 text-dark">Detail Pengguna</h1>
             </div>
+        </div>
 
-            <section class="content">
-                <div class="container-fluid d-flex justify-content-center">
-                    <div class="card shadow-lg w-100" style="max-width: 800px;">
-                        <div class="card-header bg-primary text-white">
-                            <h3 class="card-title mb-0">Informasi Pengguna</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row justify-content-center">
-                                <div class="col-12 col-md-4 text-center mb-3">
-                                    <img src="{{ $user->profile_picture ? asset('uploads/profile/' . $user->profile_picture) : asset('image/default-avatar.png') }}"
-                                        class="profile-img img-fluid rounded" alt="Foto Profil">
-                                </div>
-                                <div class="col-12 col-md-8">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-striped">
-                                            <tr>
-                                                <th style="width: 40%;">ID Pengguna</th>
-                                                <td>{{ $user->id }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Nama</th>
-                                                <td>{{ $user->nama_pengguna ?? $user->name }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Email</th>
-                                                <td>{{ $user->email }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Username</th>
-                                                <td>{{ $user->username }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Peran</th>
-                                                <td>{{ $user->role->role_name ?? '-' }}</td>
-                                            </tr>
-                                        </table>
+        <section class="content">
+            <div class="container-fluid d-flex justify-content-center">
+                <div class="card shadow w-100" style="max-width: 1100px;">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0"><i class="fas fa-user-circle mr-2"></i>Profil Pengguna</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center mb-4 mb-md-0">
+                                <img src="{{ $user->profile_picture ? asset('uploads/profile/' . $user->profile_picture) : asset('image/default-avatar.png') }}"
+                                     class="profile-img" alt="Foto Profil">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="user-info">
+                                    <div class="info-item">
+                                        <span class="info-label"><i class="fas fa-id-badge mr-1"></i>ID Pengguna</span><br>
+                                        <span class="info-value">{{ $user->id }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label"><i class="fas fa-user mr-1"></i>Nama</span><br>
+                                        <span class="info-value">{{ $user->nama_pengguna ?? $user->name }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label"><i class="fas fa-envelope mr-1"></i>Email</span><br>
+                                        <span class="info-value">{{ $user->email }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label"><i class="fas fa-user-tag mr-1"></i>Username</span><br>
+                                        <span class="info-value">{{ $user->username }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label"><i class="fas fa-user-shield mr-1"></i>Peran</span><br>
+                                        <span class="badge badge-info px-3 py-2">{{ $user->role->role_name ?? '-' }}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer text-right">
-                            <a href="{{ route('user.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Kembali
-                            </a>
-                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <a href="{{ route('user.index') }}" class="btn btn-secondary btn-back">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </a>
                     </div>
                 </div>
-            </section>
-        </div>
-
-        @include('include.footerSistem')
+            </div>
+        </section>
     </div>
 
-    @include('services.logoutModal')
+    @include('include.footerSistem')
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+@include('services.logoutModal')
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 </body>
 </html>

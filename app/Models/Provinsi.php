@@ -64,4 +64,9 @@ class Provinsi extends Model
         $this->status_provinsi = !$this->status_provinsi;
         $this->save();
     }
+
+    public function suppliers()
+    {
+        return $this->hasMany(Supplier::class, 'provinsi_id');
+    }
 }

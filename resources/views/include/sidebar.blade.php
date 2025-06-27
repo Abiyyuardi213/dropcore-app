@@ -44,7 +44,8 @@
                 </li>
 
                 @php
-                    $isMaster = request()->is('role*') ||
+                    $isMaster = request()->is('dashboard-master*') ||
+                                request()->is('role*') ||
                                 request()->is('user*') ||
                                 request()->is('category*') ||
                                 request()->is('wilayah*') ||
@@ -62,7 +63,7 @@
                     </a>
                     <ul class="nav nav-treeview" style="{{ $isMaster ? 'display: block;' : '' }}">
                         <li class="nav-item">
-                            <a href="{{ url('role') }}" class="nav-link">
+                            <a href="{{ url('dashboard-master') }}" class="nav-link">
                                 <i class="nav-icon fas fa-warehouse"></i>
                                 <p>Dashboard Master</p>
                             </a>

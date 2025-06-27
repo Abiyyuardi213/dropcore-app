@@ -56,4 +56,9 @@ class Wilayah extends Model
         $this->status_wilayah = !$this->status_wilayah;
         $this->save();
     }
+
+    public function suppliers()
+    {
+        return $this->hasMany(Supplier::class, 'wilayah_id');
+    }
 }

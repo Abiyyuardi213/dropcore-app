@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Login | PT Garuda Fiber</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/icheck-bootstrap@3.0.1/icheck-bootstrap.min.css">
@@ -16,13 +17,18 @@
         </div> --}}
 
         <div class="login-logo">
-            <a href="#">
+            {{-- <a href="#">
                 <img src="{{ asset('image/garuda-fiber.png') }}" alt="Logo PT Garuda Fiber" style="height: 60px;">
-            </a>
+            </a> --}}
         </div>
 
         <div class="card">
             <div class="card-body login-card-body">
+                <div class="text-center mb-3">
+                    <a href="#">
+                        <img src="{{ asset('image/garuda-fiber.png') }}" alt="Logo PT Garuda Fiber" style="height: 50px;">
+                    </a>
+                </div>
                 <p class="login-box-msg">Silakan login untuk masuk</p>
 
                 @if ($errors->any())

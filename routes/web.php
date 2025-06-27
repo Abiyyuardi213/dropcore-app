@@ -20,10 +20,12 @@ use App\Http\Controllers\MutasiStokController;
 use App\Http\Controllers\ProvinsiController;
 use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardMasterController;
+use App\Http\Controllers\SupplierController;
 use Whoops\Run;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
@@ -58,6 +60,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('kelurahan', KelurahanController::class);
     // Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
     // Route::resource('/user', UserController::class);
+    Route::post('supplier/{id}/toggle-status', [SupplierController::class, 'toggleStatus'])->name('role.toggleStatus');
+    Route::resource('supplier', SupplierController::class);
+    Route::get('dashboard-master', [DashboardMasterController::class, 'index'])->name('dashboard-master');
 });
 
 
