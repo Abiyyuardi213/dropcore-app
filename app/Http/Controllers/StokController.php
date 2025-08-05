@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Products;
 use App\Models\Gudang;
 use App\Models\AreaGudang;
+use App\Models\KondisiBarang;
 use App\Models\RakGudang;
 use App\Models\Stok;
 
@@ -23,8 +24,9 @@ class StokController extends Controller
         $gudangs = Gudang::all();
         $areas = AreaGudang::all();
         $raks = RakGudang::all();
+        $kondisis = KondisiBarang::all();
 
-        return view('stok.create', compact('produks', 'gudangs', 'areas', 'raks'));
+        return view('stok.create', compact('produks', 'gudangs', 'areas', 'raks', 'kondisis'));
     }
 
     public function store(Request $request)
@@ -35,6 +37,7 @@ class StokController extends Controller
             'area_id' => 'required|exists:area_gudang,id',
             'rak_id' => 'required|exists:rak_gudang,id',
             'quantity' => 'required|integer|min:1',
+            'kondisi_id' => 'nullable|exists:kondisi_barang,id'
         ]);
 
         Stok::createStok($request->all());
@@ -49,7 +52,9 @@ class StokController extends Controller
         $gudangs = Gudang::all();
         $areas = AreaGudang::all();
         $raks = RakGudang::all();
-        return view('stok.edit', compact('stok', 'produks', 'gudangs', 'areas', 'raks'));
+        $kondisis = KondisiBarang::all();
+
+        return view('stok.edit', compact('stok', 'produks', 'gudangs', 'areas', 'raks', 'kondisis'));
     }
 
     public function update(Request $request, $id)
@@ -60,6 +65,7 @@ class StokController extends Controller
             'area_id' => 'required|exists:area_gudang,id',
             'rak_id' => 'required|exists:rak_gudang,id',
             'quantity' => 'required|integer|min:1',
+            'kondisi_id' => 'nullable|exists:kondisi_barang,id'
         ]);
 
         $stok = Stok::findOrFail($id);

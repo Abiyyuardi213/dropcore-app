@@ -46,6 +46,7 @@
                                             <th>Area Gudang</th>
                                             <th>Kode Rak</th>
                                             <th>Jumlah Stok</th>
+                                            <th>Kondisi</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -58,14 +59,15 @@
                                                 <td>{{ $stok->area->kode_area ?? '-' }}</td>
                                                 <td>{{ $stok->rak->kode_rak }}</td>
                                                 <td>{{ $stok->quantity }}</td>
+                                                <td>{{ $stok->kondisi->nama_kondisi ?? '-' }}</td>
                                                 <td class="text-center">
                                                     <a href="{{ route('stok.edit', $stok->id) }}" class="btn btn-info btn-sm">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </a>
-                                                    <button class="btn btn-danger btn-sm delete-area-btn"
+                                                    <button class="btn btn-danger btn-sm delete-stok-btn"
                                                         data-toggle="modal"
                                                         data-target="#deleteStokModal"
-                                                        data-rak-id="{{ $stok->id }}">
+                                                        data-stok-id="{{ $stok->id }}">
                                                         <i class="fas fa-trash"></i> Hapus
                                                     </button>
                                                 </td>

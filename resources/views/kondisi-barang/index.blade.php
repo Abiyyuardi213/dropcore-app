@@ -51,14 +51,14 @@
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $kondisi->nama_kondisi }}</td>
-                                                <td>{{ $wilayah->deskripsi }}</td>
+                                                <td>{{ $kondisi->deskripsi }}</td>
                                                 <td class="text-center">
                                                     <button class="btn btn-warning btn-sm edit-kondisi-btn"
                                                         data-toggle="modal"
                                                         data-target="#editKondisiModal"
                                                         data-id="{{ $kondisi->id }}"
-                                                        data-negara="{{ $kondisi->nama_kondisi }}"
-                                                        data-deskripsi="{{ $kondisi->deskripsi }}"
+                                                        data-kondisi="{{ $kondisi->nama_kondisi }}"
+                                                        data-deskripsi="{{ $kondisi->deskripsi }}">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </button>
                                                     <button class="btn btn-danger btn-sm delete-kondisi-btn"
@@ -123,7 +123,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="nama_kondisi">Nama Kondisi</label>
-                            <input type="text" name="negara" class="form-control" required>
+                            <input type="text" name="nama_kondisi" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="deskripsi">Deskripsi</label>

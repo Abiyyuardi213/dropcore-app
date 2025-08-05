@@ -27,9 +27,21 @@ class MutasiStokController extends Controller
         return view('mutasi-stok.index', compact('mutasi'));
     }
 
+    // public function create()
+    // {
+    //     $products = Products::all();
+    //     $gudangs = Gudang::all();
+    //     $areas = AreaGudang::all();
+    //     $raks = RakGudang::all();
+
+    //     return view('mutasi-stok.create', compact('products', 'gudangs', 'areas', 'raks'));
+    // }
+
     public function create()
     {
-        $products = Products::all();
+        $productIds = Stok::select('produk_id')->groupBy('produk_id')->pluck('produk_id');
+        $products = Products::whereIn('id', $productIds)->get();
+
         $gudangs = Gudang::all();
         $areas = AreaGudang::all();
         $raks = RakGudang::all();
@@ -57,13 +69,28 @@ class MutasiStokController extends Controller
         return redirect()->route('mutasi-stok.index')->with('success', 'Mutasi stok berhasil ditambahkan.');
     }
 
+    // public function edit($id)
+    // {
+    //     $mutasi = MutasiStok::with([
+    //         'produk', 'gudangAsal', 'areaAsal', 'rakAsal', 'gudangTujuan', 'areaTujuan', 'rakTujuan'
+    //     ])->findOrFail($id);
+
+    //     $products = Products::all();
+    //     $gudangs = Gudang::all();
+    //     $areas = AreaGudang::all();
+    //     $raks = RakGudang::all();
+
+    //     return view('mutasi-stok.edit', compact('mutasi', 'products', 'gudangs', 'areas', 'raks'));
+    // }
+
     public function edit($id)
     {
-        $mutasi = MutasiStok::with([
-            'produk', 'gudangAsal', 'areaAsal', 'rakAsal', 'gudangTujuan', 'areaTujuan', 'rakTujuan'
-        ])->findOrFail($id);
+        $mutasi = MutasiStok::with(['produk', 'gudangAsal', 'areaAsal', 'rakAsal', 'gudangTujuan', 'areaTujuan', 'rakTujuan'])
+                    ->findOrFail($id);
 
-        $products = Products::all();
+        $productIds = Stok::select('produk_id')->groupBy('produk_id')->pluck('produk_id');
+        $products = Products::whereIn('id', $productIds)->get();
+
         $gudangs = Gudang::all();
         $areas = AreaGudang::all();
         $raks = RakGudang::all();

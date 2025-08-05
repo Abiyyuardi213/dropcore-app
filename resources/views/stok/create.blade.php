@@ -100,6 +100,19 @@
                             @error('quantity')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
+                        <div class="form-group">
+                            <label for="kondisi_id">Kondisi Barang</label>
+                            <select name="kondisi_id" class="form-control">
+                                <option value="">-- Pilih Kondisi --</option>
+                                @foreach($kondisis as $k)
+                                    <option value="{{ $k->id }}"
+                                        {{ (old('kondisi_id', $stok->kondisi_id ?? '') == $k->id) ? 'selected' : '' }}>
+                                        {{ $k->nama_kondisi }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Simpan

@@ -17,6 +17,7 @@ class Stok extends Model
         'area_id',
         'rak_id',
         'quantity',
+        'kondisi_id',
     ];
 
     protected static function booted()
@@ -36,6 +37,7 @@ class Stok extends Model
             'area_id' => $data['area_id'],
             'rak_id' => $data['rak_id'],
             'quantity' => $data['quantity'],
+            'kondisi_id' => $data['kondisi_id'],
         ]);
     }
 
@@ -47,6 +49,7 @@ class Stok extends Model
             'area_id' => $data['area_id'] ?? $this->area_id,
             'rak_id' => $data['rak_id'] ?? $this->rak_id,
             'quantity' => $data['quantity'] ?? $this->quantity,
+            'kondisi_id' => $data['kondisi_id'] ?? $this->kondisi_id,
         ]);
     }
 
@@ -68,6 +71,11 @@ class Stok extends Model
     public function rak()
     {
         return $this->belongsTo(RakGudang::class, 'rak_id');
+    }
+
+    public function kondisi()
+    {
+    return $this->belongsTo(KondisiBarang::class, 'kondisi_id');
     }
 
     public function deleteStok()
