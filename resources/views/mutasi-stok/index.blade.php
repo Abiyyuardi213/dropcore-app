@@ -44,7 +44,6 @@
                                             <th>Tanggal</th>
                                             <th>Produk</th>
                                             <th>Qty</th>
-                                            <th>Tipe</th>
                                             <th>Gudang Asal</th>
                                             <th>Gudang Tujuan</th>
                                             <th>Aksi</th>
@@ -57,7 +56,6 @@
                                                 <td>{{ $m->tanggal_mutasi }}</td>
                                                 <td>{{ $m->produk->name ?? '-' }}</td>
                                                 <td>{{ $m->quantity }}</td>
-                                                <td>{{ ucfirst($m->tipe) }}</td>
                                                 <td>
                                                     {{ $m->gudangAsal->nama_gudang ?? '-' }} /
                                                     {{ $m->areaAsal->kode_area ?? '-' }} /
@@ -69,10 +67,10 @@
                                                     {{ $m->rakTujuan->kode_rak ?? '-' }}
                                                 </td>
                                                 <td class="text-center">
-                                                    <a href="{{ route('mutasi-stok.show', $m->id) }}" class="btn btn-secondary btn-sm">
-                                                        <i class="fas fa-eye"></i> Detail
+                                                    <a href="{{ route('mutasi-stok.show', $m->id) }}" class="btn btn-info btn-sm">
+                                                        <i class="fas fa-eye"></i>
                                                     </a>
-                                                    <a href="{{ route('mutasi-stok.edit', $m->id) }}" class="btn btn-info btn-sm">
+                                                    <a href="{{ route('mutasi-stok.edit', $m->id) }}" class="btn btn-warning btn-sm">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <form action="{{ route('mutasi-stok.destroy', $m->id) }}" method="POST" class="d-inline">

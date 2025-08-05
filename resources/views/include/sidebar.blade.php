@@ -51,7 +51,8 @@
                                 request()->is('wilayah*') ||
                                 request()->is('provinsi*') ||
                                 request()->is('kota*') ||
-                                request()->is('kecamatan*');
+                                request()->is('kecamatan*') ||
+                                request()->is('supplier');
                 @endphp
                 <li class="nav-item has-treeview {{ $isMaster ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ $isMaster ? 'active' : '' }}">
@@ -114,6 +115,18 @@
                             <a href="{{ route('kelurahan.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-map"></i>
                                 <p>Master Kelurahan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('supplier.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-truck"></i>
+                                <p>Master Supplier</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('kondisi-barang.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-truck"></i>
+                                <p>Master Kondisi Barang</p>
                             </a>
                         </li>
                     </ul>
@@ -209,13 +222,6 @@
                     <a href="{{ url('pengeluaran-barang') }}" class="nav-link">
                         <i class="nav-icon fas fa-dolly"></i>
                         <p>Pengeluaran Barang</p>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ url('supplier') }}" class="nav-link">
-                        <i class="nav-icon fas fa-truck"></i>
-                        <p>Supplier</p>
                     </a>
                 </li>
 

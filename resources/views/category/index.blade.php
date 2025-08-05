@@ -53,7 +53,7 @@
                                                 <td>{{ $category->category_name }}</td>
                                                 <td>{{ $category->description }}</td>
                                                 <td class="text-center">
-                                                    <a href="{{ route('category.edit', $category->id) }}" class="btn btn-info btn-sm">
+                                                    <a href="{{ route('category.edit', $category->id) }}" class="btn btn-warning btn-sm">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </a>
                                                     <button class="btn btn-danger btn-sm delete-category-btn"

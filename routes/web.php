@@ -21,6 +21,7 @@ use App\Http\Controllers\ProvinsiController;
 use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardMasterController;
+use App\Http\Controllers\KondisiBarangController;
 use App\Http\Controllers\SupplierController;
 use Whoops\Run;
 
@@ -50,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('dashboardProduk', [DashboardProdukController::class, 'index'])->name('dashboardProduk');
     Route::resource('stok', StokController::class);
     Route::get('/stok/produk/{produk_id}', [MutasiStokController::class, 'getStokByProduk']);
+    Route::get('/lokasi-asal-produk/{produk_id}', [MutasiStokController::class, 'lokasiAsalProduk']);
     Route::resource('mutasi-stok', MutasiStokController::class);
     Route::post('wilayah/{id}/toggle-status', [WilayahController::class, 'toggleStatus'])->name('wilayah.toggleStatus');
     Route::resource('wilayah', WilayahController::class);
@@ -63,6 +65,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('supplier/{id}/toggle-status', [SupplierController::class, 'toggleStatus'])->name('role.toggleStatus');
     Route::resource('supplier', SupplierController::class);
     Route::get('dashboard-master', [DashboardMasterController::class, 'index'])->name('dashboard-master');
+
+    Route::resource('kondisi-barang', KondisiBarangController::class);
 });
 
 

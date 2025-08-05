@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kecamatan;
+use App\Models\Kelurahan;
+use App\Models\Kota;
+use App\Models\Provinsi;
 use Illuminate\Http\Request;
 use App\Models\Supplier;
+use App\Models\Wilayah;
 
 class SupplierController extends Controller
 {
@@ -15,7 +20,21 @@ class SupplierController extends Controller
 
     public function create()
     {
-        return view('supplier.create');
+        $wilayahs = Wilayah::where('status_wilayah', 1)->get();
+        $provinsis = Provinsi::where('status_provinsi', 1)
+                         ->orderBy('provinsi', 'asc')
+                         ->get();
+        $kotas = Kota::all();
+        $kecamatans = Kecamatan::all();
+        $kelurahans = Kelurahan::all();
+
+        return view('supplier.create', compact(
+            'wilayahs',
+            'provinsis',
+            'kotas',
+            'kecamatans',
+            'kelurahans',
+        ));
     }
 
     public function store(Request $request)
@@ -41,7 +60,15 @@ class SupplierController extends Controller
     public function edit($id)
     {
         $supplier = Supplier::findOrFail($id);
-        return view('supplier.edit', compact('supplier'));
+        $wilayahs = Wilayah::where('status_wilayah', 1)->get();
+        $provinsis = Provinsi::where('status_provinsi', 1)->orderBy('provinsi')->get();
+        $kotas = Kota::all();
+        $kecamatans = Kecamatan::all();
+        $kelurahans = Kelurahan::all();
+
+        return view('supplier.edit', compact(
+            'supplier', 'wilayahs', 'provinsis', 'kotas', 'kecamatans', 'kelurahans'
+        ));
     }
 
     public function update(Request $request, $id)
@@ -71,6 +98,12 @@ class SupplierController extends Controller
         $supplier->deleteSupplier();
 
         return redirect()->route('supplier.index')->with('success', 'Supplier berhasil dihapus.');
+    }
+
+    public function show($id)
+    {
+        $supplier = Supplier::with(['wilayah', 'provinsi', 'kota', 'kecamatan', 'kelurahan'])->findOrFail($id);
+        return view('supplier.show', compact('supplier'));
     }
 
     public function toggleStatus($id)

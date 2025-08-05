@@ -51,16 +51,16 @@ class Kota extends Model
     }
 
     public function wilayah()
-{
-    return $this->hasOneThrough(
-        Wilayah::class,
-        Provinsi::class,
-        'id',
-        'id',
-        'provinsi_id',
-        'wilayah_id'
-    );
-}
+    {
+        return $this->hasOneThrough(
+            Wilayah::class,
+            Provinsi::class,
+            'id',
+            'id',
+            'provinsi_id',
+            'wilayah_id'
+        );
+    }
 
     public function deleteKota()
     {

@@ -78,6 +78,19 @@
                             <a href="{{ url('provinsi') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
+
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-danger">
+                            <div class="inner">
+                                <h3>{{ $totalKota ?? 0 }}</h3>
+                                <p>Total Kota</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-map-marked-alt"></i>
+                            </div>
+                            <a href="{{ url('kota') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

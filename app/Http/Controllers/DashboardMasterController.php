@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kota;
 use App\Models\Provinsi;
 use App\Models\Role;
 use App\Models\User;
@@ -14,11 +15,13 @@ class DashboardMasterController extends Controller
         $totalPeran = Role::count();
         $totalPengguna = User::count();
         $totalProvinsi = Provinsi::count();
+        $totalKota = Kota::count();
 
         return view('dashboard-master', compact(
             'totalPeran',
             'totalPengguna',
             'totalProvinsi',
+            'totalKota',
         ));
     }
 }

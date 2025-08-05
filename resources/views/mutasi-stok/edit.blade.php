@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Mutasi Stok</title>
+    <title>Edit Mutasi Stok</title>
     <link rel="icon" type="image/png" href="{{ asset('image/itats-1080.jpg') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
-
     <style>
-        /* Styling agar dropdown Select2 tampil rapi */
         .select2-container--default .select2-selection--single {
             height: 38px;
             padding: 6px 12px;
@@ -37,7 +35,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Tambah Mutasi Stok</h1>
+                        <h1 class="m-0">Edit Mutasi Stok</h1>
                     </div>
                 </div>
             </div>
@@ -45,17 +43,14 @@
 
         <section class="content">
             <div class="container-fluid">
-                <div class="card card-primary">
+                <div class="card card-warning">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-exchange-alt"></i> Form Mutasi Stok</h3>
+                        <h3 class="card-title"><i class="fas fa-edit"></i> Form Edit Mutasi Stok</h3>
                     </div>
                     <div class="card-body">
-                        @if(session('error'))
-                            <div class="alert alert-danger">{{ session('error') }}</div>
-                        @endif
-
-                        <form action="{{ route('mutasi-stok.store') }}" method="POST">
+                        <form action="{{ route('mutasi-stok.update', $mutasi->id) }}" method="POST">
                             @csrf
+                            @method('PUT')
                             <div class="row">
                                 {{-- Kolom Kiri --}}
                                 <div class="col-md-6">
@@ -63,10 +58,10 @@
                                         <label for="produk_id">Produk</label>
                                         <select id="produk_id" name="produk_id"
                                                 class="form-control select2 @error('produk_id') is-invalid @enderror"
-                                                style="width: 100%;" required>
+                                                style="width:100%;" required>
                                             <option value="">-- Pilih Produk --</option>
                                             @foreach($products as $produk)
-                                                <option value="{{ $produk->id }}" {{ old('produk_id') == $produk->id ? 'selected' : '' }}>
+                                                <option value="{{ $produk->id }}" {{ ($mutasi->produk_id == $produk->id) ? 'selected' : '' }}>
                                                     {{ $produk->name }}
                                                 </option>
                                             @endforeach
@@ -78,55 +73,51 @@
 
                                     <div class="form-group">
                                         <label for="quantity">Jumlah (Qty)</label>
-                                        <input type="number" name="quantity"
-                                               class="form-control @error('quantity') is-invalid @enderror"
-                                               value="{{ old('quantity') }}" required min="1">
+                                        <input type="number" name="quantity" class="form-control @error('quantity') is-invalid @enderror"
+                                               value="{{ old('quantity', $mutasi->quantity) }}" required min="1">
                                         @error('quantity')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
 
                                     <div class="form-group">
                                         <label for="tanggal_mutasi">Tanggal Mutasi</label>
-                                        <input type="date" name="tanggal_mutasi"
-                                               class="form-control @error('tanggal_mutasi') is-invalid @enderror"
-                                               value="{{ old('tanggal_mutasi') ?? date('Y-m-d') }}" required>
+                                        <input type="date" name="tanggal_mutasi" class="form-control @error('tanggal_mutasi') is-invalid @enderror"
+                                               value="{{ old('tanggal_mutasi', $mutasi->tanggal_mutasi) }}" required>
                                         @error('tanggal_mutasi')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
 
                                     <hr>
                                     <h5>Lokasi Asal</h5>
                                     <div class="form-group">
-                                        <label for="gudang_asal_id">Gudang Asal</label>
+                                        <label>Gudang Asal</label>
                                         <select name="gudang_asal_id" class="form-control @error('gudang_asal_id') is-invalid @enderror">
                                             <option value="">-- Pilih Gudang --</option>
-                                            @foreach($gudangs as $gudang)
-                                                <option value="{{ $gudang->id }}" {{ old('gudang_asal_id') == $gudang->id ? 'selected' : '' }}>
-                                                    {{ $gudang->nama_gudang }}
+                                            @foreach($gudangs as $g)
+                                                <option value="{{ $g->id }}" {{ $mutasi->gudang_asal_id == $g->id ? 'selected' : '' }}>
+                                                    {{ $g->nama_gudang }}
                                                 </option>
                                             @endforeach
                                         </select>
                                         @error('gudang_asal_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
-
                                     <div class="form-group">
-                                        <label for="area_asal_id">Area Asal</label>
+                                        <label>Area Asal</label>
                                         <select name="area_asal_id" class="form-control @error('area_asal_id') is-invalid @enderror">
                                             <option value="">-- Pilih Area --</option>
-                                            @foreach($areas as $area)
-                                                <option value="{{ $area->id }}" {{ old('area_asal_id') == $area->id ? 'selected' : '' }}>
-                                                    {{ $area->kode_area }}
+                                            @foreach($areas as $a)
+                                                <option value="{{ $a->id }}" {{ $mutasi->area_asal_id == $a->id ? 'selected' : '' }}>
+                                                    {{ $a->kode_area }}
                                                 </option>
                                             @endforeach
                                         </select>
                                         @error('area_asal_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
-
                                     <div class="form-group">
-                                        <label for="rak_asal_id">Rak Asal</label>
+                                        <label>Rak Asal</label>
                                         <select name="rak_asal_id" class="form-control @error('rak_asal_id') is-invalid @enderror">
                                             <option value="">-- Pilih Rak --</option>
-                                            @foreach($raks as $rak)
-                                                <option value="{{ $rak->id }}" {{ old('rak_asal_id') == $rak->id ? 'selected' : '' }}>
-                                                    {{ $rak->kode_rak }}
+                                            @foreach($raks as $r)
+                                                <option value="{{ $r->id }}" {{ $mutasi->rak_asal_id == $r->id ? 'selected' : '' }}>
+                                                    {{ $r->kode_rak }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -138,48 +129,45 @@
                                 <div class="col-md-6">
                                     <h5 class="mt-4 mt-md-0">Lokasi Tujuan</h5>
                                     <div class="form-group">
-                                        <label for="gudang_tujuan_id">Gudang Tujuan</label>
+                                        <label>Gudang Tujuan</label>
                                         <select name="gudang_tujuan_id" class="form-control @error('gudang_tujuan_id') is-invalid @enderror">
                                             <option value="">-- Pilih Gudang --</option>
-                                            @foreach($gudangs as $gudang)
-                                                <option value="{{ $gudang->id }}" {{ old('gudang_tujuan_id') == $gudang->id ? 'selected' : '' }}>
-                                                    {{ $gudang->nama_gudang }}
+                                            @foreach($gudangs as $g)
+                                                <option value="{{ $g->id }}" {{ $mutasi->gudang_tujuan_id == $g->id ? 'selected' : '' }}>
+                                                    {{ $g->nama_gudang }}
                                                 </option>
                                             @endforeach
                                         </select>
                                         @error('gudang_tujuan_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
-
                                     <div class="form-group">
-                                        <label for="area_tujuan_id">Area Tujuan</label>
+                                        <label>Area Tujuan</label>
                                         <select name="area_tujuan_id" class="form-control @error('area_tujuan_id') is-invalid @enderror">
                                             <option value="">-- Pilih Area --</option>
-                                            @foreach($areas as $area)
-                                                <option value="{{ $area->id }}" {{ old('area_tujuan_id') == $area->id ? 'selected' : '' }}>
-                                                    {{ $area->kode_area }}
+                                            @foreach($areas as $a)
+                                                <option value="{{ $a->id }}" {{ $mutasi->area_tujuan_id == $a->id ? 'selected' : '' }}>
+                                                    {{ $a->kode_area }}
                                                 </option>
                                             @endforeach
                                         </select>
                                         @error('area_tujuan_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
-
                                     <div class="form-group">
-                                        <label for="rak_tujuan_id">Rak Tujuan</label>
+                                        <label>Rak Tujuan</label>
                                         <select name="rak_tujuan_id" class="form-control @error('rak_tujuan_id') is-invalid @enderror">
                                             <option value="">-- Pilih Rak --</option>
-                                            @foreach($raks as $rak)
-                                                <option value="{{ $rak->id }}" {{ old('rak_tujuan_id') == $rak->id ? 'selected' : '' }}>
-                                                    {{ $rak->kode_rak }}
+                                            @foreach($raks as $r)
+                                                <option value="{{ $r->id }}" {{ $mutasi->rak_tujuan_id == $r->id ? 'selected' : '' }}>
+                                                    {{ $r->kode_rak }}
                                                 </option>
                                             @endforeach
                                         </select>
                                         @error('rak_tujuan_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
-
                                     <div class="form-group">
                                         <label for="keterangan">Keterangan (Opsional)</label>
                                         <textarea name="keterangan" rows="5" class="form-control @error('keterangan') is-invalid @enderror"
-                                            placeholder="Contoh: Mutasi karena penataan ulang stok">{{ old('keterangan') }}</textarea>
+                                                  placeholder="Contoh: Mutasi karena penataan ulang stok">{{ old('keterangan', $mutasi->keterangan) }}</textarea>
                                         @error('keterangan')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                 </div>
@@ -187,8 +175,8 @@
 
                             <div class="mt-4 d-flex justify-content-between">
                                 <a href="{{ route('mutasi-stok.index') }}" class="btn btn-secondary px-4">Batal</a>
-                                <button type="submit" class="btn btn-primary px-4">
-                                    <i class="fas fa-save"></i> Simpan
+                                <button type="submit" class="btn btn-success px-4">
+                                    <i class="fas fa-save"></i> Update
                                 </button>
                             </div>
                         </form>
@@ -213,15 +201,22 @@
         $('#produk_id').select2({
             placeholder: "-- Pilih Produk --",
             allowClear: true,
-            width: '100%'
-        });
-    });
+            width: '100%'     // pastikan penuh
+        }).trigger('change');
 
-    $(document).ready(function () {
+        // untuk load lokasi asal awal saat halaman dibuka
+        const initialProdukId = $('#produk_id').val();
+        if (initialProdukId) {
+            loadLokasiAwal(initialProdukId);
+        }
+
         $('#produk_id').change(function () {
-            const produkId = $(this).val();
-            $('#lokasi-asal-list').html('');
+            let produkId = $(this).val();
+            loadLokasiAwal(produkId);
+        });
 
+        function loadLokasiAwal(produkId) {
+            $('#lokasi-asal-list').html('');
             if (produkId) {
                 $.ajax({
                     url: `/lokasi-asal-produk/${produkId}`,
@@ -241,24 +236,15 @@
                         } else {
                             $('#lokasi-asal-list').html('<div class="alert alert-warning">Tidak ada stok asal untuk produk ini.</div>');
                         }
-
-                        if (res.lokasi_utama) {
-                            $('select[name="gudang_asal_id"]').val(res.lokasi_utama.gudang_id).trigger('change');
-                            $('select[name="area_asal_id"]').val(res.lokasi_utama.area_id).trigger('change');
-                            $('select[name="rak_asal_id"]').val(res.lokasi_utama.rak_id).trigger('change');
-                        } else {
-                            $('select[name="gudang_asal_id"]').val('');
-                            $('select[name="area_asal_id"]').val('');
-                            $('select[name="rak_asal_id"]').val('');
-                        }
                     },
                     error: function () {
                         $('#lokasi-asal-list').html('<div class="alert alert-danger">Gagal memuat data lokasi.</div>');
                     }
                 });
             }
-        });
+        }
     });
 </script>
+
 </body>
 </html>
