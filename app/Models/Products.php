@@ -4,12 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use App\Models\RiwayatAktivitasLog;
 
 class Products extends Model
 {
     protected $table = 'products';
     protected $keyType = 'string';
     public $incrementing = false;
+
     protected $fillable = [
         'sku',
         'name',
@@ -27,31 +30,58 @@ class Products extends Model
                 $product->id = (string) Str::uuid();
             }
         });
+
+        static::created(function ($product) {
+            RiwayatAktivitasLog::add(
+                'product',
+                'create',
+                "Menambah produk {$product->name}",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::updated(function ($product) {
+            RiwayatAktivitasLog::add(
+                'product',
+                'update',
+                "Mengubah produk {$product->name}",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::deleted(function ($product) {
+            RiwayatAktivitasLog::add(
+                'product',
+                'delete',
+                "Menghapus produk {$product->name}",
+                optional(Auth::user())->id
+            );
+        });
     }
 
     public static function createProduct($data)
     {
         return self::create([
-            'sku' => $data['sku'],
-            'name' => $data['name'],
+            'sku'         => $data['sku'],
+            'name'        => $data['name'],
             'description' => $data['description'],
-            'price' => str_replace(',', '', $data['price']), // bersihkan kalau pakai format ribuan
+            'price'       => str_replace(',', '', $data['price']),
             'category_id' => $data['category_id'],
-            'uom_id' => $data['uom_id'],
-            'image' => $data['image'] ?? null,
+            'uom_id'      => $data['uom_id'],
+            'image'       => $data['image'] ?? null,
         ]);
     }
 
     public function updateProduct($data)
     {
         return $this->update([
-            'sku' => $data['sku'] ?? $this->sku,
-            'name' => $data['name'] ?? $this->name,
-            'description' => $data['description'] ?? $this->description,
-            'price' => isset($data['price']) ? str_replace(',', '', $data['price']) : $this->price,
-            'category_id' => $data['category_id'] ?? $this->category_id,
-            'uom_id' => $data['uom_id'] ?? $this->uom_id,
-            'image' => $data['image'] ?? $this->image,
+            'sku'         => $data['sku']        ?? $this->sku,
+            'name'        => $data['name']       ?? $this->name,
+            'description' => $data['description']?? $this->description,
+            'price'       => isset($data['price']) ? str_replace(',', '', $data['price']) : $this->price,
+            'category_id' => $data['category_id']?? $this->category_id,
+            'uom_id'      => $data['uom_id']     ?? $this->uom_id,
+            'image'       => $data['image']      ?? $this->image,
         ]);
     }
 

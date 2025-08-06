@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use App\Models\RiwayatAktivitasLog;
 
 class User extends Authenticatable
 {
@@ -35,7 +37,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
     }
 
@@ -45,6 +47,33 @@ class User extends Authenticatable
             if (!$user->id) {
                 $user->id = (string) Str::uuid();
             }
+        });
+
+        static::created(function ($user) {
+            RiwayatAktivitasLog::add(
+                'user',
+                'create',
+                "Menambah user {$user->name} ({$user->username})",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::updated(function ($user) {
+            RiwayatAktivitasLog::add(
+                'user',
+                'update',
+                "Mengubah user {$user->name} ({$user->username})",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::deleted(function ($user) {
+            RiwayatAktivitasLog::add(
+                'user',
+                'delete',
+                "Menghapus user {$user->name} ({$user->username})",
+                optional(Auth::user())->id
+            );
         });
     }
 

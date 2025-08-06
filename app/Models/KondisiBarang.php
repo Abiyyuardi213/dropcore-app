@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use App\Models\RiwayatAktivitasLog;
 
 class KondisiBarang extends Model
 {
@@ -23,13 +25,40 @@ class KondisiBarang extends Model
                 $kondisi->id = (string) Str::uuid();
             }
         });
+
+        static::created(function ($kondisi) {
+            RiwayatAktivitasLog::add(
+                'kondisi_barang',
+                'create',
+                "Menambah kondisi barang {$kondisi->nama_kondisi}",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::updated(function ($kondisi) {
+            RiwayatAktivitasLog::add(
+                'kondisi_barang',
+                'update',
+                "Mengubah kondisi barang {$kondisi->nama_kondisi}",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::deleted(function ($kondisi) {
+            RiwayatAktivitasLog::add(
+                'kondisi_barang',
+                'delete',
+                "Menghapus kondisi barang {$kondisi->nama_kondisi}",
+                optional(Auth::user())->id
+            );
+        });
     }
 
     public static function createKondisi($data)
     {
         return self::create([
             'nama_kondisi' => $data['nama_kondisi'],
-            'deskripsi' => $data['deskripsi'] ?? null,
+            'deskripsi'    => $data['deskripsi'] ?? null,
         ]);
     }
 
@@ -37,7 +66,7 @@ class KondisiBarang extends Model
     {
         $this->update([
             'nama_kondisi' => $data['nama_kondisi'],
-            'deskripsi' => $data['deskripsi'] ?? $this->deskripsi,
+            'deskripsi'    => $data['deskripsi'] ?? $this->deskripsi,
         ]);
     }
 

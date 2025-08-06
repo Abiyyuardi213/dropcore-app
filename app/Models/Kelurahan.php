@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
+use App\Models\RiwayatAktivitasLog;
 
 class Kelurahan extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
+
     protected $table = 'kelurahan';
     protected $keyType = 'string';
     public $incrementing = false;
@@ -27,13 +29,40 @@ class Kelurahan extends Model
                 $kelurahan->id = (string) Str::uuid();
             }
         });
+
+        static::created(function ($kelurahan) {
+            RiwayatAktivitasLog::add(
+                'kelurahan',
+                'create',
+                "Menambah kelurahan {$kelurahan->kelurahan}",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::updated(function ($kelurahan) {
+            RiwayatAktivitasLog::add(
+                'kelurahan',
+                'update',
+                "Mengubah kelurahan {$kelurahan->kelurahan}",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::deleted(function ($kelurahan) {
+            RiwayatAktivitasLog::add(
+                'kelurahan',
+                'delete',
+                "Menghapus kelurahan {$kelurahan->kelurahan}",
+                optional(Auth::user())->id
+            );
+        });
     }
 
     public static function createKelurahan($data)
     {
         return self::create([
             'kecamatan_id' => $data['kecamatan_id'],
-            'kelurahan' => $data['kelurahan'],
+            'kelurahan'    => $data['kelurahan'],
         ]);
     }
 
@@ -41,7 +70,7 @@ class Kelurahan extends Model
     {
         $this->update([
             'kecamatan_id' => $data['kecamatan_id'] ?? $this->kecamatan_id,
-            'kelurahan' => $data['kelurahan'] ?? $this->kelurahan,
+            'kelurahan'    => $data['kelurahan'] ?? $this->kelurahan,
         ]);
     }
 

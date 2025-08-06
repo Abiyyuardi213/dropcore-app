@@ -4,16 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-
-// /**
-//  * @property string $id
-//  * @property string $nama_supplier
-//  * @property string|null $alamat
-//  * @property string|null $no_telepon
-//  * @property string|null $email
-//  * @property string|null $kontak_person
-//  * @property string $status
-//  */
+use Illuminate\Support\Facades\Auth;
+use App\Models\RiwayatAktivitasLog;
 
 class Supplier extends Model
 {
@@ -41,21 +33,48 @@ class Supplier extends Model
                 $supplier->id = (string) Str::uuid();
             }
         });
+
+        static::created(function ($supplier) {
+            RiwayatAktivitasLog::add(
+                'supplier',
+                'create',
+                "Menambah supplier {$supplier->nama_supplier}",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::updated(function ($supplier) {
+            RiwayatAktivitasLog::add(
+                'supplier',
+                'update',
+                "Mengubah supplier {$supplier->nama_supplier}",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::deleted(function ($supplier) {
+            RiwayatAktivitasLog::add(
+                'supplier',
+                'delete',
+                "Menghapus supplier {$supplier->nama_supplier}",
+                optional(Auth::user())->id
+            );
+        });
     }
 
     public static function createSupplier($data)
     {
         return self::create([
             'nama_supplier' => $data['nama_supplier'],
-            'email' => $data['email'],
-            'no_telepon' => $data['no_telepon'],
-            'alamat' => $data['alamat'],
-            'wilayah_id' => $data['wilayah_id'],
-            'provinsi_id' => $data['provinsi_id'],
-            'kota_id' => $data['kota_id'],
+            'email'        => $data['email'],
+            'no_telepon'   => $data['no_telepon'],
+            'alamat'       => $data['alamat'],
+            'wilayah_id'   => $data['wilayah_id'],
+            'provinsi_id'  => $data['provinsi_id'],
+            'kota_id'      => $data['kota_id'],
             'kecamatan_id' => $data['kecamatan_id'],
             'kelurahan_id' => $data['kelurahan_id'],
-            'status' => $data['status'] ?? true,
+            'status'       => $data['status'] ?? true,
         ]);
     }
 
@@ -63,15 +82,15 @@ class Supplier extends Model
     {
         $this->update([
             'nama_supplier' => $data['nama_supplier'],
-            'email' => $data['email'] ?? $this->email,
-            'no_telepon' => $data['no_telepon'] ?? $this->no_telepon,
-            'alamat' => $data['alamat'] ?? $this->alamat,
-            'wilayah_id' => $data['wilayah_id'] ?? $this->wilayah_id,
-            'provinsi_id' => $data['provinsi_id'] ?? $this->provinsi_id,
-            'kota_id' => $data['kota_id'] ?? $this->kota_id,
+            'email'        => $data['email']        ?? $this->email,
+            'no_telepon'   => $data['no_telepon']    ?? $this->no_telepon,
+            'alamat'       => $data['alamat']       ?? $this->alamat,
+            'wilayah_id'   => $data['wilayah_id']   ?? $this->wilayah_id,
+            'provinsi_id'  => $data['provinsi_id']  ?? $this->provinsi_id,
+            'kota_id'      => $data['kota_id']      ?? $this->kota_id,
             'kecamatan_id' => $data['kecamatan_id'] ?? $this->kecamatan_id,
             'kelurahan_id' => $data['kelurahan_id'] ?? $this->kelurahan_id,
-            'status' => $data['status'] ?? $this->status,
+            'status'       => $data['status']       ?? $this->status,
         ]);
     }
 
@@ -109,5 +128,12 @@ class Supplier extends Model
     {
         $this->status = !$this->status;
         $this->save();
+
+        RiwayatAktivitasLog::add(
+            'supplier',
+            'toggle_status',
+            "Mengubah status supplier {$this->nama_supplier}",
+            optional(Auth::user())->id
+        );
     }
 }

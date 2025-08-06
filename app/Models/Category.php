@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use App\Models\RiwayatAktivitasLog;
 
 class Category extends Model
 {
@@ -23,13 +25,40 @@ class Category extends Model
                 $category->id = (string) Str::uuid();
             }
         });
+
+        static::created(function ($category) {
+            RiwayatAktivitasLog::add(
+                'category',
+                'create',
+                "Menambah kategori {$category->category_name}",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::updated(function ($category) {
+            RiwayatAktivitasLog::add(
+                'category',
+                'update',
+                "Mengubah kategori {$category->category_name}",
+                optional(Auth::user())->id
+            );
+        });
+
+        static::deleted(function ($category) {
+            RiwayatAktivitasLog::add(
+                'category',
+                'delete',
+                "Menghapus kategori {$category->category_name}",
+                optional(Auth::user())->id
+            );
+        });
     }
 
     public static function createCategory($data)
     {
         return self::create([
             'category_name' => $data['category_name'],
-            'description' => $data['description'] ?? null,
+            'description'   => $data['description'] ?? null,
         ]);
     }
 
@@ -37,7 +66,7 @@ class Category extends Model
     {
         $this->update([
             'category_name' => $data['category_name'],
-            'description' => $data['description'] ?? $this->description,
+            'description'   => $data['description'] ?? $this->description,
         ]);
     }
 

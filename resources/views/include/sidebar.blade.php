@@ -52,7 +52,9 @@
                                 request()->is('provinsi*') ||
                                 request()->is('kota*') ||
                                 request()->is('kecamatan*') ||
-                                request()->is('supplier');
+                                request()->is('kelurahan*') ||
+                                request()->is('supplier') ||
+                                request()->is('kondisi-barang*');
                 @endphp
                 <li class="nav-item has-treeview {{ $isMaster ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ $isMaster ? 'active' : '' }}">

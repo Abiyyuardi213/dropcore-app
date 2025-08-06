@@ -215,15 +215,15 @@
 
         $(document).on('click', '.edit-kondisi-btn', function () {
             let id = $(this).data('id');
-            let nama_kondisi = $(this).data('nama_kondisi');
+            let nama_kondisi = $(this).data('kondisi');
             let deskripsi = $(this).data('deskripsi');
 
             $('#editKondisiId').val(id);
-            $('#editNamaKondisi').val(nama_kondisi);
+            $('#editKondisiBarang').val(nama_kondisi);
             $('#editDeskripsi').val(deskripsi);
 
             let actionUrl = "{{ url('kondisi-barang') }}/" + id;
-            $('#editKondisiForm').attr('action', actionUrl);
+            $('#editWilayahForm').attr('action', actionUrl);
         });
     </script>
 </body>
