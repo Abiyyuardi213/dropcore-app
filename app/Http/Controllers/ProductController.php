@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Products;
 use App\Models\Category;
 use App\Models\Uom;
+use App\Models\RiwayatAktivitasProduk;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
@@ -45,7 +46,14 @@ class ProductController extends Controller
             $data['image'] = $filename;
         }
 
-        Products::createProduct($data);
+        // Products::createProduct($data);
+        $product = Products::createProduct($data);
+
+        RiwayatAktivitasProduk::log([
+            'produk_id'      => $product->id,
+            'tipe_aktivitas' => 'tambah_produk',
+            'deskripsi'      => 'Menambahkan produk baru'
+        ]);
 
         return redirect()->route('product.index')->with('success', 'Produk berhasil ditambahkan');
     }
@@ -83,6 +91,12 @@ class ProductController extends Controller
 
         $product->updateProduct($data);
 
+        RiwayatAktivitasProduk::log([
+            'produk_id'      => $product->id,
+            'tipe_aktivitas' => 'edit_produk',
+            'deskripsi'      => 'Mengubah data produk'
+        ]);
+
         return redirect()->route('product.index')->with('success', 'Produk berhasil diperbarui.');
     }
 
@@ -96,6 +110,12 @@ class ProductController extends Controller
     {
         $product = Products::findOrFail($id);
         $product->deleteProduct();
+
+        RiwayatAktivitasProduk::log([
+            'produk_id'      => $product->id,
+            'tipe_aktivitas' => 'hapus_produk',
+            'deskripsi'      => 'Menghapus produk'
+        ]);
 
         return redirect()->route('product.index')->with('success', 'Produk berhasil dihapus.');
     }

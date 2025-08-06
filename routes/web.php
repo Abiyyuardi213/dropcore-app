@@ -22,6 +22,8 @@ use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardMasterController;
 use App\Http\Controllers\KondisiBarangController;
+use App\Http\Controllers\RiwayatAktivitasLogController;
+use App\Http\Controllers\RiwayatAktivitasProdukController;
 use App\Http\Controllers\SupplierController;
 use Whoops\Run;
 
@@ -35,7 +37,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
-    
+
     Route::get('homepage', [HomepageController::class, 'index'])->name('homepage');
 
     Route::post('role/{id}/toggle-status', [RoleController::class, 'toggleStatus'])->name('role.toggleStatus');
@@ -60,6 +62,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('dashboardProduk', [DashboardProdukController::class, 'index'])->name('dashboardProduk');
 
+    Route::post('/stok/update-kondisi/{id}', [StokController::class, 'updateKondisi']);
     Route::resource('stok', StokController::class);
 
     Route::get('/stok/produk/{produk_id}', [MutasiStokController::class, 'getStokByProduk']);
@@ -84,6 +87,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('dashboard-master', [DashboardMasterController::class, 'index'])->name('dashboard-master');
 
     Route::resource('kondisi-barang', KondisiBarangController::class);
+
+    Route::resource('riwayat-aktivitas-produk', RiwayatAktivitasProdukController::class)->only(['index','show']);
+
+    Route::get('riwayat-logs', [RiwayatAktivitasLogController::class,'index'])->name('riwayat-log.index');
+    Route::get('riwayat-logs/{id}', [RiwayatAktivitasLogController::class,'show'])->name('riwayat-log.show');
+    Route::delete('riwayat-logs', [RiwayatAktivitasLogController::class,'destroyAll'])->name('riwayat-log.destroyAll'); // optional
 });
 
 

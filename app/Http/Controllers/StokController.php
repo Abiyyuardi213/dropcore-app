@@ -15,7 +15,8 @@ class StokController extends Controller
     public function index()
     {
         $stoks = Stok::orderBy('created_at', 'asc')->get();
-        return view('stok.index', compact('stoks'));
+        $kondisis = KondisiBarang::all();
+        return view('stok.index', compact('stoks', 'kondisis'));
     }
 
     public function create()
@@ -80,5 +81,17 @@ class StokController extends Controller
         $stok->deleteStok();
 
         return redirect()->route('stok.index')->with('success', 'Stok produk berhasil dihapus.');
+    }
+
+    public function updateKondisi(Request $request, $id)
+    {
+        $request->validate([
+            'kondisi_id' => 'nullable|exists:kondisi_barang,id'
+        ]);
+
+        $stok = Stok::findOrFail($id);
+        $stok->update(['kondisi_id' => $request->kondisi_id]);
+
+        return response()->json(['status' => 'ok']);
     }
 }

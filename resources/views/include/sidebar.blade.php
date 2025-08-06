@@ -212,6 +212,20 @@
                 </li>
 
                 <li class="nav-item">
+                    <a href="{{ url('riwayat-aktivitas-produk') }}" class="nav-link">
+                        <i class="nav-icon fas fa-history"></i>
+                        <p>Riwayat Aktivitas Produk</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ url('riwayat-logs') }}" class="nav-link">
+                        <i class="nav-icon fas fa-history"></i>
+                        <p>Log Aktivitas</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a href="{{ url('penerimaan-barang') }}" class="nav-link">
                         <i class="nav-icon fas fa-truck-loading"></i>
                         <p>Penerimaan Barang</p>

@@ -101,6 +101,19 @@
                                 @error('quantity')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
+                            <div class="form-group">
+                                <label for="kondisi_id">Kondisi Barang</label>
+                                <select name="kondisi_id" id="kondisi_id" class="form-control @error('kondisi_id') is-invalid @enderror">
+                                    <option value="">-- Pilih Kondisi --</option>
+                                    @foreach($kondisis as $k)
+                                        <option value="{{ $k->id }}" {{ old('kondisi_id', $stok->kondisi_id) == $k->id ? 'selected' : '' }}>
+                                            {{ $k->nama_kondisi }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('kondisi_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-warning">
                                     <i class="fas fa-save"></i> Perbarui

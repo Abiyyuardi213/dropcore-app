@@ -59,7 +59,19 @@
                                                 <td>{{ $stok->area->kode_area ?? '-' }}</td>
                                                 <td>{{ $stok->rak->kode_rak }}</td>
                                                 <td>{{ $stok->quantity }}</td>
-                                                <td>{{ $stok->kondisi->nama_kondisi ?? '-' }}</td>
+                                                {{-- <td>{{ $stok->kondisi->nama_kondisi ?? '-' }}</td> --}}
+                                                <td>
+                                                    <select class="form-control form-control-sm ubah-kondisi-select"
+                                                            data-stok-id="{{ $stok->id }}">
+                                                        <option value="">-- Pilih --</option>
+                                                        @foreach($kondisis as $k)
+                                                            <option value="{{ $k->id }}"
+                                                                {{ $stok->kondisi_id == $k->id ? 'selected' : '' }}>
+                                                                {{ $k->nama_kondisi }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
                                                 <td class="text-center">
                                                     <a href="{{ route('stok.edit', $stok->id) }}" class="btn btn-info btn-sm">
                                                         <i class="fas fa-edit"></i> Edit
@@ -148,6 +160,26 @@
                     autohide: true
                 }).toast('show');
             @endif
+        });
+
+        $(document).on('change', '.ubah-kondisi-select', function () {
+            let stokId    = $(this).data('stok-id');
+            let kondisiId = $(this).val();
+
+            $.ajax({
+                url: '{{ url("stok/update-kondisi") }}/' + stokId,
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    kondisi_id: kondisiId
+                },
+                success: function (res) {
+                    toastr.success('Kondisi berhasil diubah');
+                },
+                error: function () {
+                    toastr.error('Gagal mengubah kondisi');
+                }
+            });
         });
     </script>
 </body>
