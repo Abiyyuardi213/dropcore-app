@@ -38,6 +38,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
+    Route::get('/pengguna/profil', [UserController::class, 'profil'])->name('user.profil');
+    Route::post('/pengguna/profil', [UserController::class, 'updateProfil'])->name('user.profil.update');
+
     Route::get('homepage', [HomepageController::class, 'index'])->name('homepage');
 
     Route::post('role/{id}/toggle-status', [RoleController::class, 'toggleStatus'])->name('role.toggleStatus');

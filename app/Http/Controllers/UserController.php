@@ -111,4 +111,47 @@ class UserController extends Controller
 
         return redirect()->route('user.index')->with('success', 'User berhasil dihapus.');
     }
+
+    public function profil()
+    {
+        $user = auth()->user();
+        return view('user.profil', compact('user'));
+    }
+
+    public function updateProfil(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name'       => 'required|string|max:255',
+            'username'   => ['required', 'string', Rule::unique('users','username')->ignore($user->id)],
+            'email'      => ['nullable','email', Rule::unique('users','email')->ignore($user->id)],
+            'no_telepon' => 'nullable|string|max:20',
+            'password'   => 'nullable|min:6',
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
+        ]);
+
+        $data = $request->only('name','username','email','no_telepon');
+
+        if (!empty($request->password)) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('profile_picture')) {
+
+            // Hapus foto lama jika ada
+            if ($user->profile_picture && file_exists(public_path('uploads/profile/'.$user->profile_picture))) {
+                unlink(public_path('uploads/profile/'.$user->profile_picture));
+            }
+
+            $file = $request->file('profile_picture');
+            $filename = uniqid().'.'.$file->getClientOriginalExtension();
+            $file->move(public_path('uploads/profile'), $filename);
+            $data['profile_picture'] = $filename;
+        }
+
+        $user->update($data);
+
+        return redirect()->route('user.profil')->with('success','Profil berhasil diperbarui');
+    }
 }
