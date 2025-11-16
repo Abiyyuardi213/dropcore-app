@@ -36,7 +36,7 @@
         }
 
         .file-input {
-            width: 240px;
+            width: 260px;
             margin: 15px auto 0 auto;
         }
 
@@ -55,6 +55,10 @@
         .card-header {
             border-top-left-radius: 12px;
             border-top-right-radius: 12px;
+        }
+
+        .form-group label {
+            font-weight: 600;
         }
     </style>
 </head>
@@ -76,7 +80,7 @@
         <section class="content">
             <div class="container-fluid d-flex justify-content-center">
 
-                <div class="card card-custom shadow w-100" style="max-width: 700px;">
+                <div class="card card-custom shadow w-100" style="max-width: 900px;">
 
                     <div class="card-header bg-primary text-white text-center">
                         <h3 class="card-title mb-0">
@@ -91,6 +95,7 @@
 
                             <!-- FOTO PROFIL DI TENGAH -->
                             <div class="profile-container">
+
                                 <img src="{{ Auth::user()->profile_picture
                                     ? asset('uploads/profile/' . Auth::user()->profile_picture)
                                     : asset('image/default-avatar.png') }}"
@@ -98,50 +103,69 @@
                                      id="previewImage">
 
                                 <div class="file-input">
-                                    <input type="file" name="profile_picture" class="form-control mt-3" onchange="previewPhoto(event)">
+                                    <input type="file" name="profile_picture" class="form-control mt-3"
+                                           onchange="previewPhoto(event)">
+
+                                    <!-- BUTTON LIHAT FOTO -->
+                                    <button type="button" class="btn btn-info btn-sm mt-3 w-100"
+                                            data-toggle="modal" data-target="#modalFoto">
+                                        <i class="fas fa-eye"></i> Lihat Foto
+                                    </button>
                                 </div>
                             </div>
 
                             <hr>
 
-                            <!-- FORM PROFIL -->
-                            <div class="form-section-title">Informasi Akun</div>
+                            <div class="form-section-title text-center">Informasi Akun</div>
 
-                            <div class="form-group">
-                                <label>Nama Lengkap</label>
-                                <input type="text" name="name" class="form-control"
-                                       value="{{ Auth::user()->name }}" required>
+                            <!-- FORM 2 KOLOM -->
+                            <div class="row">
+
+                                <!-- KIRI -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Nama Lengkap</label>
+                                        <input type="text" name="name" class="form-control"
+                                               value="{{ Auth::user()->name }}" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Username</label>
+                                        <input type="text" name="username" class="form-control"
+                                               value="{{ Auth::user()->username }}" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="email" name="email" class="form-control"
+                                               value="{{ Auth::user()->email }}">
+                                    </div>
+                                </div>
+
+                                <!-- KANAN -->
+                                <div class="col-md-6">
+
+                                    <div class="form-group">
+                                        <label>No. Telepon</label>
+                                        <input type="text" name="no_telepon" class="form-control"
+                                               value="{{ Auth::user()->no_telepon }}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Password (kosongkan jika tidak diubah)</label>
+                                        <input type="password" name="password" class="form-control"
+                                               placeholder="********">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Peran</label>
+                                        <input type="text" class="form-control"
+                                               value="{{ Auth::user()->role->role_name ?? '-' }}" disabled>
+                                    </div>
+
+                                </div>
+
                             </div>
-
-                            <div class="form-group">
-                                <label>Username</label>
-                                <input type="text" name="username" class="form-control"
-                                       value="{{ Auth::user()->username }}" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" name="email" class="form-control"
-                                       value="{{ Auth::user()->email }}">
-                            </div>
-
-                            <div class="form-group">
-                                <label>No. Telepon</label>
-                                <input type="text" name="no_telepon" class="form-control"
-                                       value="{{ Auth::user()->no_telepon }}">
-                            </div>
-
-                            <div class="form-group">
-                                <label>Password (kosongkan jika tidak diubah)</label>
-                                <input type="password" name="password" class="form-control" placeholder="********">
-                            </div>
-
-                            <div class="form-group">
-                                <label>Peran</label>
-                                <input type="text" class="form-control"
-                                       value="{{ Auth::user()->role->role_name ?? '-' }}" disabled>
-                            </div>
-
                         </div>
 
                         <div class="card-footer text-right">
@@ -162,11 +186,46 @@
     @include('include.footerSistem')
 </div>
 
+<!-- ======================== -->
+<!--        MODAL FOTO        -->
+<!-- ======================== -->
+<div class="modal fade" id="modalFoto" tabindex="-1" aria-labelledby="modalFotoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFotoLabel">Foto Profil</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body text-center">
+                <img src="{{ Auth::user()->profile_picture
+                    ? asset('uploads/profile/' . Auth::user()->profile_picture)
+                    : asset('image/default-avatar.png') }}"
+                     id="modalPreviewImage"
+                     class="img-fluid rounded"
+                     style="max-height: 350px;">
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Tutup
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
 <script>
 function previewPhoto(event) {
     const reader = new FileReader();
     reader.onload = function(){
         document.getElementById('previewImage').src = reader.result;
+        document.getElementById('modalPreviewImage').src = reader.result; // update modal foto
     }
     reader.readAsDataURL(event.target.files[0]);
 }
