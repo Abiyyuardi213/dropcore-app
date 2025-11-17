@@ -136,7 +136,8 @@
 
                 @php
                     $isOffice = request()->is('dashboard-office*') ||
-                                request()->is('kantor*');
+                                request()->is('kantor*') ||
+                                request()->is('divisi*');
                 @endphp
                 <li class="nav-item has-treeview {{ $isOffice ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ $isOffice ? 'active' : '' }}">
@@ -154,11 +155,16 @@
                                 <p>Dashboard Office</p>
                             </a>
                         </li>
-
                         <li class="nav-item">
                             <a href="{{ url('kantor') }}" class="nav-link">
                                 <i class="nav-icon fas fa-building"></i>
                                 <p>Master Kantor</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('divisi') }}" class="nav-link">
+                                <i class="nav-icon fas fa-sitemap"></i>
+                                <p>Master Divisi</p>
                             </a>
                         </li>
                     </ul>

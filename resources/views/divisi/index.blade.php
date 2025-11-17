@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garuda Fiber - Kantor</title>
+    <title>Garuda Fiber - Divisi</title>
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -57,7 +57,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Manajemen Kantor</h1>
+                            <h1 class="m-0">Manajemen Divisi</h1>
                         </div>
                     </div>
                 </div>
@@ -67,56 +67,44 @@
                 <div class="container-fluid">
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title">Daftar Kantor</h3>
-                            <a href="{{ route('kantor.create') }}" class="btn btn-primary btn-sm ml-auto">
-                                <i class="fas fa-plus"></i> Tambah Kantor
+                            <h3 class="card-title">Daftar Divisi</h3>
+                            <a href="{{ route('divisi.create') }}" class="btn btn-primary btn-sm ml-auto">
+                                <i class="fas fa-plus"></i> Tambah Divisi
                             </a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="kantorTable" class="table table-bordered table-striped">
+                                <table id="divisiTable" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Nama Kantor</th>
-                                            <th>Kota</th>
-                                            <th>Alamat</th>
-                                            <th>Telepon</th>
-                                            <th>Jenis Kantor</th>
+                                            <th>Kode Divisi</th>
+                                            <th>Nama Divisi</th>
+                                            <th>Deskripsi</th>
                                             <th>Status</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($kantors as $index => $kantor)
+                                        @foreach($divisis as $index => $divisi)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>{{ $kantor->nama_kantor }}</td>
-                                                <td>{{ $kantor->kota->kota }}</td>
-                                                <td>{{ $kantor->alamat }}</td>
-                                                <td>{{ $kantor->telepon }}</td>
-                                                <td>
-                                                    @if($kantor->jenis_kantor == 1)
-                                                        Pusat
-                                                    @elseif($kantor->jenis_kantor == 2)
-                                                        Cabang
-                                                    @elseif($kantor->jenis_kantor == 3)
-                                                        Gudang
-                                                    @endif
-                                                </td>
+                                                <td>{{ $divisi->kode }}</td>
+                                                <td>{{ $divisi->name }}</td>
+                                                <td>{{ $divisi->deskripsi }}</td>
                                                 <td class="text-center">
                                                     <input type="checkbox" class="toggle-status"
-                                                        data-kantor-id="{{ $kantor->id }}"
-                                                        {{ $kantor->status ? 'checked' : '' }}>
+                                                        data-divisi-id="{{ $divisi->id }}"
+                                                        {{ $divisi->status ? 'checked' : '' }}>
                                                 </td>
                                                 <td class="text-center">
-                                                    <a href="{{ route('kantor.edit', $kantor->id) }}" class="btn btn-info btn-sm">
+                                                    <a href="{{ route('divisi.edit', $divisi->id) }}" class="btn btn-info btn-sm">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </a>
-                                                    <button class="btn btn-danger btn-sm delete-kantor-btn"
+                                                    <button class="btn btn-danger btn-sm delete-divisi-btn"
                                                         data-toggle="modal"
-                                                        data-target="#deleteKantorModal"
-                                                        data-kantor-id="{{ $kantor->id }}">
+                                                        data-target="#deleteDivisiModal"
+                                                        data-divisi-id="{{ $divisi->id }}">
                                                         <i class="fas fa-trash"></i> Hapus
                                                     </button>
                                                 </td>
@@ -136,17 +124,17 @@
     </div>
 
     <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteKantorModal" tabindex="-1" aria-labelledby="deleteKantorModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteDivisiModal" tabindex="-1" aria-labelledby="deleteDivisiModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteKantorModalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
+                    <h5 class="modal-title" id="deleteDivisiModalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus kantor ini? Tindakan ini tidak dapat dibatalkan.
+                    Apakah Anda yakin ingin menghapus divisi ini? Tindakan ini tidak dapat dibatalkan.
                 </div>
                 <form id="deleteForm" method="POST">
                     @csrf
@@ -171,7 +159,7 @@
     <script src="{{ asset('js/ToastScript.js') }}"></script>
     <script>
         $(document).ready(function () {
-            $("#kantorTable").DataTable({
+            $("#divisiTable").DataTable({
                 "paging": true,
                 "lengthChange": false,
                 "searching": true,
@@ -183,19 +171,19 @@
         });
 
         $(document).ready(function () {
-            $('.delete-kantor-btn').click(function () {
-                let kantorId = $(this).data('kantor-id');
-                let deleteUrl = "{{ url('kantor') }}/" + kantorId;
+            $('.delete-divisi-btn').click(function () {
+                let divisiId = $(this).data('divisi-id');
+                let deleteUrl = "{{ url('divisi') }}/" + divisiId;
                 $('#deleteForm').attr('action', deleteUrl);
             });
         });
 
         $(document).ready(function () {
             $(".toggle-status").change(function () {
-                let kantorId = $(this).data("kantor-id");
+                let divisiId = $(this).data("divisi-id");
                 let status = $(this).prop("checked") ? 1 : 0;
 
-                $.post("{{ url('kantor') }}/" + kantorId + "/toggle-status", {
+                $.post("{{ url('divisi') }}/" + divisiId + "/toggle-status", {
                     _token: '{{ csrf_token() }}',
                     status: status
                 }, function (res) {
