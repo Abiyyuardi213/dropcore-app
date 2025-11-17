@@ -21,6 +21,7 @@ use App\Http\Controllers\ProvinsiController;
 use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardMasterController;
+use App\Http\Controllers\KantorController;
 use App\Http\Controllers\KondisiBarangController;
 use App\Http\Controllers\RiwayatAktivitasLogController;
 use App\Http\Controllers\RiwayatAktivitasProdukController;
@@ -54,6 +55,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('gudang/{id}/toggle-status', [GudangController::class, 'toggleStatus'])->name('gudang.toggleStatus');
     Route::resource('gudang', GudangController::class);
+
+    Route::post('kantor/{id}/toggle-status', [KantorController::class, 'toggleStatus'])->name('kantor.toggleStatus');
+    Route::resource('kantor', KantorController::class);
 
     Route::post('areaGudang/{id}/toggle-status', [AreaGudangController::class, 'toggleStatus'])->name('areaGudang.toggleStatus');
     Route::resource('areaGudang', AreaGudangController::class);

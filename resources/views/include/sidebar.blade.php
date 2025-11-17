@@ -24,7 +24,7 @@
             </div>
             <div class="info">
                 <a href="#" class="d-block text-white font-weight-bold">
-                    {{ Auth::user()->username }}
+                    {{ Auth::user()->name }}
                 </a>
                 <span class="badge badge-success">Online</span>
                 <span class="d-block" style="color: #f39c12; font-size: 14px; font-weight: 600;">
@@ -129,6 +129,36 @@
                             <a href="{{ route('kondisi-barang.index') }}" class="nav-link">
                                 <i class="nav-icon fas fa-truck"></i>
                                 <p>Master Kondisi Barang</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                @php
+                    $isOffice = request()->is('dashboard-office*') ||
+                                request()->is('kantor*');
+                @endphp
+                <li class="nav-item has-treeview {{ $isOffice ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ $isOffice ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>
+                            Master Office
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview" style="{{ $isOffice ? 'display: block;' : '' }}">
+                        <li class="nav-item">
+                            <a href="{{ url('dashboard-kantor') }}" class="nav-link">
+                                <i class="nav-icon fas fa-chart-line"></i>
+                                <p>Dashboard Office</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ url('kantor') }}" class="nav-link">
+                                <i class="nav-icon fas fa-building"></i>
+                                <p>Master Kantor</p>
                             </a>
                         </li>
                     </ul>

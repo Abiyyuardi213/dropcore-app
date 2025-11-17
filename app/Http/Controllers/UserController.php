@@ -138,15 +138,14 @@ class UserController extends Controller
         }
 
         if ($request->hasFile('profile_picture')) {
-
-            // Hapus foto lama jika ada
             if ($user->profile_picture && file_exists(public_path('uploads/profile/'.$user->profile_picture))) {
                 unlink(public_path('uploads/profile/'.$user->profile_picture));
             }
 
             $file = $request->file('profile_picture');
-            $filename = uniqid().'.'.$file->getClientOriginalExtension();
+            $filename = uniqid().'.jpg'; // pakai jpg hasil crop
             $file->move(public_path('uploads/profile'), $filename);
+
             $data['profile_picture'] = $filename;
         }
 
