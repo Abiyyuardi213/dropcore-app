@@ -1,118 +1,126 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garuda Fiber</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PT Garuda Fiber</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Playfair Display', serif;
-            background: #ffffff;
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        .logo img {
-            max-width: 250px;
-        }
-
-        .triangle-menu {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        .triangle {
-            width: 0;
-            height: 0;
-            border-left: 80px solid transparent;
-            border-right: 80px solid transparent;
-            border-bottom: 140px solid rgba(0, 128, 170, 0.6);
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .triangle.inverted {
-            transform: rotate(180deg);
-        }
-
-        .triangle:hover {
-            transform: scale(1.05);
-        }
-
-        .triangle-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #1a1a3d;
-            font-size: 18px;
+        body { font-family: 'Poppins', sans-serif; }
+        .hero {
+            padding: 120px 20px;
+            background: linear-gradient(135deg, #0d47a1, #1976d2);
+            color: white;
             text-align: center;
-            width: 110px;
         }
-
-        .background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            z-index: -1;
-            background: url('/images/network-pattern.svg') center/cover no-repeat;
-            opacity: 0.2;
+        .feature-icon {
+            font-size: 40px;
+            color: #0d47a1;
+        }
+        .upgrade-card {
+            background: #0d47a1;
+            color: white;
+            border-radius: 15px;
+        }
+        footer {
+            background: #0d47a1;
+            color: white;
+            padding: 40px 20px;
+            margin-top: 60px;
         }
     </style>
 </head>
 <body>
-
-    <div class="background"></div>
-
-    <div class="container text-center mt-5">
-        <div class="logo">
-            <img src="{{ asset('images/logo-garuda.png') }}" alt="Garuda Fiber">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url('/homepage') }}">
+                <img src="{{ asset('image/garuda-fiber.png') }}" alt="Logo" height="40" class="me-2">
+            </a>
+            <div class="ms-auto d-flex align-items-center">
+                <img src="{{ asset('images/profile.jpg') }}" alt="Profile" height="40" class="rounded-circle">
+            </div>
         </div>
+    </nav>
 
-        <div class="triangle-menu mt-5">
-            <a href="#tentang">
-                <div class="triangle">
-                    <div class="triangle-text">Tentang<br>Kami</div>
-                </div>
-            </a>
-            <a href="#produk">
-                <div class="triangle">
-                    <div class="triangle-text">Produk</div>
-                </div>
-            </a>
-            <a href="#berita">
-                <div class="triangle">
-                    <div class="triangle-text">Berita</div>
-                </div>
-            </a>
-            <a href="#temukan">
-                <div class="triangle">
-                    <div class="triangle-text">Temukan<br>Kami</div>
-                </div>
-            </a>
-            <a href="#gabung">
-                <div class="triangle inverted">
-                    <div class="triangle-text">Gabung<br>Distributor</div>
-                </div>
-            </a>
+    <section class="hero">
+        <div class="container">
+            <h1 class="fw-bold mb-3">Internet Superfast untuk Semua</h1>
+            <p class="mb-4">
+                Rasakan kecepatan internet fiber optik terbaik dengan layanan customer service 24/7.
+                Koneksi stabil, cepat, dan terpercaya untuk kebutuhan Anda.
+            </p>
+            <a href="#penawaran" class="btn btn-warning btn-lg me-2">Lihat Penawaran</a>
+            <a href="#kontak" class="btn btn-outline-light btn-lg">Hubungi Kami</a>
         </div>
-    </div>
+    </section>
 
-    <!-- JS Resources -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-4">Navigasi Utama</h2>
+            <div class="row g-4">
+                <div class="col-md-4 col-lg-2"><div class="card p-3 text-center">Produk</div></div>
+                <div class="col-md-4 col-lg-2"><div class="card p-3 text-center">Tentang Kami</div></div>
+                <div class="col-md-4 col-lg-2"><div class="card p-3 text-center">Berita</div></div>
+                <div class="col-md-4 col-lg-2"><div class="card p-3 text-center">Temukan Kami</div></div>
+                <div class="col-md-4 col-lg-2"><div class="card p-3 text-center">Gabung Distributor</div></div>
+                <div class="col-md-4 col-lg-2"><div class="card p-3 text-center">Dukungan</div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Fitur Unggulan Garuda Fiber</h2>
+            <div class="row g-4">
+                <div class="col-md-4"><div class="card p-4"><h5>Kecepatan Ultra Tinggi</h5><p>Nikmati kecepatan hingga 300 Mbps dengan teknologi fiber optik terkini.</p></div></div>
+                <div class="col-md-4"><div class="card p-4"><h5>Support 24/7</h5><p>Tim customer service kami siap membantu kapan saja.</p></div></div>
+                <div class="col-md-4"><div class="card p-4"><h5>Instalasi Mudah</h5><p>Instalasi cepat dan mudah tanpa ribet.</p></div></div>
+                <div class="col-md-4"><div class="card p-4"><h5>Koneksi Stabil</h5><p>Uptime 99.9% untuk koneksi tanpa terputus.</p></div></div>
+                <div class="col-md-4"><div class="card p-4"><h5>Harga Kompetitif</h5><p>Paket internet berkualitas dengan harga terjangkau.</p></div></div>
+                <div class="col-md-4"><div class="card p-4"><h5>Trusted by Thousands</h5><p>Dipercaya ribuan pelanggan seluruh Indonesia.</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="upgrade-card p-5 text-center">
+                <h2 class="fw-bold mb-3">Siap Upgrade Internet Anda?</h2>
+                <p class="mb-4">Bergabunglah dengan ribuan pelanggan yang telah merasakan kecepatan internet fiber optik terbaik.</p>
+                <a href="#daftar" class="btn btn-warning btn-lg">Daftar Sekarang</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-3">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" height="50" class="mb-2"><br>
+                    <strong>Garuda Fiber</strong>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <h5>Navigasi</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url('/') }}" class="text-white text-decoration-none">Beranda</a></li>
+                        <li><a href="{{ url('/produk') }}" class="text-white text-decoration-none">Produk</a></li>
+                        <li><a href="{{ url('/tentang') }}" class="text-white text-decoration-none">Tentang Kami</a></li>
+                        <li><a href="{{ url('/berita') }}" class="text-white text-decoration-none">Berita</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <h5>Kontak</h5>
+                    <ul class="list-unstyled">
+                        <li>Email: info@garudafiber.id</li>
+                        <li>Tel: +62 812-3456-7890</li>
+                        <li>Alamat: Jakarta, Indonesia</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

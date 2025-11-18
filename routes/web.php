@@ -21,7 +21,9 @@ use App\Http\Controllers\ProvinsiController;
 use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardMasterController;
+use App\Http\Controllers\DashboardOfficeController;
 use App\Http\Controllers\DivisiController;
+use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\KantorController;
 use App\Http\Controllers\KondisiBarangController;
 use App\Http\Controllers\RiwayatAktivitasLogController;
@@ -57,11 +59,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('gudang/{id}/toggle-status', [GudangController::class, 'toggleStatus'])->name('gudang.toggleStatus');
     Route::resource('gudang', GudangController::class);
 
+    Route::get('dashboardOffice', [DashboardOfficeController::class, 'index'])->name('dashboardOffice');
+
     Route::post('kantor/{id}/toggle-status', [KantorController::class, 'toggleStatus'])->name('kantor.toggleStatus');
     Route::resource('kantor', KantorController::class);
 
     Route::post('divisi/{id}/toggle-status', [DivisiController::class, 'toggleStatus'])->name('divisi.toggleStatus');
     Route::resource('divisi', DivisiController::class);
+
+    Route::post('jabatan/{id}/toggle-status', [JabatanController::class, 'toggleStatus'])->name('jabatan.toggleStatus');
+    Route::resource('jabatan', JabatanController::class);
 
     Route::post('areaGudang/{id}/toggle-status', [AreaGudangController::class, 'toggleStatus'])->name('areaGudang.toggleStatus');
     Route::resource('areaGudang', AreaGudangController::class);
