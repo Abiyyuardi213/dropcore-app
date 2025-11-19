@@ -32,16 +32,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url('/homepage') }}">
-                <img src="{{ asset('image/garuda-fiber.png') }}" alt="Logo" height="40" class="me-2">
-            </a>
-            <div class="ms-auto d-flex align-items-center">
-                <img src="{{ asset('images/profile.jpg') }}" alt="Profile" height="40" class="rounded-circle">
-            </div>
-        </div>
-    </nav>
+    @include('include.navbar-client')
 
     <section class="hero">
         <div class="container">
@@ -93,33 +84,7 @@
         </div>
     </section>
 
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-3">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo" height="50" class="mb-2"><br>
-                    <strong>Garuda Fiber</strong>
-                </div>
-                <div class="col-lg-4 mb-3">
-                    <h5>Navigasi</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{{ url('/') }}" class="text-white text-decoration-none">Beranda</a></li>
-                        <li><a href="{{ url('/produk') }}" class="text-white text-decoration-none">Produk</a></li>
-                        <li><a href="{{ url('/tentang') }}" class="text-white text-decoration-none">Tentang Kami</a></li>
-                        <li><a href="{{ url('/berita') }}" class="text-white text-decoration-none">Berita</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-4 mb-3">
-                    <h5>Kontak</h5>
-                    <ul class="list-unstyled">
-                        <li>Email: info@garudafiber.id</li>
-                        <li>Tel: +62 812-3456-7890</li>
-                        <li>Alamat: Jakarta, Indonesia</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
+    @include('include.footer-client')
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
