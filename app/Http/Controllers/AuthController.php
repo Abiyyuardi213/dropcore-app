@@ -48,11 +48,11 @@ class AuthController extends Controller
         if ($user && Hash::check($request->password, $user->password)) {
             Auth::login($user);
 
-            if ($user->role->name === 'admin') {
+            if ($user->role->role_name === 'admin') {
                 return redirect()->intended('/dashboard');
             }
 
-            if ($user->role->name === 'customer') {
+            if ($user->role->role_name === 'customer') {
                 return redirect()->intended('/homepage');
             }
 

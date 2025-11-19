@@ -153,4 +153,57 @@ class UserController extends Controller
 
         return redirect()->route('user.profil')->with('success','Profil berhasil diperbarui');
     }
+
+    public function profilCustomer()
+    {
+        $user = auth()->user();
+
+        // Pastikan hanya customer yang boleh akses
+        if ($user->role->role_name !== 'customer') {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
+        return view('customer.profil-client', compact('user'));
+    }
+
+    public function updateProfilCustomer(Request $request)
+    {
+        $user = auth()->user();
+
+        if ($user->role->role_name !== 'customer') {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
+        $request->validate([
+            'name'       => 'required|string|max:255',
+            'username'   => ['required', 'string', Rule::unique('users','username')->ignore($user->id)],
+            'email'      => ['nullable','email', Rule::unique('users','email')->ignore($user->id)],
+            'no_telepon' => 'nullable|string|max:20',
+            'password'   => 'nullable|min:6',
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
+        ]);
+
+        $data = $request->only('name','username','email','no_telepon');
+
+        if (!empty($request->password)) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('profile_picture')) {
+            // hapus foto lama
+            if ($user->profile_picture && file_exists(public_path('uploads/profile/'.$user->profile_picture))) {
+                unlink(public_path('uploads/profile/'.$user->profile_picture));
+            }
+
+            $file = $request->file('profile_picture');
+            $filename = uniqid().'.'.$file->getClientOriginalExtension();
+            $file->move(public_path('uploads/profile'), $filename);
+
+            $data['profile_picture'] = $filename;
+        }
+
+        $user->update($data);
+
+        return redirect()->route('customer.profil')->with('success', 'Profil berhasil diperbarui');
+    }
 }

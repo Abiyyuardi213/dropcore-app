@@ -43,7 +43,7 @@
 
                         {{-- Menu Profile --}}
                         <li>
-                            <a class="dropdown-item" href="{{ route('user.profil') }}">
+                            <a class="dropdown-item" href="{{ route('customer.profil') }}">
                                 <i class="bi bi-person me-2"></i> Profil
                             </a>
                         </li>
