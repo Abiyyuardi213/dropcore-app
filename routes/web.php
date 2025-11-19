@@ -32,12 +32,21 @@ use App\Http\Controllers\SupplierController;
 use Whoops\Run;
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return redirect()->route('homepage');
 });
+
+Route::get('homepage', [HomepageController::class, 'index'])->name('homepage');
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+Route::get('/login-customer', function () {
+    return view('auth.login-customer');
+})->name('login.customer.form')->middleware('guest');
+
+Route::post('/login-customer', [AuthController::class, 'loginCustomer'])
+    ->name('login.customer');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
@@ -45,7 +54,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pengguna/profil', [UserController::class, 'profil'])->name('user.profil');
     Route::post('/pengguna/profil', [UserController::class, 'updateProfil'])->name('user.profil.update');
 
-    Route::get('homepage', [HomepageController::class, 'index'])->name('homepage');
+    // Route::get('homepage', [HomepageController::class, 'index'])->name('homepage');
 
     Route::post('role/{id}/toggle-status', [RoleController::class, 'toggleStatus'])->name('role.toggleStatus');
     Route::resource('role', RoleController::class);
