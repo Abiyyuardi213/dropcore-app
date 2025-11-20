@@ -39,9 +39,7 @@
                             <i class="fas fa-edit"></i> Form Edit Jabatan
                         </h3>
                     </div>
-
                     <div class="card-body">
-
                         @if(session('error'))
                             <div class="alert alert-danger">{{ session('error') }}</div>
                         @endif
@@ -51,41 +49,35 @@
                             @method('PUT')
 
                             <div class="form-group">
-                                <label for="kode">Kode Jabatan</label>
-                                <input type="text" name="kode_jabatan"
-                                       class="form-control @error('kode_jabatan') is-invalid @enderror"
-                                       value="{{ old('kode_jabatan', $jabatan->kode_jabatan) }}" required
-                                       placeholder="Masukkan kode jabatan" autocomplete="off">
-                                @error('kode')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                <label for="kode_jabatan">Kode Jabatan</label>
 
+                                <input type="text" class="form-control" value="{{ $jabatan->kode_jabatan }}" readonly>
+
+                                <!-- Jika tetap ingin mengirim ke backend, maka pakai hidden -->
+                                <input type="hidden" name="kode_jabatan" value="{{ $jabatan->kode_jabatan }}">
+                            </div>
                             <div class="form-group">
                                 <label for="name">Nama Jabatan</label>
                                 <input type="text" name="name"
-                                       class="form-control @error('name') is-invalid @enderror"
-                                       value="{{ old('name', $jabatan->name) }}" required
-                                       placeholder="Masukkan nama jabatan" autocomplete="off">
+                                    class="form-control @error('name') is-invalid @enderror"
+                                    value="{{ old('name', $jabatan->name) }}"
+                                    placeholder="Masukkan nama jabatan" required autocomplete="off">
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
                             <div class="form-group">
                                 <label for="deskripsi">Deskripsi</label>
                                 <textarea name="deskripsi"
-                                          class="form-control @error('deskripsi') is-invalid @enderror"
-                                          placeholder="Masukkan deskripsi">{{ old('deskripsi', $jabatan->deskripsi) }}</textarea>
+                                        class="form-control @error('deskripsi') is-invalid @enderror"
+                                        placeholder="Masukkan deskripsi">{{ old('deskripsi', $jabatan->deskripsi) }}</textarea>
                                 @error('deskripsi')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
                             <div class="form-group">
                                 <label for="status">Status</label>
-                                <select name="status"
-                                        class="form-control @error('status') is-invalid @enderror" required>
+                                <select name="status" class="form-control @error('status') is-invalid @enderror" required>
                                     <option value="1" {{ old('status', $jabatan->status) == '1' ? 'selected' : '' }}>Aktif</option>
                                     <option value="0" {{ old('status', $jabatan->status) == '0' ? 'selected' : '' }}>Nonaktif</option>
                                 </select>
@@ -93,22 +85,17 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-warning">
                                     <i class="fas fa-save"></i> Update
                                 </button>
-
                                 <a href="{{ route('jabatan.index') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> Kembali
                                 </a>
                             </div>
-
                         </form>
-
                     </div>
                 </div>
-
             </div>
         </section>
     </div>

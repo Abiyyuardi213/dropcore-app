@@ -27,23 +27,51 @@ class Divisi extends Model
         });
     }
 
+    public static function generateKode($name)
+    {
+        $inisial = strtoupper(implode('', array_map(function($word) {
+            return $word[0];
+        }, explode(' ', $name))));
+
+        $number = rand(10000000, 99999999);
+        return $inisial . $number;
+    }
+
     public static function createDivisi($data)
     {
         return self::create([
-            'kode'  => $data['kode'],
+            'kode'  => self::generateKode($data['name']),
             'name'      => $data['name'],
             'deskripsi'       => $data['deskripsi'] ?? null,
             'status'       => $data['status'] ?? true,
         ]);
     }
 
+    // public function updateDivisi($data)
+    // {
+    //     return $this->update([
+    //         'kode'  => $data['kode'] ?? $this->kode,
+    //         'name'      => $data['name'] ?? $this->name,
+    //         'deskripsi'       => $data['deskripsi'] ?? $this->deskripsi,
+    //         'status'       => $data['status'] ?? $this->status,
+    //     ]);
+    // }
+
     public function updateDivisi($data)
     {
+        $newName = $data['name'] ?? $this->name;
+
+        if ($newName !== $this->name) {
+            $newKode = self::generateKode($newName);
+        } else {
+            $newKode = $this->kode;
+        }
+
         return $this->update([
-            'kode'  => $data['kode'] ?? $this->kode,
-            'name'      => $data['name'] ?? $this->name,
-            'deskripsi'       => $data['deskripsi'] ?? $this->deskripsi,
-            'status'       => $data['status'] ?? $this->status,
+            'kode'       => $newKode,
+            'name'       => $newName,
+            'deskripsi'  => $data['deskripsi'] ?? $this->deskripsi,
+            'status'     => $data['status'] ?? $this->status,
         ]);
     }
 

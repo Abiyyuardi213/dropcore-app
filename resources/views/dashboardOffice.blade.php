@@ -65,6 +65,19 @@
                             <a href="{{ url('divisi') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
+
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-danger">
+                            <div class="inner">
+                                <h3>{{ $totalJabatan ?? 0 }}</h3>
+                                <p>Total Jabatan Fungsional</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <a href="{{ url('jabatan') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

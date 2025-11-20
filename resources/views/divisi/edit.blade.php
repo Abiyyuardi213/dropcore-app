@@ -50,17 +50,16 @@
                             @csrf
                             @method('PUT')
 
+                            <!-- Kode Divisi (readonly, tidak ikut form request) -->
                             <div class="form-group">
                                 <label for="kode">Kode Divisi</label>
-                                <input type="text" name="kode"
-                                       class="form-control @error('kode') is-invalid @enderror"
-                                       value="{{ old('kode', $divisi->kode) }}" required
-                                       placeholder="Masukkan kode divisi" autocomplete="off">
-                                @error('kode')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="text"
+                                       class="form-control"
+                                       value="{{ $divisi->kode }}"
+                                       readonly>
                             </div>
 
+                            <!-- Nama -->
                             <div class="form-group">
                                 <label for="name">Nama Divisi</label>
                                 <input type="text" name="name"
@@ -72,6 +71,7 @@
                                 @enderror
                             </div>
 
+                            <!-- Deskripsi -->
                             <div class="form-group">
                                 <label for="deskripsi">Deskripsi</label>
                                 <textarea name="deskripsi"
@@ -82,6 +82,7 @@
                                 @enderror
                             </div>
 
+                            <!-- Status -->
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select name="status"
@@ -94,6 +95,7 @@
                                 @enderror
                             </div>
 
+                            <!-- Tombol -->
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-warning">
                                     <i class="fas fa-save"></i> Update

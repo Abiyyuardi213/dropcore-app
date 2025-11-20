@@ -21,7 +21,7 @@ class JabatanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode_jabatan'      => 'required|string|max:50|unique:jabatan,kode_jabatan',
+            // 'kode_jabatan'      => 'required|string|max:50|unique:jabatan,kode_jabatan',
             'name'              => 'required|string|max:255|unique:jabatan,name',
             'deskripsi'         => 'nullable|string',
             'status'            => 'required|boolean',
@@ -44,7 +44,7 @@ class JabatanController extends Controller
         $jabatan = Jabatan::findOrFail($id);
 
         $request->validate([
-            'kode_jabatan'      => 'required|string|max:50|unique:jabatan,kode,' . $id,
+            // 'kode_jabatan'      => 'required|string|max:50|unique:jabatan,kode,' . $id,
             'name'              => 'required|string|max:255|unique:jabatan,name,' . $id,
             'deskripsi'         => 'nullable|string',
             'status'            => 'required|boolean',

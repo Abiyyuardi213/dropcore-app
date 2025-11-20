@@ -21,7 +21,7 @@ class DivisiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode'      => 'required|string|max:50|unique:divisi,kode',
+            // 'kode'      => 'required|string|max:50|unique:divisi,kode',
             'name'      => 'required|string|max:255|unique:divisi,name',
             'deskripsi' => 'nullable|string',
             'status'    => 'required|boolean',
@@ -44,7 +44,7 @@ class DivisiController extends Controller
         $divisi = Divisi::findOrFail($id);
 
         $request->validate([
-            'kode'      => 'required|string|max:50|unique:divisi,kode,' . $id,
+            // 'kode'      => 'required|string|max:50|unique:divisi,kode,' . $id,
             'name'      => 'required|string|max:255|unique:divisi,name,' . $id,
             'deskripsi' => 'nullable|string',
             'status'    => 'required|boolean',

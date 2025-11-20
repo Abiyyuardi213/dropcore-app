@@ -62,7 +62,7 @@
                             <div class="icon">
                                 <i class="fas fa-user-friends"></i>
                             </div>
-                            <a href="{{ url('pengguna') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{ url('user') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
 
@@ -75,7 +75,7 @@
                             <div class="icon">
                                 <i class="fas fa-boxes"></i>
                             </div>
-                            <a href="{{ url('produk') }}" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{ url('product') }}" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
 
