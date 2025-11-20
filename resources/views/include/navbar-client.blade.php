@@ -71,7 +71,7 @@
                 </div>
 
             @else
-                <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
+                <a href="{{ route('login.customer') }}" class="btn btn-primary">Login</a>
             @endauth
         </div>
     </div>
