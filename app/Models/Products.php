@@ -29,6 +29,10 @@ class Products extends Model
             if (!$product->id) {
                 $product->id = (string) Str::uuid();
             }
+
+            if (!$product->sku && $product->name) {
+                $product->sku = self::generateSKU($product->name);
+            }
         });
 
         static::created(function ($product) {
@@ -59,8 +63,34 @@ class Products extends Model
         });
     }
 
+    public static function generateSKU($productName)
+    {
+        $words = explode(" ", $productName);
+
+        $part1 = strtoupper(substr($words[0], 0, 3));
+
+        $part2 = isset($words[1]) ? strtoupper(substr($words[1], 0, 4)) : 'XXXX';
+
+        $lastWord = $words[count($words) - 1];
+
+        $cleanLast = preg_replace('/[^A-Za-z]/', '', $lastWord);
+        $letters = str_split(strtoupper($cleanLast));
+
+        $h1 = $letters[0] ?? 'X';
+        $h3 = $letters[2] ?? 'X';
+        $h5 = $letters[4] ?? 'X';
+
+        $part3 = $h1 . $h3 . $h5;
+
+        $random = random_int(10000000, 99999999);
+
+        return "{$part1}-{$part2}-{$part3}-{$random}";
+    }
+
     public static function createProduct($data)
     {
+        $data['sku'] = self::generateSKU($data['name']);
+
         return self::create([
             'sku'         => $data['sku'],
             'name'        => $data['name'],
@@ -74,6 +104,10 @@ class Products extends Model
 
     public function updateProduct($data)
     {
+        if (isset($data['name'])) {
+            $data['sku'] = self::generateSKU($data['name']);
+        }
+
         return $this->update([
             'sku'         => $data['sku']        ?? $this->sku,
             'name'        => $data['name']       ?? $this->name,

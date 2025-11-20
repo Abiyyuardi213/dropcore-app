@@ -88,6 +88,7 @@
         </div>
 
         @include('include.footerSistem')
+        @include('services.ToastModal')
     </div>
 
     <!-- Modal Konfirmasi Hapus -->

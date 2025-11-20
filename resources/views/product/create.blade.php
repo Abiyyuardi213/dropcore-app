@@ -33,6 +33,7 @@
                             <h3 class="card-title"><i class="fas fa-plus-circle"></i> Form Tambah Produk</h3>
                         </div>
                         <div class="card-body">
+
                             @if(session('error'))
                                 <div class="alert alert-danger">{{ session('error') }}</div>
                             @endif
@@ -40,23 +41,24 @@
                             <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="row">
+
                                     <!-- Kiri -->
                                     <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="sku">SKU</label>
-                                            <input type="text" class="form-control @error('sku') is-invalid @enderror" name="sku" value="{{ old('sku') }}" required>
-                                            @error('sku')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                        </div>
 
                                         <div class="form-group">
                                             <label for="name">Nama Barang</label>
-                                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required>
+                                            <input type="text"
+                                                   class="form-control @error('name') is-invalid @enderror"
+                                                   name="name"
+                                                   value="{{ old('name') }}"
+                                                   required>
                                             @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
                                             <label for="description">Deskripsi</label>
-                                            <textarea class="form-control @error('description') is-invalid @enderror" name="description" required>{{ old('description') }}</textarea>
+                                            <textarea class="form-control @error('description') is-invalid @enderror"
+                                                      name="description">{{ old('description') }}</textarea>
                                             @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
                                     </div>
@@ -65,30 +67,41 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="price">Harga Barang</label>
-                                            <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ old('price') }}">
+                                            <input type="number"
+                                                   class="form-control @error('price') is-invalid @enderror"
+                                                   name="price"
+                                                   value="{{ old('price') }}">
                                             @error('price')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
                                             <label for="category_id">Kategori Barang</label>
-                                            <select name="category_id" id="category_id" class="form-control @error('category_id') is-invalid @enderror">
+                                            <select name="category_id" id="category_id"
+                                                    class="form-control @error('category_id') is-invalid @enderror">
                                                 <option value="">-- Pilih Kategori --</option>
                                                 @foreach($categories as $category)
-                                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->category_name }}</option>
+                                                    <option value="{{ $category->id }}"
+                                                        {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                        {{ $category->category_name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
-                                            @error('role_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                            @error('category_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
                                             <label for="uom_id">Unit Satuan Barang</label>
-                                            <select name="uom_id" id="uom_id" class="form-control @error('uom_id') is-invalid @enderror">
+                                            <select name="uom_id" id="uom_id"
+                                                    class="form-control @error('uom_id') is-invalid @enderror">
                                                 <option value="">-- Pilih Satuan --</option>
                                                 @foreach($uoms as $uom)
-                                                    <option value="{{ $uom->id }}" {{ old('uom_id') == $uom->id ? 'selected' : '' }}>{{ $uom->name }}</option>
+                                                    <option value="{{ $uom->id }}"
+                                                        {{ old('uom_id') == $uom->id ? 'selected' : '' }}>
+                                                        {{ $uom->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
-                                            @error('role_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                            @error('uom_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
                                     </div>
 
@@ -96,19 +109,30 @@
                                     <div class="col-md-4 text-center">
                                         <div class="form-group">
                                             <label for="image">Foto Produk</label>
-                                            <input type="file" name="image" id="image" class="form-control-file @error('image') is-invalid @enderror" accept="image/*">
+                                            <input type="file"
+                                                   name="image"
+                                                   id="image"
+                                                   class="form-control-file @error('image') is-invalid @enderror"
+                                                   accept="image/*">
                                             @error('image')<div class="text-danger">{{ $message }}</div>@enderror
                                         </div>
+
                                         <div style="width: 300px; height: 300px; border: 2px dashed #ccc; margin: auto; display: flex; align-items: center; justify-content: center;">
-                                            <img id="preview" src="https://via.placeholder.com/300x300?text=Preview" class="img-fluid rounded" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                            <img id="preview"
+                                                 src="https://via.placeholder.com/300x300?text=Preview"
+                                                 class="img-fluid rounded"
+                                                 style="max-width: 100%; max-height: 100%; object-fit: contain;">
                                         </div>
+
                                         <input type="hidden" name="cropped_image" id="cropped_image">
                                     </div>
                                 </div>
 
                                 <!-- Tombol -->
                                 <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Simpan
+                                    </button>
                                     <a href="{{ route('product.index') }}" class="btn btn-secondary">Batal</a>
                                 </div>
                             </form>
