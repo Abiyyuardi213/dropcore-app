@@ -91,34 +91,108 @@
                                     <div class="form-group">
                                         <label>Nama Lengkap</label>
                                         <input type="text" name="name" class="form-control"
-                                               value="{{ Auth::user()->name }}" required>
+                                            value="{{ Auth::user()->name }}" required>
                                     </div>
                                     <div class="form-group">
                                         <label>Username</label>
                                         <input type="text" name="username" class="form-control"
-                                               value="{{ Auth::user()->username }}" required>
+                                            value="{{ Auth::user()->username }}" required>
                                     </div>
                                     <div class="form-group">
                                         <label>Email</label>
                                         <input type="email" name="email" class="form-control"
-                                               value="{{ Auth::user()->email }}">
+                                            value="{{ Auth::user()->email }}">
                                     </div>
+                                    <div class="form-group">
+                                        <label>NIP Pegawai</label>
+                                        <input type="text" class="form-control"
+                                            value="{{ Auth::user()->nip }}" readonly>
+                                    </div>
+                                    {{-- <div class="form-group">
+                                        <label>NIK</label>
+                                        <input type="text" name="nik" class="form-control"
+                                            value="{{ Auth::user()->nik }}">
+                                    </div> --}}
                                 </div>
+
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>No. Telepon</label>
                                         <input type="text" name="no_telepon" class="form-control"
-                                               value="{{ Auth::user()->no_telepon }}">
+                                            value="{{ Auth::user()->no_telepon }}">
                                     </div>
                                     <div class="form-group">
                                         <label>Password (opsional)</label>
                                         <input type="password" name="password" class="form-control"
-                                               placeholder="********">
+                                            placeholder="********">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Jenis Kelamin</label>
+                                        <select name="jenis_kelamin" class="form-control">
+                                            <option value="">- pilih -</option>
+                                            <option value="L" {{ Auth::user()->jenis_kelamin == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                                            <option value="P" {{ Auth::user()->jenis_kelamin == 'P' ? 'selected' : '' }}>Perempuan</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Alamat</label>
+                                        <textarea name="alamat" class="form-control"
+                                                rows="2">{{ Auth::user()->alamat }}</textarea>
                                     </div>
                                     <div class="form-group">
                                         <label>Peran</label>
                                         <input type="text" class="form-control"
-                                               value="{{ Auth::user()->role->role_name ?? '-' }}" disabled>
+                                            value="{{ Auth::user()->role->role_name ?? '-' }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Tempat Lahir</label>
+                                        <input type="text" name="tempat_lahir" class="form-control"
+                                            value="{{ Auth::user()->tempat_lahir }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tanggal Lahir</label>
+                                        <input type="date" name="tanggal_lahir" class="form-control"
+                                            value="{{ Auth::user()->tanggal_lahir }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Tanggal Bergabung</label>
+                                        <input type="date" class="form-control"
+                                            value="{{ $user->tanggal_bergabung ? \Carbon\Carbon::parse($user->tanggal_bergabung)->format('Y-m-d') : '' }}"
+                                            disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Status</label>
+                                        <select name="status_kepegawaian" class="form-control">
+                                            <option value="">- pilih -</option>
+                                            <option value="aktif" {{ Auth::user()->status_kepegawaian == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                            <option value="nonaktif" {{ Auth::user()->status_kepegawaian == 'nonaktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Divisi</label>
+                                        <input type="text" class="form-control"
+                                            value="{{ Auth::user()->divisi->name ?? '-' }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Jabatan</label>
+                                        <input type="text" class="form-control"
+                                            value="{{ Auth::user()->jabatan->name ?? '-' }}" readonly>
                                     </div>
                                 </div>
                             </div>

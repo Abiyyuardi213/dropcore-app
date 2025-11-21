@@ -18,11 +18,7 @@
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1 class="m-0">Ubah Pengguna</h1>
-                        </div>
-                    </div>
+                    <h1 class="m-0">Ubah Pengguna</h1>
                 </div>
             </div>
 
@@ -32,6 +28,7 @@
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-edit"></i> Form Ubah Pengguna</h3>
                         </div>
+
                         <div class="card-body">
                             @if(session('error'))
                                 <div class="alert alert-danger">{{ session('error') }}</div>
@@ -40,77 +37,148 @@
                             <form action="{{ route('user.update', $user->id) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
+
                                 <div class="row">
-                                    <!-- Kiri -->
+
+                                    <!-- KIRI -->
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="name">Nama Pengguna</label>
-                                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name', $user->name) }}" required>
+                                            <label>NIP</label>
+                                            <input type="text" class="form-control" value="{{ $user->nip }}" readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Nama Pengguna</label>
+                                            <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                                name="name" value="{{ old('name', $user->name) }}">
                                             @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="username">Username</label>
-                                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username', $user->username) }}" required>
+                                            <label>Username</label>
+                                            <input type="text" class="form-control @error('username') is-invalid @enderror"
+                                                name="username" value="{{ old('username', $user->username) }}">
                                             @error('username')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="email">Email</label>
-                                            <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email', $user->email) }}">
+                                            <label>Email</label>
+                                            <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                                name="email" value="{{ old('email', $user->email) }}">
                                             @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="no_telepon">Nomor Telepon</label>
-                                            <input type="text" class="form-control @error('no_telepon') is-invalid @enderror" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon) }}">
+                                            <label>Nomor Telepon</label>
+                                            <input type="text" class="form-control @error('no_telepon') is-invalid @enderror"
+                                                name="no_telepon" value="{{ old('no_telepon', $user->no_telepon) }}">
                                             @error('no_telepon')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
-                                    </div>
-
-                                    <!-- Tengah -->
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="password">Password <small class="text-muted">(kosongkan jika tidak ingin mengubah)</small></label>
-                                            <input type="password" class="form-control @error('password') is-invalid @enderror" name="password">
-                                            @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                        </div>
 
                                         <div class="form-group">
-                                            <label for="role_id">Role</label>
-                                            <select name="role_id" id="role_id" class="form-control @error('role_id') is-invalid @enderror">
-                                                <option value="">-- Pilih Role --</option>
-                                                @foreach($roles as $role)
-                                                    <option value="{{ $role->id }}" {{ old('role_id', $user->role_id) == $role->id ? 'selected' : '' }}>{{ $role->role_name }}</option>
+                                            <label>Peran</label>
+                                            <select name="role_id" class="form-control @error('role_id') is-invalid @enderror">
+                                                <option value="">-- Pilih Peran --</option>
+                                                @foreach($roles as $r)
+                                                    <option value="{{ $r->id }}" {{ old('role_id', $user->role_id) == $r->id ? 'selected' : '' }}>
+                                                        {{ $r->role_name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                             @error('role_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
                                     </div>
 
-                                    <!-- Kanan: Foto -->
-                                    <div class="col-md-4 text-center">
+                                    <!-- TENGAH -->
+                                    <div class="col-md-4">
+
                                         <div class="form-group">
-                                            <label for="profile_picture">Foto Profil</label>
-                                            <input type="file" name="profile_picture" id="profile_picture" class="form-control-file @error('profile_picture') is-invalid @enderror" accept="image/*">
-                                            @error('profile_picture')<div class="text-danger">{{ $message }}</div>@enderror
+                                            <label>Password <small class="text-muted">(opsional)</small></label>
+                                            <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                                name="password">
+                                            @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
-                                        <div style="width: 300px; height: 300px; border: 2px dashed #ccc; margin: auto; display: flex; align-items: center; justify-content: center;">
-                                            <img id="preview" src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) : 'https://via.placeholder.com/300x300?text=Preview' }}" class="img-fluid rounded" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+
+                                        <div class="form-group">
+                                            <label for="jenis_kelamin">Jenis Kelamin</label>
+                                            <select name="jenis_kelamin" id="jenis_kelamin" class="form-control">
+                                                <option value="">-- Pilih Jenis Kelamin --</option>
+                                                <option value="L" {{ old('jenis_kelamin', $user->jenis_kelamin) == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                                                <option value="P" {{ old('jenis_kelamin', $user->jenis_kelamin) == 'P' ? 'selected' : '' }}>Perempuan</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Alamat</label>
+                                            <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror">{{ old('alamat', $user->alamat) }}</textarea>
+                                            @error('alamat')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Tanggal Bergabung</label>
+                                            <input type="date" name="tanggal_bergabung"
+                                                class="form-control @error('tanggal_bergabung') is-invalid @enderror"
+                                                value="{{ old('tanggal_bergabung', $user->tanggal_bergabung) }}">
+                                            @error('tanggal_bergabung')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Status Pegawai</label>
+                                            <select name="status" class="form-control @error('status') is-invalid @enderror">
+                                                <option value="">-- Pilih --</option>
+                                                <option value="Aktif" {{ old('status', $user->status) == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                                                <option value="Nonaktif" {{ old('status', $user->status) == 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                                            </select>
+                                            @error('status')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Divisi</label>
+                                            <select name="divisi_id" class="form-control">
+                                                <option value="">-- Pilih Divisi --</option>
+                                                @foreach($divisi as $d)
+                                                    <option value="{{ $d->id }}" {{ old('divisi_id', $user->divisi_id) == $d->id ? 'selected' : '' }}>
+                                                        {{ $d->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Jabatan</label>
+                                            <select name="jabatan_id" class="form-control">
+                                                <option value="">-- Pilih Jabatan --</option>
+                                                @foreach($jabatan as $j)
+                                                    <option value="{{ $j->id }}" {{ old('jabatan_id', $user->jabatan_id) == $j->id ? 'selected' : '' }}>
+                                                        {{ $j->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- KANAN (FOTO) -->
+                                    <div class="col-md-4 text-center">
+                                        <label>Foto Profil</label>
+                                        <input type="file" name="profile_picture" id="profile_picture" accept="image/*" class="form-control">
+
+                                        <div style="width: 300px; height: 300px; margin-top: 10px; border: 2px dashed #ccc;">
+                                            <img id="preview" src="{{ $user->profile_picture ? asset('uploads/profile/' . $user->profile_picture) : 'https://via.placeholder.com/300' }}" class="img-fluid rounded">
                                         </div>
                                         <input type="hidden" name="cropped_image" id="cropped_image">
                                     </div>
+
                                 </div>
 
-                                <div class="mt-4">
-                                    <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Simpan Perubahan</button>
-                                    <a href="{{ route('user.index') }}" class="btn btn-secondary">Batal</a>
-                                </div>
+                                <button type="submit" class="btn btn-warning mt-4"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                                <a href="{{ route('user.index') }}" class="btn btn-secondary mt-4">Batal</a>
                             </form>
                         </div>
                     </div>
                 </div>
             </section>
+
         </div>
 
         @include('include.footerSistem')
@@ -122,39 +190,30 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('[data-widget="treeview"]').Treeview('init');
-        });
 
+    <script>
         let cropper;
-        const image = document.getElementById('preview');
+        const img = document.getElementById('preview');
         const input = document.getElementById('profile_picture');
 
-        input.addEventListener('change', (e) => {
+        input.addEventListener('change', e => {
             const file = e.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = () => {
-                image.src = reader.result;
+                img.src = reader.result;
 
                 if (cropper) cropper.destroy();
-                cropper = new Cropper(image, {
+                cropper = new Cropper(img, {
                     aspectRatio: 1,
                     viewMode: 1,
                     autoCropArea: 1,
-                    crop(event) {
-                        const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
-                        canvas.toBlob((blob) => {
-                            const formData = new FormData();
-                            formData.append('cropped_image', blob);
-                        });
-                    }
                 });
             };
             reader.readAsDataURL(file);
         });
     </script>
+
 </body>
 </html>
