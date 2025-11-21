@@ -26,6 +26,7 @@ use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\KantorController;
 use App\Http\Controllers\KondisiBarangController;
+use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\RiwayatAktivitasLogController;
 use App\Http\Controllers\RiwayatAktivitasProdukController;
 use App\Http\Controllers\SupplierController;
@@ -58,6 +59,8 @@ Route::middleware(['role:admin,staff'])->group(function () {
     Route::resource('role', RoleController::class);
 
     Route::resource('user', UserController::class);
+
+    Route::resource('pegawai', PegawaiController::class);
 
     Route::resource('category', CategoryController::class);
 

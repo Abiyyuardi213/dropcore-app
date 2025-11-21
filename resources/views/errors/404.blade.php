@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Halaman Tidak Ditemukan</title>
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            /* font-family: 'Source Sans Pro', sans-serif !important; */
             background: url('{{ asset('image/wh1.jpg') }}') no-repeat center center fixed; /* Menambahkan gambar latar */
             background-size: cover;
             height: 100vh;
@@ -76,7 +78,7 @@
 <body>
     <div class="container">
         <div class="emoji">
-            <img src="{{ asset('image/dropcore.png') }}" alt="Not Found">
+            <img src="{{ asset('image/garuda-fiber.png') }}" alt="Not Found">
         </div>
         <h1>404 - Halaman Tidak Ditemukan</h1>
         <p>Ups! Kami tidak dapat menemukan halaman yang Anda cari.<br> Mungkin sudah dihapus atau alamatnya salah.</p>

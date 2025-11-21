@@ -174,6 +174,12 @@
                                 <p>Master Jabatan</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ url('pegawai') }}" class="nav-link">
+                                <i class="nav-icon fas fa-id-card"></i>
+                                <p>Master Pegawai</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
 

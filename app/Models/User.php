@@ -21,6 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'nip',
         'name',
+        'nik',
         'username',
         'email',
         'no_telepon',
@@ -107,6 +108,7 @@ class User extends Authenticatable
         return self::create([
             'nip'               => $data['nip'] ?? self::generateNIP(),
             'name'              => $data['name'],
+            'nik'               => $data['nik'],
             'username'          => $data['username'],
             'email'             => $data['email'],
             'no_telepon'        => $data['no_telepon'] ?? null,
@@ -126,6 +128,7 @@ class User extends Authenticatable
     {
         return $this->update([
             'name'              => $data['name'] ?? $this->name,
+            'nik'               => $data['nik'] ?? $this->nik,
             'username'          => $data['username'] ?? $this->username,
             'email'             => $data['email'] ?? $this->email,
             'no_telepon'        => $data['no_telepon'] ?? $this->no_telepon,
