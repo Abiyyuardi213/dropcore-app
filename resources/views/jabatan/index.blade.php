@@ -159,14 +159,25 @@
     <script src="{{ asset('js/ToastScript.js') }}"></script>
     <script>
         $(document).ready(function () {
-            $("#jabatanTable").DataTable({
+            jabatanTable = $("#jabatanTable").DataTable({
                 "paging": true,
                 "lengthChange": false,
                 "searching": true,
                 "ordering": true,
                 "info": true,
                 "autoWidth": false,
-                "responsive": true
+                "responsive": true,
+                "pageLength": 10
+            });
+
+            let lastPage = localStorage.getItem('jabatan_last_page');
+            if (lastPage) {
+                jabatanTable.page(parseInt(lastPage)).draw(false);
+            }
+
+            jabatanTable.on('page.dt', function () {
+                let currentPage = jabatanTable.page();
+                localStorage.setItem('jabatan_last_page', currentPage);
             });
         });
 

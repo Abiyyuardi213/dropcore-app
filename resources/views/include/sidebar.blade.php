@@ -2,11 +2,11 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Logo -->
     <a href="#" class="brand-link d-flex flex-column align-items-center p-2" style="overflow: hidden;">
-        <img src="{{ asset('image/garuda-fiber.png') }}"
+        <img src="{{ asset('image/gfi-putih.png') }}"
              alt="Logo Dropcore"
              class="img-fluid d-none d-md-block"
              style="max-height: 40px; object-fit: contain;">
-        <img src="{{ asset('image/garuda-fiber.png') }}"
+        <img src="{{ asset('image/gfi-putih.png') }}"
              alt="Logo Mini Dropcore"
              class="img-fluid d-block d-md-none"
              style="max-height: 100px; object-fit: contain;">
@@ -138,7 +138,8 @@
                     $isOffice = request()->is('dashboardOffice*') ||
                                 request()->is('kantor*') ||
                                 request()->is('divisi*') ||
-                                request()->is('jabatan*');
+                                request()->is('jabatan*') ||
+                                request()->is('pegawai');
                 @endphp
                 <li class="nav-item has-treeview {{ $isOffice ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ $isOffice ? 'active' : '' }}">

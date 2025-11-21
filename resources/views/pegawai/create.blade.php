@@ -163,20 +163,52 @@
                                 </div>
 
                                 <!-- KOLOM KANAN: FOTO -->
-                                <div class="col-md-4 text-center">
+                                <div class="col-md-4">
 
-                                    <label>Foto Profil</label>
-                                    <input type="file" name="profile_picture" id="profile_picture"
-                                           class="form-control-file @error('profile_picture') is-invalid @enderror" accept="image/*">
-                                    @error('profile_picture')<div class="text-danger">{{ $message }}</div>@enderror
+                                    <div class="card shadow-sm">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="card-title mb-0">
+                                                <i class="fas fa-image"></i> Foto Profil
+                                            </h5>
+                                        </div>
 
-                                    <div style="width: 300px; height: 300px; border: 2px dashed #ccc; margin: auto;
-                                        display: flex; align-items: center; justify-content: center;">
-                                        <img id="preview" src="https://via.placeholder.com/300?text=Preview"
-                                             class="img-fluid rounded" style="object-fit: contain;">
+                                        <div class="card-body text-center">
+
+                                            <!-- Preview Container -->
+                                            <div class="mb-3">
+                                                <div style="
+                                                    width: 260px;
+                                                    height: 260px;
+                                                    margin: auto;
+                                                    border-radius: 15px;
+                                                    overflow: hidden;
+                                                    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                                                    border: 1px solid #ddd;
+                                                ">
+                                                    <img id="preview"
+                                                        src="https://via.placeholder.com/260?text=Preview"
+                                                        style="width:100%; height:100%; object-fit: cover;">
+                                                </div>
+                                            </div>
+
+                                            <!-- Input File -->
+                                            <label class="btn btn-outline-primary">
+                                                <i class="fas fa-upload"></i> Pilih Foto
+                                                <input type="file"
+                                                    name="profile_picture"
+                                                    id="profile_picture"
+                                                    accept="image/*"
+                                                    hidden>
+                                            </label>
+
+                                            @error('profile_picture')
+                                            <div class="text-danger mt-2">{{ $message }}</div>
+                                            @enderror
+
+                                            <input type="hidden" name="cropped_image" id="cropped_image">
+
+                                        </div>
                                     </div>
-
-                                    <input type="hidden" name="cropped_image" id="cropped_image">
 
                                 </div>
 

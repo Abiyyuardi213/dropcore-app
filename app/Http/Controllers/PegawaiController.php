@@ -45,11 +45,40 @@ class PegawaiController extends Controller
             'tanggal_bergabung' => 'nullable|date',
             'jenis_kelamin'     => 'nullable|in:L,P',
             'status_kepegawaian'=> 'nullable|in:aktif,nonaktif',
+            'profile_picture'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'cropped_image'     => 'nullable|string'
         ]);
 
-        $data = $request->all();
+        $data = $request->except(['profile_picture', 'cropped_image']);
         $data['role_id'] = Role::where('role_name', 'staff')->value('id');
         $data['password'] = bcrypt($request->password);
+
+        if ($request->filled('cropped_image')) {
+
+            $cropped = $request->cropped_image;
+            list($type, $cropped) = explode(';', $cropped);
+            list(, $cropped) = explode(',', $cropped);
+
+            $cropped = base64_decode($cropped);
+            $filename = uniqid().'.png';
+
+            $path = public_path('uploads/profile/'.$filename);
+            if (!file_exists(public_path('uploads/profile'))) {
+                mkdir(public_path('uploads/profile'), 0777, true);
+            }
+
+            file_put_contents($path, $cropped);
+
+            $data['profile_picture'] = $filename;
+
+        } elseif ($request->hasFile('profile_picture')) {
+
+            $file = $request->file('profile_picture');
+            $filename = uniqid().'.'.$file->getClientOriginalExtension();
+            $file->move(public_path('uploads/profile'), $filename);
+
+            $data['profile_picture'] = $filename;
+        }
 
         User::createPengguna($data);
 
@@ -81,14 +110,49 @@ class PegawaiController extends Controller
             'tanggal_bergabung' => 'nullable|date',
             'jenis_kelamin'     => 'nullable|in:L,P',
             'status_kepegawaian'=> 'nullable|in:aktif,nonaktif',
+            'profile_picture'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'cropped_image'     => 'nullable|string'
         ]);
 
-        $data = $request->all();
+        $data = $request->except(['password','profile_picture','cropped_image']);
 
         if ($request->filled('password')) {
             $data['password'] = bcrypt($request->password);
-        } else {
-            unset($data['password']);
+        }
+
+        if ($request->filled('cropped_image')) {
+
+            $cropped = $request->cropped_image;
+            list($type, $cropped) = explode(';', $cropped);
+            list(, $cropped) = explode(',', $cropped);
+
+            $cropped = base64_decode($cropped);
+            $filename = uniqid().'.png';
+
+            if (!file_exists(public_path('uploads/profile'))) {
+                mkdir(public_path('uploads/profile'), 0777, true);
+            }
+
+            $path = public_path('uploads/profile/'.$filename);
+            file_put_contents($path, $cropped);
+
+            if ($pegawai->profile_picture && file_exists(public_path('uploads/profile/'.$pegawai->profile_picture))) {
+                unlink(public_path('uploads/profile/'.$pegawai->profile_picture));
+            }
+
+            $data['profile_picture'] = $filename;
+
+        } elseif ($request->hasFile('profile_picture')) {
+
+            if ($pegawai->profile_picture && file_exists(public_path('uploads/profile/'.$pegawai->profile_picture))) {
+                unlink(public_path('uploads/profile/'.$pegawai->profile_picture));
+            }
+
+            $file = $request->file('profile_picture');
+            $filename = uniqid().'.'.$file->getClientOriginalExtension();
+            $file->move(public_path('uploads/profile'), $filename);
+
+            $data['profile_picture'] = $filename;
         }
 
         $pegawai->updatePengguna($data);
