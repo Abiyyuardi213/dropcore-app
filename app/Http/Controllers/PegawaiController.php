@@ -169,4 +169,10 @@ class PegawaiController extends Controller
         return redirect()->route('pegawai.index')
             ->with('success','Pegawai berhasil dihapus');
     }
+
+    public function show($id)
+    {
+        $pegawai = User::with(['role','divisi','jabatan'])->findOrFail($id);
+        return view('pegawai.show', compact('pegawai'));
+    }
 }

@@ -139,7 +139,7 @@
                                 request()->is('kantor*') ||
                                 request()->is('divisi*') ||
                                 request()->is('jabatan*') ||
-                                request()->is('pegawai');
+                                request()->is('pegawai*');
                 @endphp
                 <li class="nav-item has-treeview {{ $isOffice ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ $isOffice ? 'active' : '' }}">
