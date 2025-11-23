@@ -80,6 +80,7 @@
                                             <th>No</th>
                                             <th>Kode Jabatan</th>
                                             <th>Nama Jabatan</th>
+                                            <th>Divisi</th>
                                             <th>Deskripsi</th>
                                             <th>Status</th>
                                             <th>Aksi</th>
@@ -91,6 +92,7 @@
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $jabatan->kode_jabatan }}</td>
                                                 <td>{{ $jabatan->name }}</td>
+                                                <td>{{ $jabatan->divisi->name ?? '-' }}</td>
                                                 <td>{{ $jabatan->deskripsi }}</td>
                                                 <td class="text-center">
                                                     <input type="checkbox" class="toggle-status"

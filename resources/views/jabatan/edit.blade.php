@@ -21,11 +21,7 @@
         <!-- Header -->
         <div class="content-header">
             <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">Edit Jabatan</h1>
-                    </div>
-                </div>
+                <h1 class="m-0">Edit Jabatan</h1>
             </div>
         </div>
 
@@ -39,7 +35,9 @@
                             <i class="fas fa-edit"></i> Form Edit Jabatan
                         </h3>
                     </div>
+
                     <div class="card-body">
+
                         @if(session('error'))
                             <div class="alert alert-danger">{{ session('error') }}</div>
                         @endif
@@ -48,43 +46,79 @@
                             @csrf
                             @method('PUT')
 
+                            <!-- Kode Jabatan -->
                             <div class="form-group">
-                                <label for="kode_jabatan">Kode Jabatan</label>
-
-                                <input type="text" class="form-control" value="{{ $jabatan->kode_jabatan }}" readonly>
-
-                                <!-- Jika tetap ingin mengirim ke backend, maka pakai hidden -->
-                                <input type="hidden" name="kode_jabatan" value="{{ $jabatan->kode_jabatan }}">
+                                <label>Kode Jabatan</label>
+                                <input type="text"
+                                       class="form-control"
+                                       value="{{ $jabatan->kode_jabatan }}"
+                                       readonly>
                             </div>
+
+                            <!-- Nama Jabatan -->
                             <div class="form-group">
                                 <label for="name">Nama Jabatan</label>
-                                <input type="text" name="name"
-                                    class="form-control @error('name') is-invalid @enderror"
-                                    value="{{ old('name', $jabatan->name) }}"
-                                    placeholder="Masukkan nama jabatan" required autocomplete="off">
+                                <input type="text"
+                                       name="name"
+                                       class="form-control @error('name') is-invalid @enderror"
+                                       value="{{ old('name', $jabatan->name) }}"
+                                       placeholder="Masukkan nama jabatan"
+                                       required autocomplete="off">
+
                                 @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
+                            <!-- Divisi -->
+                            <div class="form-group">
+                                <label for="divisi_id">Divisi</label>
+                                <select name="divisi_id"
+                                        class="form-control @error('divisi_id') is-invalid @enderror"
+                                        required>
+
+                                    <option value="">Pilih Divisi</option>
+
+                                    @foreach($divisis as $divisi)
+                                        <option value="{{ $divisi->id }}"
+                                            {{ old('divisi_id', $jabatan->divisi_id) == $divisi->id ? 'selected' : '' }}>
+                                            {{ $divisi->kode }} | {{ $divisi->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                @error('divisi_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Deskripsi -->
                             <div class="form-group">
                                 <label for="deskripsi">Deskripsi</label>
                                 <textarea name="deskripsi"
-                                        class="form-control @error('deskripsi') is-invalid @enderror"
-                                        placeholder="Masukkan deskripsi">{{ old('deskripsi', $jabatan->deskripsi) }}</textarea>
+                                          class="form-control @error('deskripsi') is-invalid @enderror"
+                                          placeholder="Masukkan deskripsi jabatan">{{ old('deskripsi', $jabatan->deskripsi) }}</textarea>
+
                                 @error('deskripsi')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
+                            <!-- Status -->
                             <div class="form-group">
                                 <label for="status">Status</label>
-                                <select name="status" class="form-control @error('status') is-invalid @enderror" required>
+                                <select name="status"
+                                        class="form-control @error('status') is-invalid @enderror"
+                                        required>
                                     <option value="1" {{ old('status', $jabatan->status) == '1' ? 'selected' : '' }}>Aktif</option>
                                     <option value="0" {{ old('status', $jabatan->status) == '0' ? 'selected' : '' }}>Nonaktif</option>
                                 </select>
+
                                 @error('status')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-warning">
                                     <i class="fas fa-save"></i> Update
@@ -93,14 +127,19 @@
                                     <i class="fas fa-arrow-left"></i> Kembali
                                 </a>
                             </div>
+
                         </form>
+
                     </div>
                 </div>
+
             </div>
         </section>
+
     </div>
 
     @include('include.footerSistem')
+
 </div>
 
 @include('services.logoutModal')

@@ -57,7 +57,6 @@
                                                 : 'https://via.placeholder.com/260?text=Foto' }}"
                                                 style="width:100%; height:100%; object-fit: cover;">
                                         </div>
-
                                     </div>
                                 </div>
                             </div>

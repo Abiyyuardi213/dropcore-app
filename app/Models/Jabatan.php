@@ -13,6 +13,7 @@ class Jabatan extends Model
 
     protected $fillable = [
         'kode_jabatan',
+        'divisi_id',
         'name',
         'deskripsi',
         'status',
@@ -42,8 +43,9 @@ class Jabatan extends Model
     {
         return self::create([
             'kode_jabatan' => self::generateKodeJabatan($data['name']),
-            'name'      => $data['name'],
-            'deskripsi'       => $data['deskripsi'] ?? null,
+            'name'         => $data['name'],
+            'divisi_id'    => $data['divisi_id'] ?? null,
+            'deskripsi'    => $data['deskripsi'] ?? null,
             'status'       => $data['status'] ?? true,
         ]);
     }
@@ -70,6 +72,7 @@ class Jabatan extends Model
 
         return $this->update([
             'kode_jabatan' => $newKode,
+            'divisi_id'    => $data['divisi_id'] ?? $this->divisi_id,
             'name'         => $newName,
             'deskripsi'    => $data['deskripsi'] ?? $this->deskripsi,
             'status'       => $data['status'] ?? $this->status,
@@ -85,5 +88,10 @@ class Jabatan extends Model
     {
         $this->status = !$this->status;
         $this->save();
+    }
+
+    public function divisi()
+    {
+        return $this->belongsTo(Divisi::class, 'divisi_id', 'id');
     }
 }

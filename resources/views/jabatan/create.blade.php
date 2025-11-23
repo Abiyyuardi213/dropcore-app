@@ -17,17 +17,13 @@
     @include('include.sidebar')
 
     <div class="content-wrapper">
+
         <div class="content-header">
             <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">Tambah Jabatan</h1>
-                    </div>
-                </div>
+                <h1 class="m-0">Tambah Jabatan</h1>
             </div>
         </div>
 
-        <!-- Main Content -->
         <section class="content">
             <div class="container-fluid">
 
@@ -46,29 +42,55 @@
 
                         <form action="{{ route('jabatan.store') }}" method="POST">
                             @csrf
+
+                            <!-- Nama Jabatan -->
                             <div class="form-group">
                                 <label for="name">Nama Jabatan</label>
                                 <input type="text"
-                                    name="name"
-                                    class="form-control @error('name') is-invalid @enderror"
-                                    value="{{ old('name') }}"
-                                    placeholder="Masukkan nama jabatan"
-                                    required autocomplete="off">
+                                       name="name"
+                                       class="form-control @error('name') is-invalid @enderror"
+                                       value="{{ old('name') }}"
+                                       placeholder="Masukkan nama jabatan"
+                                       required>
 
                                 @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
+                            <!-- Divisi -->
+                            <div class="form-group">
+                                <label for="divisi_id">Divisi</label>
+                                <select name="divisi_id"
+                                        class="form-control @error('divisi_id') is-invalid @enderror"
+                                        required>
+                                    <option value="">Pilih Divisi</option>
+                                    @foreach($divisis as $divisi)
+                                        <option value="{{ $divisi->id }}"
+                                            {{ old('divisi_id') == $divisi->id ? 'selected' : '' }}>
+                                            {{ $divisi->kode }} | {{ $divisi->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                @error('divisi_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Deskripsi -->
                             <div class="form-group">
                                 <label for="deskripsi">Deskripsi</label>
                                 <textarea name="deskripsi"
-                                        class="form-control @error('deskripsi') is-invalid @enderror"
-                                        placeholder="Masukkan deskripsi jabatan">{{ old('deskripsi') }}</textarea>
+                                          class="form-control @error('deskripsi') is-invalid @enderror"
+                                          placeholder="Masukkan deskripsi jabatan">{{ old('deskripsi') }}</textarea>
 
                                 @error('deskripsi')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
+                            <!-- Status -->
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select name="status"
@@ -79,9 +101,10 @@
                                 </select>
 
                                 @error('status')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save"></i> Simpan
@@ -90,11 +113,15 @@
                                     <i class="fas fa-arrow-left"></i> Batal
                                 </a>
                             </div>
+
                         </form>
+
                     </div>
                 </div>
+
             </div>
         </section>
+
     </div>
 
     @include('include.footerSistem')
@@ -102,7 +129,6 @@
 
 @include('services.logoutModal')
 
-<!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
