@@ -37,15 +37,12 @@
                     </div>
 
                     <div class="card-body">
-
                         @if(session('error'))
                             <div class="alert alert-danger">{{ session('error') }}</div>
                         @endif
-
                         <form action="{{ route('jabatan.update', $jabatan->id) }}" method="POST">
                             @csrf
                             @method('PUT')
-
                             <!-- Kode Jabatan -->
                             <div class="form-group">
                                 <label>Kode Jabatan</label>
@@ -54,7 +51,6 @@
                                        value="{{ $jabatan->kode_jabatan }}"
                                        readonly>
                             </div>
-
                             <!-- Nama Jabatan -->
                             <div class="form-group">
                                 <label for="name">Nama Jabatan</label>
@@ -64,21 +60,17 @@
                                        value="{{ old('name', $jabatan->name) }}"
                                        placeholder="Masukkan nama jabatan"
                                        required autocomplete="off">
-
                                 @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
                             <!-- Divisi -->
                             <div class="form-group">
                                 <label for="divisi_id">Divisi</label>
                                 <select name="divisi_id"
                                         class="form-control @error('divisi_id') is-invalid @enderror"
                                         required>
-
                                     <option value="">Pilih Divisi</option>
-
                                     @foreach($divisis as $divisi)
                                         <option value="{{ $divisi->id }}"
                                             {{ old('divisi_id', $jabatan->divisi_id) == $divisi->id ? 'selected' : '' }}>
@@ -86,24 +78,20 @@
                                         </option>
                                     @endforeach
                                 </select>
-
                                 @error('divisi_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
                             <!-- Deskripsi -->
                             <div class="form-group">
                                 <label for="deskripsi">Deskripsi</label>
                                 <textarea name="deskripsi"
                                           class="form-control @error('deskripsi') is-invalid @enderror"
                                           placeholder="Masukkan deskripsi jabatan">{{ old('deskripsi', $jabatan->deskripsi) }}</textarea>
-
                                 @error('deskripsi')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
                             <!-- Status -->
                             <div class="form-group">
                                 <label for="status">Status</label>
@@ -113,12 +101,10 @@
                                     <option value="1" {{ old('status', $jabatan->status) == '1' ? 'selected' : '' }}>Aktif</option>
                                     <option value="0" {{ old('status', $jabatan->status) == '0' ? 'selected' : '' }}>Nonaktif</option>
                                 </select>
-
                                 @error('status')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-warning">
                                     <i class="fas fa-save"></i> Update
@@ -127,19 +113,14 @@
                                     <i class="fas fa-arrow-left"></i> Kembali
                                 </a>
                             </div>
-
                         </form>
-
                     </div>
                 </div>
-
             </div>
         </section>
-
     </div>
 
     @include('include.footerSistem')
-
 </div>
 
 @include('services.logoutModal')

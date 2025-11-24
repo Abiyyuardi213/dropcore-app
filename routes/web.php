@@ -27,6 +27,7 @@ use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\KantorController;
 use App\Http\Controllers\KondisiBarangController;
 use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\PenerimaanBarangController;
 use App\Http\Controllers\RiwayatAktivitasLogController;
 use App\Http\Controllers\RiwayatAktivitasProdukController;
 use App\Http\Controllers\SupplierController;
@@ -115,6 +116,8 @@ Route::middleware(['role:admin,staff'])->group(function () {
     Route::get('dashboard-master', [DashboardMasterController::class, 'index'])->name('dashboard-master');
 
     Route::resource('kondisi-barang', KondisiBarangController::class);
+
+    Route::resource('penerimaan-barang', PenerimaanBarangController::class);
 
     Route::resource('riwayat-aktivitas-produk', RiwayatAktivitasProdukController::class)->only(['index','show']);
 
