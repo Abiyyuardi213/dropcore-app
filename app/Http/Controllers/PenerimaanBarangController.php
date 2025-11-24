@@ -23,6 +23,24 @@ class PenerimaanBarangController extends Controller
         return view('penerimaan_barang.create', compact('suppliers', 'no_penerimaan'));
     }
 
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'supplier_id'        => 'required|exists:suppliers,id',
+    //         'tanggal_penerimaan' => 'required|date',
+    //         'keterangan'         => 'nullable|string',
+    //     ]);
+
+    //     PenerimaanBarang::createPenerimaan([
+    //         'supplier_id'        => $request->supplier_id,
+    //         'tanggal_penerimaan' => $request->tanggal_penerimaan,
+    //         'keterangan'         => $request->keterangan,
+    //     ]);
+
+    //     return redirect()->route('penerimaan.index')
+    //         ->with('success', 'Penerimaan barang berhasil ditambahkan.');
+    // }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -31,14 +49,14 @@ class PenerimaanBarangController extends Controller
             'keterangan'         => 'nullable|string',
         ]);
 
-        PenerimaanBarang::createPenerimaan([
+        $penerimaan = PenerimaanBarang::createPenerimaan([
             'supplier_id'        => $request->supplier_id,
             'tanggal_penerimaan' => $request->tanggal_penerimaan,
             'keterangan'         => $request->keterangan,
         ]);
 
-        return redirect()->route('penerimaan.index')
-            ->with('success', 'Penerimaan barang berhasil ditambahkan.');
+        return redirect()->route('penerimaan-barang.detail', $penerimaan->id)
+            ->with('success', 'Penerimaan barang berhasil ditambahkan, silakan tambahkan produk.');
     }
 
     public function edit($id)
@@ -69,9 +87,21 @@ class PenerimaanBarangController extends Controller
             ->with('success', 'Penerimaan barang berhasil diperbarui.');
     }
 
+    // public function show($id)
+    // {
+    //     $penerimaan = PenerimaanBarang::with('supplier')->findOrFail($id);
+
+    //     return view('penerimaan_barang.show', compact('penerimaan'));
+    // }
+
     public function show($id)
     {
-        $penerimaan = PenerimaanBarang::with('supplier')->findOrFail($id);
+        $penerimaan = PenerimaanBarang::with([
+            'details.produk',
+            'details.gudang',
+            'details.area',
+            'details.rak'
+        ])->findOrFail($id);
 
         return view('penerimaan_barang.show', compact('penerimaan'));
     }

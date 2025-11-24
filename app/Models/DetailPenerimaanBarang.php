@@ -19,6 +19,9 @@ class DetailPenerimaanBarang extends Model
         'qty',
         'harga',
         'subtotal',
+        'gudang_id',
+        'area_id',
+        'rak_id',
     ];
 
     protected static function booted()
@@ -74,6 +77,9 @@ class DetailPenerimaanBarang extends Model
         return self::create([
             'penerimaan_id' => $data['penerimaan_id'],
             'produk_id'     => $data['produk_id'],
+            'gudang_id'     => $data['gudang_id'],
+            'area_id'       => $data['area_id'],
+            'rak_id'        => $data['rak_id'],
             'qty'           => $data['qty'],
             'harga'         => $data['harga'],
             'subtotal'      => $subtotal,
@@ -95,5 +101,20 @@ class DetailPenerimaanBarang extends Model
     public function deleteDetail()
     {
         return $this->delete();
+    }
+
+    public function gudang()
+    {
+        return $this->belongsTo(Gudang::class, 'gudang_id');
+    }
+
+    public function area()
+    {
+        return $this->belongsTo(AreaGudang::class, 'area_id');
+    }
+
+    public function rak()
+    {
+        return $this->belongsTo(RakGudang::class, 'rak_id');
     }
 }

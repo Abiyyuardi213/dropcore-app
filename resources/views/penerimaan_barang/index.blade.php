@@ -65,12 +65,12 @@
                                             <td>{{ $p->keterangan ?? '-' }}</td>
                                             <td class="text-center">
 
-                                                <a href="{{ route('penerimaan.show', $p->id) }}"
+                                                <a href="{{ route('penerimaan-barang.show', $p->id) }}"
                                                    class="btn btn-secondary btn-sm">
                                                     <i class="fas fa-eye"></i> Detail
                                                 </a>
 
-                                                <a href="{{ route('penerimaan.edit', $p->id) }}"
+                                                <a href="{{ route('penerimaan-barang.edit', $p->id) }}"
                                                    class="btn btn-info btn-sm">
                                                     <i class="fas fa-edit"></i> Edit
                                                 </a>

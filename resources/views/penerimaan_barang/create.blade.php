@@ -104,7 +104,7 @@
                             <!-- Tombol -->
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Simpan
+                                    <i class="fas fa-save"></i> Selanjutnya
                                 </button>
                                 <a href="{{ route('penerimaan-barang.index') }}" class="btn btn-secondary">
                                     Batal

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Penerimaan Barang</title>
+    <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        @media print {
+            .no-print { display: none; }
+        }
+        .card-header h3 { margin-bottom: 0; }
+        .table th, .table td { vertical-align: middle; }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    @include('include.navbarSistem')
+    @include('include.sidebar')
+
+    <div class="content-wrapper">
+
+        <!-- Header -->
+        <div class="content-header mb-3">
+            <div class="container-fluid">
+                <h1 class="m-0">Detail Penerimaan Barang</h1>
+            </div>
+        </div>
+
+        <section class="content">
+            <div class="container-fluid">
+
+                <!-- Info Penerimaan -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle"></i> Informasi Penerimaan
+                        </h3>
+                        <div class="card-tools no-print">
+                            <button class="btn btn-success btn-sm" onclick="window.print();">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Nomor Penerimaan:</strong> {{ $penerimaan->no_penerimaan }}</p>
+                                <p><strong>Supplier:</strong> {{ $penerimaan->supplier->nama_supplier }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Tanggal Penerimaan:</strong> {{ \Carbon\Carbon::parse($penerimaan->tanggal_penerimaan)->format('d-m-Y') }}</p>
+                                <p><strong>Keterangan:</strong>
+                                    @if($penerimaan->keterangan)
+                                        {{ $penerimaan->keterangan }}
+                                    @else
+                                        <span class="badge badge-secondary">-</span>
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daftar Produk -->
+                <div class="card mt-3">
+                    <div class="card-header bg-dark">
+                        <h3 class="card-title">
+                            <i class="fas fa-boxes"></i> Daftar Produk Diterima
+                        </h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-bordered table-hover m-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Gudang</th>
+                                    <th>Area</th>
+                                    <th>Rak</th>
+                                    <th class="text-right">Qty</th>
+                                    <th class="text-right">Harga</th>
+                                    <th class="text-right">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $total = 0; @endphp
+                                @forelse($penerimaan->details as $d)
+                                    @php $total += $d->subtotal; @endphp
+                                    <tr>
+                                        <td>{{ $d->produk->name ?? '-' }}</td>
+                                        <td>{{ $d->gudang->nama_gudang ?? '-' }}</td>
+                                        <td>{{ $d->area->nama_area ?? '-' }}</td>
+                                        <td>{{ $d->rak->kode_rak ?? '-' }}</td>
+                                        <td class="text-right">{{ $d->qty }}</td>
+                                        <td class="text-right">Rp {{ number_format($d->harga,0,',','.') }}</td>
+                                        <td class="text-right">Rp {{ number_format($d->subtotal,0,',','.') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-3">Belum ada produk ditambahkan</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                            @if($penerimaan->details->count() > 0)
+                            <tfoot>
+                                <tr class="bg-light">
+                                    <th colspan="6" class="text-right">Total</th>
+                                    <th class="text-right">Rp {{ number_format($total,0,',','.') }}</th>
+                                </tr>
+                            </tfoot>
+                            @endif
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mt-3 no-print">
+                    <a href="{{ route('penerimaan-barang.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    @include('include.footerSistem')
+</div>
+
+@include('services.logoutModal')
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
+</body>
+</html>
