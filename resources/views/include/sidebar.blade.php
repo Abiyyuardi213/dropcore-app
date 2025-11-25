@@ -257,6 +257,13 @@
                 </li>
 
                 <li class="nav-item">
+                    <a href="{{ url('distributor') }}" class="nav-link">
+                        <i class="nav-icon fas fa-truck-moving"></i>
+                        <p>Distributor</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a href="{{ url('mutasi-stok') }}" class="nav-link">
                         <i class="nav-icon fas fa-exchange-alt"></i>
                         <p>Mutasi Stok</p>

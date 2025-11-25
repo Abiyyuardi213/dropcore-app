@@ -23,6 +23,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardMasterController;
 use App\Http\Controllers\DashboardOfficeController;
 use App\Http\Controllers\DetailPenerimaanBarangController;
+use App\Http\Controllers\DistributorController;
 use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\KantorController;
@@ -78,6 +79,9 @@ Route::middleware(['role:admin,staff'])->group(function () {
 
     Route::post('divisi/{id}/toggle-status', [DivisiController::class, 'toggleStatus'])->name('divisi.toggleStatus');
     Route::resource('divisi', DivisiController::class);
+
+    //Route::post('distributor/{id}/toggle-status', [DistributorController::class, 'toggleStatus'])->name('distributor.toggleStatus');
+    Route::resource('distributor', DistributorController::class);
 
     Route::post('jabatan/{id}/toggle-status', [JabatanController::class, 'toggleStatus'])->name('jabatan.toggleStatus');
     Route::resource('jabatan', JabatanController::class);
