@@ -70,7 +70,7 @@
                                                     <i class="fas fa-eye"></i> Detail
                                                 </a>
 
-                                                <a href="{{ route('penerimaan-barang.edit', $p->id) }}"
+                                                {{-- <a href="{{ route('penerimaan-barang.edit', $p->id) }}"
                                                    class="btn btn-info btn-sm">
                                                     <i class="fas fa-edit"></i> Edit
                                                 </a>
@@ -80,7 +80,7 @@
                                                     data-target="#deletePenerimaanModal"
                                                     data-id="{{ $p->id }}">
                                                     <i class="fas fa-trash"></i> Hapus
-                                                </button>
+                                                </button> --}}
 
                                             </td>
                                         </tr>

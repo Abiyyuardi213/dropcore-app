@@ -42,9 +42,10 @@
                             <i class="fas fa-info-circle"></i> Informasi Penerimaan
                         </h3>
                         <div class="card-tools no-print">
-                            <button class="btn btn-success btn-sm" onclick="window.print();">
-                                <i class="fas fa-print"></i> Print
-                            </button>
+                            <a href="{{ route('penerimaan-barang.pdf', $penerimaan->id) }}"
+                            class="btn btn-danger btn-sm" target="_blank">
+                                <i class="fas fa-file-pdf"></i> Cetak PDF
+                            </a>
                         </div>
                     </div>
                     <div class="card-body">

@@ -118,6 +118,9 @@ Route::middleware(['role:admin,staff'])->group(function () {
 
     Route::resource('kondisi-barang', KondisiBarangController::class);
 
+    Route::get('penerimaan-barang/{id}/pdf', [PenerimaanBarangController::class, 'generatePDF'])
+        ->name('penerimaan-barang.pdf');
+
     Route::resource('penerimaan-barang', PenerimaanBarangController::class);
 
     Route::get(

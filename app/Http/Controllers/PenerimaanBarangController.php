@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PenerimaanBarang;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PenerimaanBarangController extends Controller
 {
@@ -113,5 +114,20 @@ class PenerimaanBarangController extends Controller
 
         return redirect()->route('penerimaan.index')
             ->with('success', 'Penerimaan barang berhasil dihapus.');
+    }
+
+    public function generatePDF($id)
+    {
+        $penerimaan = PenerimaanBarang::with([
+            'supplier',
+            'details.produk',
+            'details.gudang',
+            'details.area',
+            'details.rak'
+        ])->findOrFail($id);
+
+        $pdf = Pdf::loadView('penerimaan_barang.pdf', compact('penerimaan'));
+
+        return $pdf->stream('Penerimaan_'.$penerimaan->no_penerimaan.'.pdf');
     }
 }
