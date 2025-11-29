@@ -278,14 +278,16 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('riwayat-logs') }}" class="nav-link">
-                        <i class="nav-icon fas fa-history"></i>
+                    <a href="{{ url('riwayat-logs') }}"
+                    class="nav-link {{ Request::is('riwayat-logs*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-truck-loading"></i>
                         <p>Log Aktivitas</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('penerimaan-barang') }}" class="nav-link">
+                    <a href="{{ url('penerimaan-barang') }}"
+                    class="nav-link {{ Request::is('penerimaan-barang*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-truck-loading"></i>
                         <p>Penerimaan Barang</p>
                     </a>

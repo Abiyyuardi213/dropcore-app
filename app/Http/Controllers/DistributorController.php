@@ -23,8 +23,7 @@ class DistributorController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode_distributor' => 'required|string|max:50|unique:distributors,kode_distributor',
-            'nama_distributor' => 'required|string|max:255|unique:distributors,name',
+            'nama_distributor' => 'required|string|max:255|unique:distributor,nama_distributor',
             'telepon'          => 'nullable|string|max:20',
             'email'            => 'nullable|email|max:255',
             'alamat'           => 'nullable|string',
@@ -34,13 +33,14 @@ class DistributorController extends Controller
         Distributor::createDistributor($request->all());
 
         return redirect()->route('distributor.index')
-                         ->with('success', 'Distributor berhasil ditambahkan.');
+                        ->with('success', 'Distributor berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
         $distributor = Distributor::findOrFail($id);
-        return view('distributor.edit', compact('distributor'));
+        $kotas = Kota::orderBy('kota', 'asc')->get();
+        return view('distributor.edit', compact('distributor', 'kotas'));
     }
 
     public function update(Request $request, $id)

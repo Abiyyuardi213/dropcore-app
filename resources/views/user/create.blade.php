@@ -73,6 +73,13 @@
                                         @error('no_telepon')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
 
+                                    <div class="form-group">
+                                        <label for="nik">NIK</label>
+                                        <input type="text" class="form-control @error('nik') is-invalid @enderror"
+                                            name="nik" value="{{ old('nik') }}">
+                                        @error('nik')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    </div>
+
                                 </div>
 
                                 <!-- TENGAH -->
