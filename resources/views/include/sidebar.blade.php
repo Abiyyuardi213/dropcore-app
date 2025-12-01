@@ -37,8 +37,9 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" data-accordion="false" role="menu">
                 <li class="nav-item">
-                    <a href="{{ url('dashboard') }}" class="nav-link">
-                        <i class="nav-icon fas fa-warehouse"></i>
+                    <a href="{{ url('dashboard') }}"
+                    class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-truck-loading"></i>
                         <p>Dashboard Utama</p>
                     </a>
                 </li>
@@ -294,7 +295,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('pengeluaran-barang') }}" class="nav-link">
+                    <a href="{{ url('pengeluaran-barang') }}"
+                    class="nav-link {{ Request::is('pengeluaran-barang*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-dolly"></i>
                         <p>Pengeluaran Barang</p>
                     </a>

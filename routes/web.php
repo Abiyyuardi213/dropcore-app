@@ -23,6 +23,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardMasterController;
 use App\Http\Controllers\DashboardOfficeController;
 use App\Http\Controllers\DetailPenerimaanBarangController;
+use App\Http\Controllers\DetailPengeluaranBarangController;
 use App\Http\Controllers\DistributorController;
 use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\JabatanController;
@@ -30,6 +31,7 @@ use App\Http\Controllers\KantorController;
 use App\Http\Controllers\KondisiBarangController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PenerimaanBarangController;
+use App\Http\Controllers\PengeluaranBarangController;
 use App\Http\Controllers\RiwayatAktivitasLogController;
 use App\Http\Controllers\RiwayatAktivitasProdukController;
 use App\Http\Controllers\SupplierController;
@@ -141,6 +143,23 @@ Route::middleware(['role:admin,staff'])->group(function () {
         'detail-penerimaan/{id}',
         [DetailPenerimaanBarangController::class, 'destroy']
     )->name('detail-penerimaan.destroy');
+
+    Route::resource('pengeluaran-barang', PengeluaranBarangController::class);
+
+    Route::get(
+        'pengeluaran-barang/{id}/detail',
+        [DetailPengeluaranBarangController::class, 'index']
+    )->name('pengeluaran-barang.detail');
+
+    Route::post(
+        'detail-pengeluaran/store',
+        [DetailPengeluaranBarangController::class, 'store']
+    )->name('detail-pengeluaran.store');
+
+    Route::delete(
+        'detail-pengeluaran/{id}',
+        [DetailPengeluaranBarangController::class, 'destroy']
+    )->name('detail-pengeluaran.destroy');
 
     Route::resource('riwayat-aktivitas-produk', RiwayatAktivitasProdukController::class)->only(['index','show']);
 
