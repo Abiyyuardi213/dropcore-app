@@ -101,6 +101,8 @@ Route::middleware(['role:admin,staff'])->group(function () {
     Route::post('/stok/update-kondisi/{id}', [StokController::class, 'updateKondisi']);
     Route::resource('stok', StokController::class);
 
+    Route::get('/stok/by-produk/{produk_id}', [StokController::class, 'getStokByProduk']);
+
     Route::get('/stok/produk/{produk_id}', [MutasiStokController::class, 'getStokByProduk']);
     Route::get('/lokasi-asal-produk/{produk_id}', [MutasiStokController::class, 'lokasiAsalProduk']);
     Route::resource('mutasi-stok', MutasiStokController::class);

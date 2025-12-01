@@ -50,8 +50,11 @@ class PengeluaranBarangController extends Controller
             'keterangan'         => $request->keterangan,
         ]);
 
-        return redirect()->route('pengeluaran-barang.detail', $pengeluaran->id)
-            ->with('success', 'Pengeluaran barang berhasil dibuat, silakan tambahkan produk.');
+        // return redirect()->route('pengeluaran-barang.detail', $pengeluaran->id)
+        //     ->with('success', 'Pengeluaran barang berhasil dibuat, silakan tambahkan produk.');
+        return redirect()->route('pengeluaran-barang.detail', [
+            'id' => $pengeluaran->id
+        ])->with('success', 'Pengeluaran barang berhasil dibuat, silakan tambahkan produk.');
     }
 
     public function edit($id)

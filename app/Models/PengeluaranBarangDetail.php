@@ -16,6 +16,7 @@ class PengeluaranBarangDetail extends Model
     protected $fillable = [
         'pengeluaran_id',
         'produk_id',
+        'stok_id',
         'qty',
         'harga',
         'subtotal',
@@ -39,13 +40,17 @@ class PengeluaranBarangDetail extends Model
             if ($detail->isDirty(['qty', 'harga'])) {
                 $detail->subtotal = $detail->qty * $detail->harga;
             }
+
+            if ($detail->isDirty(['stok_id', 'gudang_id', 'area_id', 'rak_id'])) {
+                throw new \Exception("Lokasi stok tidak boleh diubah setelah tersimpan.");
+            }
         });
 
         static::created(function ($detail) {
             RiwayatAktivitasLog::add(
                 'pengeluaran_barang_details',
                 'create',
-                "Menambah detail pengeluaran barang untuk produk {$detail->produk_id}",
+                "Menambah detail pengeluaran barang untuk produk {$detail->produk_id} (stok: {$detail->stok_id})",
                 optional(Auth::user())->id
             );
         });
@@ -54,7 +59,7 @@ class PengeluaranBarangDetail extends Model
             RiwayatAktivitasLog::add(
                 'pengeluaran_barang_details',
                 'update',
-                "Mengubah detail pengeluaran barang untuk produk {$detail->produk_id}",
+                "Mengubah detail pengeluaran barang untuk produk {$detail->produk_id} (stok: {$detail->stok_id})",
                 optional(Auth::user())->id
             );
         });
@@ -63,7 +68,7 @@ class PengeluaranBarangDetail extends Model
             RiwayatAktivitasLog::add(
                 'pengeluaran_barang_details',
                 'delete',
-                "Menghapus detail pengeluaran barang untuk produk {$detail->produk_id}",
+                "Menghapus detail pengeluaran barang untuk produk {$detail->produk_id} (stok: {$detail->stok_id})",
                 optional(Auth::user())->id
             );
         });
@@ -74,9 +79,11 @@ class PengeluaranBarangDetail extends Model
         return self::create([
             'pengeluaran_id' => $data['pengeluaran_id'],
             'produk_id'      => $data['produk_id'],
+            'stok_id'        => $data['stok_id'], // wajib
             'qty'            => $data['qty'],
             'harga'          => $data['harga'],
             'kondisi_id'     => $data['kondisi_id'] ?? null,
+
             'gudang_id'      => $data['gudang_id'],
             'area_id'        => $data['area_id'],
             'rak_id'         => $data['rak_id'],
@@ -85,13 +92,10 @@ class PengeluaranBarangDetail extends Model
 
     public function updateDetail($data)
     {
-        $this->update([
-            'qty'        => $data['qty']        ?? $this->qty,
-            'harga'      => $data['harga']      ?? $this->harga,
+        return $this->update([
+            'qty'        => $data['qty']   ?? $this->qty,
+            'harga'      => $data['harga'] ?? $this->harga,
             'kondisi_id' => $data['kondisi_id'] ?? $this->kondisi_id,
-            'gudang_id'  => $data['gudang_id']  ?? $this->gudang_id,
-            'area_id'    => $data['area_id']    ?? $this->area_id,
-            'rak_id'     => $data['rak_id']     ?? $this->rak_id,
         ]);
     }
 
@@ -128,5 +132,10 @@ class PengeluaranBarangDetail extends Model
     public function rak()
     {
         return $this->belongsTo(RakGudang::class, 'rak_id');
+    }
+
+    public function stok()
+    {
+        return $this->belongsTo(Stok::class, 'stok_id');
     }
 }

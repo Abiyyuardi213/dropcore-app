@@ -10,7 +10,6 @@ use App\Models\Products;
 use App\Models\RakGudang;
 use App\Models\Stok;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class DetailPengeluaranBarangController extends Controller
 {
@@ -44,9 +43,8 @@ class DetailPengeluaranBarangController extends Controller
             'gudang_id'      => 'required',
             'area_id'        => 'required',
             'rak_id'         => 'required',
+            'kondisi_id'     => 'nullable',
         ]);
-
-        $subtotal = $request->qty * $request->harga;
 
         $stok = Stok::where('produk_id', $request->produk_id)
             ->where('gudang_id', $request->gudang_id)
@@ -58,16 +56,16 @@ class DetailPengeluaranBarangController extends Controller
             return redirect()->back()->with('error', 'Stok tidak mencukupi untuk pengeluaran.');
         }
 
-        $detail = PengeluaranBarangDetail::create([
-            'id'            => Str::uuid(),
-            'pengeluaran_id'=> $request->pengeluaran_id,
-            'produk_id'     => $request->produk_id,
-            'qty'           => $request->qty,
-            'harga'         => $request->harga,
-            'subtotal'      => $subtotal,
-            'gudang_id'     => $request->gudang_id,
-            'area_id'       => $request->area_id,
-            'rak_id'        => $request->rak_id,
+        $detail = PengeluaranBarangDetail::createDetail([
+            'pengeluaran_id' => $request->pengeluaran_id,
+            'produk_id'      => $request->produk_id,
+            'stok_id'        => $stok->id,
+            'qty'            => $request->qty,
+            'harga'          => $request->harga,
+            'kondisi_id'     => $request->kondisi_id,
+            'gudang_id'      => $request->gudang_id,
+            'area_id'        => $request->area_id,
+            'rak_id'         => $request->rak_id,
         ]);
 
         $stok->quantity -= $request->qty;
@@ -88,15 +86,13 @@ class DetailPengeluaranBarangController extends Controller
                 'area_id'   => $detail->area_id,
                 'rak_id'    => $detail->rak_id,
             ],
-            [
-                'quantity' => 0
-            ]
+            ['quantity' => 0]
         );
 
         $stok->quantity += $detail->qty;
         $stok->save();
 
-        $detail->delete();
+        $detail->deleteDetail();
 
         return redirect()->back()->with('success', 'Detail pengeluaran berhasil dihapus.');
     }

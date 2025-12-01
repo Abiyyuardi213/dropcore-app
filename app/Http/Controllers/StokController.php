@@ -75,6 +75,15 @@ class StokController extends Controller
         return redirect()->route('stok.index')->with('success', 'Stok produk berhasil diperbarui.');
     }
 
+    public function getStokByProduk($produk_id)
+    {
+        $stok = Stok::with(['gudang', 'area', 'rak'])
+                ->where('produk_id', $produk_id)
+                ->get();
+
+        return response()->json($stok);
+    }
+
     public function destroy($id)
     {
         $stok = Stok::findOrFail($id);
