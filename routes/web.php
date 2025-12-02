@@ -28,6 +28,7 @@ use App\Http\Controllers\DistributorController;
 use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\KantorController;
+use App\Http\Controllers\KasPusatController;
 use App\Http\Controllers\KondisiBarangController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PenerimaanBarangController;
@@ -70,6 +71,11 @@ Route::middleware(['role:admin,staff'])->group(function () {
     Route::resource('category', CategoryController::class);
 
     Route::resource('product', ProductController::class);
+
+    Route::get('/kas-pusat', [KasPusatController::class, 'index'])->name('kas-pusat.index');
+    Route::get('/kas-pusat/edit', [KasPusatController::class, 'edit'])->name('kas-pusat.edit');
+    // Route::post('/kas-pusat/update', [KasPusatController::class, 'update'])->name('kas-pusat.update');
+    Route::put('/kas-pusat/update/{id}', [KasPusatController::class, 'update'])->name('kas-pusat.update');
 
     Route::post('gudang/{id}/toggle-status', [GudangController::class, 'toggleStatus'])->name('gudang.toggleStatus');
     Route::resource('gudang', GudangController::class);

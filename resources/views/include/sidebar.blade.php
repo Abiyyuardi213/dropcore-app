@@ -257,6 +257,35 @@
                     </ul>
                 </li>
 
+                @php
+                    $isKeuangan = request()->is('dashboardKeuangan*') || request()->is('kas-pusat*');
+                @endphp
+                <li class="nav-item has-treeview {{ $isKeuangan ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ $isKeuangan ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-wallet"></i> {{-- Ikon grup Keuangan --}}
+                        <p>
+                            Keuangan
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview" style="{{ $isKeuangan ? 'display: block;' : '' }}">
+                        <li class="nav-item">
+                            <a href="{{ url('dashboardKeuangan') }}" class="nav-link">
+                                <i class="nav-icon fas fa-chart-line"></i> {{-- Ikon dashboard --}}
+                                <p>Dashboard Keuangan</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ url('kas-pusat') }}" class="nav-link">
+                                <i class="nav-icon fas fa-coins"></i> {{-- Ikon kas pusat --}}
+                                <p>Kas Pusat</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
                 <li class="nav-item">
                     <a href="{{ url('distributor') }}" class="nav-link">
                         <i class="nav-icon fas fa-truck-moving"></i>
