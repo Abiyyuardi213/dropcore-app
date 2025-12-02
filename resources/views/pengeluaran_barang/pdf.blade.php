@@ -2,11 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Penerimaan Barang - {{ $penerimaan->no_penerimaan }}</title>
+    <title>Laporan Pengeluaran Barang - {{ $pengeluaran->no_pengeluaran }}</title>
 
     <style>
         /*
-         * STYLING CSS MONOKROMATIK (HITAM PUTIH) UNTUK LAPORAN PDF (PENERIMAAN BARANG)
+         * STYLING CSS MONOKROMATIK (HITAM PUTIH) UNTUK LAPORAN PDF
          */
 
         body {
@@ -51,7 +51,7 @@
             padding-bottom: 3px;
         }
 
-        /* --- Info Blocks (Supplier & Keterangan) --- */
+        /* --- Info Blocks (Penerima & Keterangan) --- */
         .info-table {
             width: 100%;
             margin-top: 5px;
@@ -145,11 +145,11 @@
         <tr>
             <td style="width: 50%;">
                 <img src="{{ public_path('image/garuda-fiber.png') }}" alt="Logo Perusahaan" class="logo"><br>
-                <div class="title">LAPORAN PENERIMAAN BARANG</div>
+                <div class="title">LAPORAN PENGELUARAN BARANG</div>
             </td>
             <td class="header-right" style="width: 50%;">
-                <strong>No Penerimaan:</strong> <span style="color:#333;">{{ $penerimaan->no_penerimaan }}</span><br>
-                <strong>Tanggal Terima:</strong> {{ \Carbon\Carbon::parse($penerimaan->tanggal_penerimaan)->format('d F Y') }}<br>
+                <strong>No Pengeluaran:</strong> <span style="color:#333;">{{ $pengeluaran->no_pengeluaran }}</span><br>
+                <strong>Tanggal Keluar:</strong> {{ \Carbon\Carbon::parse($pengeluaran->tanggal_pengeluaran)->format('d F Y') }}<br>
                 <strong>Dicetak Pada:</strong> {{ date('d/m/Y H:i') }}
             </td>
         </tr>
@@ -161,10 +161,16 @@
         <tr>
             <td style="width: 48%;">
                 <div class="info-block">
-                    <strong>Supplier</strong><br>
-                    **{{ $penerimaan->supplier->nama_supplier ?? 'N/A' }}**<br>
-                    Alamat: {{ $penerimaan->supplier->alamat ?? '-' }}<br>
-                    Telp: {{ $penerimaan->supplier->telepon ?? '-' }}
+                    <strong>Penerima Barang</strong><br>
+                    @if($pengeluaran->tipe_penerima === 'distributor')
+                        **{{ optional($pengeluaran->distributor)->nama_distributor ?? 'N/A' }}**<br>
+                        Tipe: Distributor (Kode: {{ optional($pengeluaran->distributor)->kode_distributor ?? '-' }})
+                    @else
+                        **{{ $pengeluaran->nama_konsumen ?? 'N/A' }}**<br>
+                        Tipe: Konsumen<br>
+                        Telp: {{ $pengeluaran->telepon_konsumen ?? '-' }}<br>
+                        Alamat: {{ $pengeluaran->alamat_konsumen ?? '-' }}
+                    @endif
                 </div>
             </td>
 
@@ -173,14 +179,14 @@
 
             <td style="width: 48%;">
                 <div class="info-block">
-                    <strong>Keterangan Penerimaan</strong><br>
-                    {{ $penerimaan->keterangan ?? 'Tidak ada keterangan tambahan.' }}
+                    <strong>Keterangan Pengeluaran</strong><br>
+                    {{ $pengeluaran->keterangan ?? 'Tidak ada keterangan tambahan.' }}
                 </div>
             </td>
         </tr>
     </table>
 
-    <div class="section-title">Detail Barang yang Diterima</div>
+    <div class="section-title">Detail Barang yang Dikeluarkan</div>
 
     <table class="product-table">
         <thead>
@@ -196,7 +202,7 @@
         </thead>
         <tbody>
             @php $total = 0; @endphp
-            @foreach($penerimaan->details as $d)
+            @foreach($pengeluaran->details as $d)
                 @php $total += $d->subtotal; @endphp
                 <tr>
                     <td>{{ $d->produk->name ?? '-' }}</td>
@@ -214,25 +220,20 @@
     <table class="total-box">
         <tr>
             <td style="width: 70%;"></td>
-            <td class="total-label">TOTAL PENERIMAAN:</td>
+            <td class="total-label">TOTAL PENGELUARAN:</td>
             <td class="total-value">Rp {{ number_format($total,0,',','.') }}</td>
         </tr>
     </table>
 
     <table style="width: 100%; margin-top: 50px;">
         <tr>
-            <td style="width: 33%; text-align: center;">
-                <p>Disiapkan Oleh (Gudang):</p>
+            <td style="width: 50%; text-align: center;">
+                <p>Disiapkan Oleh:</p>
                 <br><br><br>
                 <p>_________________________</p>
             </td>
-            <td style="width: 33%; text-align: center;">
-                <p>Diterima Oleh (Akunting):</p>
-                <br><br><br>
-                <p>_________________________</p>
-            </td>
-            <td style="width: 33%; text-align: center;">
-                <p>Disetujui Oleh (Manajer):</p>
+            <td style="width: 50%; text-align: center;">
+                <p>Disetujui Oleh:</p>
                 <br><br><br>
                 <p>_________________________</p>
             </td>
@@ -240,7 +241,7 @@
     </table>
 
     <div class="footer">
-        Laporan Penerimaan ini otomatis dihasilkan oleh Sistem. Harap simpan sebagai bukti transaksi.<br>
+        Laporan Pengeluaran ini otomatis dihasilkan oleh Sistem. Harap simpan sebagai bukti transaksi.<br>
         Sistem Manajemen Informasi – PT DropCore Indonesia
     </div>
 

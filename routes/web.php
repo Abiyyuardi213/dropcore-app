@@ -146,6 +146,9 @@ Route::middleware(['role:admin,staff'])->group(function () {
         [DetailPenerimaanBarangController::class, 'destroy']
     )->name('detail-penerimaan.destroy');
 
+    Route::get('pengeluaran-barang/{id}/pdf', [PengeluaranBarangController::class, 'generatePDF'])
+        ->name('pengeluaran-barang.pdf');
+
     Route::resource('pengeluaran-barang', PengeluaranBarangController::class);
 
     Route::get(

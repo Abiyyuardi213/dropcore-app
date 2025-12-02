@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Penjualan #INV-2025001</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="invoice-container">
+    <header>
+        <div class="company-details">
+            <h1>Nama Perusahaan Anda</h1>
+            <p>Jl. Jend. Sudirman No. 123, Jakarta Pusat</p>
+            <p>Telp: (021) 1234567 | Email: info@perusahaananda.com</p>
+            <p>NPWP: 01.234.567.8-901.000</p>
+        </div>
+        <div class="logo">
+            <img src="logo-anda.png" alt="Logo Perusahaan" style="width:100px;">
+        </div>
+    </header>
+
+    <section class="invoice-header">
+        <h2>INVOICE PENJUALAN</h2>
+        <div class="invoice-meta">
+            <p><strong>Nomor Invoice:</strong> INV-2025001</p>
+            <p><strong>Tanggal Invoice:</strong> 02 Desember 2025</p>
+            <p><strong>Tanggal Jatuh Tempo:</strong> 09 Desember 2025</p>
+        </div>
+    </section>
+
+    <section class="billing-shipping">
+        <div class="billing-to">
+            <h3>Ditagihkan Kepada:</h3>
+            <p><strong>Nama Pelanggan/Perusahaan:</strong> PT. Mitra Jaya Abadi</p>
+            <p>Jl. Merdeka No. 45, Bandung</p>
+            <p>Telp: (022) 9876543 | Email: finance@mitrajaya.com</p>
+        </div>
+        <div class="shipping-to">
+            <h3>Dikirim Kepada:</h3>
+            <p>Gudang Utama PT. Mitra Jaya Abadi</p>
+            <p>Jl. Industri No. 10, Kawasan Industri, Bandung</p>
+        </div>
+    </section>
+
+    <table class="item-table">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Kode Barang</th>
+                <th>Deskripsi Barang</th>
+                <th class="qty">Qty</th>
+                <th class="right">Harga Satuan (Rp)</th>
+                <th class="right">Total (Rp)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>P001</td>
+                <td>Laptop Gaming Xtreme i7, RAM 32GB</td>
+                <td class="qty">2</td>
+                <td class="right">15.000.000</td>
+                <td class="right">30.000.000</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>S005</td>
+                <td>Monitor LED 27" 144Hz</td>
+                <td class="qty">5</td>
+                <td class="right">3.500.000</td>
+                <td class="right">17.500.000</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>A010</td>
+                <td>Keyboard Mekanikal Pro X</td>
+                <td class="qty">10</td>
+                <td class="right">800.000</td>
+                <td class="right">8.000.000</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" class="right total-label">Subtotal</td>
+                <td class="right total-amount">55.500.000</td>
+            </tr>
+            <tr>
+                <td colspan="5" class="right total-label">Diskon (5%)</td>
+                <td class="right total-amount">-2.775.000</td>
+            </tr>
+            <tr>
+                <td colspan="5" class="right total-label">PPN (11%)</td>
+                <td class="right total-amount">5.805.750</td>
+            </tr>
+            <tr class="grand-total">
+                <td colspan="5" class="right total-label"><strong>TOTAL AKHIR</strong></td>
+                <td class="right total-amount"><strong>58.530.750</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <section class="notes-and-payment">
+        <div class="payment-info">
+            <h3>Informasi Pembayaran</h3>
+            <p>Harap transfer sejumlah total akhir ke rekening berikut:</p>
+            <p><strong>Bank:</strong> BCA</p>
+            <p><strong>No. Rekening:</strong> 731 088 9900</p>
+            <p><strong>Atas Nama:</strong> Nama Perusahaan Anda</p>
+        </div>
+        <div class="notes">
+            <h3>Catatan</h3>
+            <p>* Pembayaran jatuh tempo 7 hari sejak tanggal invoice.</p>
+            <p>* Keterlambatan pembayaran akan dikenakan denda 1% per minggu.</p>
+        </div>
+    </section>
+
+    <section class="signature-section">
+        <div class="signature-box">
+            <p>Hormat Kami,</p>
+            <br><br><br>
+            <p>_________________________</p>
+            <p><strong>(Nama Manajer/Pimpinan)</strong></p>
+        </div>
+        <div class="signature-box customer">
+            <p>Penerima,</p>
+            <br><br><br>
+            <p>_________________________</p>
+            <p><strong>(Nama Penerima Barang)</strong></p>
+        </div>
+    </section>
+
+    <footer>
+        <p>Terima kasih atas kepercayaan Anda.</p>
+    </footer>
+</div>
+
+</body>
+</html>

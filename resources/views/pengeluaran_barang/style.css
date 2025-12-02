@@ -1,0 +1,190 @@
+/* Styling CSS untuk template invoice modern */
+body {
+    font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.invoice-container {
+    width: 800px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Header Section --- */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 3px solid #007bff; /* Garis pemisah modern */
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    color: #007bff;
+    margin: 0;
+    font-size: 28px;
+}
+
+.company-details p {
+    margin: 2px 0;
+    font-size: 13px;
+    color: #555;
+}
+
+/* --- Invoice Header (Judul dan Meta) --- */
+.invoice-header h2 {
+    text-align: center;
+    color: #333;
+    background-color: #f0f8ff; /* Warna latar belakang lembut */
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.invoice-meta {
+    display: flex;
+    justify-content: flex-end;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+/* --- Billing & Shipping --- */
+.billing-shipping {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    padding: 10px 0;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.billing-shipping h3 {
+    font-size: 16px;
+    color: #007bff;
+    margin-top: 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+}
+
+.billing-to, .shipping-to {
+    width: 45%;
+}
+
+.billing-to p, .shipping-to p {
+    margin: 5px 0;
+    font-size: 13px;
+}
+
+/* --- Item Table --- */
+.item-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.item-table thead th {
+    background-color: #007bff;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    border: none;
+    font-weight: 600;
+}
+
+.item-table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.item-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.item-table .qty {
+    text-align: center;
+    width: 50px;
+}
+
+.item-table .right {
+    text-align: right;
+}
+
+/* --- Footer Table (Total) --- */
+.item-table tfoot td {
+    border-top: 2px solid #007bff;
+    padding: 8px 12px;
+}
+
+.item-table tfoot .total-label {
+    font-weight: 500;
+    color: #333;
+}
+
+.item-table tfoot .grand-total td {
+    border-top: 3px solid #007bff;
+    background-color: #e6f0ff;
+    font-size: 16px;
+}
+
+.item-table tfoot .grand-total strong {
+    font-size: 18px;
+    color: #007bff;
+}
+
+
+/* --- Notes and Payment --- */
+.notes-and-payment {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+}
+
+.payment-info, .notes {
+    width: 48%;
+}
+
+.payment-info h3, .notes h3 {
+    color: #333;
+    font-size: 15px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.payment-info p {
+    font-size: 13px;
+    margin: 3px 0;
+}
+
+/* --- Signature --- */
+.signature-section {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.signature-box {
+    width: 40%;
+}
+
+.signature-box p {
+    margin: 5px 0;
+}
+
+/* --- Footer --- */
+footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    color: #777;
+    font-size: 12px;
+}
