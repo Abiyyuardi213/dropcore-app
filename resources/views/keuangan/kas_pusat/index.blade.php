@@ -11,104 +11,105 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
-        .saldo-box {
-            font-size: 26px;
-            font-weight: bold;
-            color: #28a745;
+        .content-header h1 {
+            font-weight: 700;
+            color: #343a40;
         }
-
+        /* Styling untuk info-box kustom agar sedikit lebih besar */
+        .info-box-number {
+            font-size: 1.5rem; /* Membuat angka saldo lebih besar */
+            font-weight: 700;
+        }
         .card-info {
-            font-size: 15px;
-            line-height: 1.6;
+            font-size: 14px;
+            line-height: 1.7;
         }
     </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
-
     @include('include.navbarSistem')
     @include('include.sidebar')
 
     <div class="content-wrapper">
-
-        <!-- Header -->
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">Kas Pusat Perusahaan</h1>
+                    <div class="col-sm-12">
+                        <h1 class="m-0"><i class="fas fa-coins mr-2"></i>Kas Pusat Perusahaan</h1>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Page Content -->
         <section class="content">
             <div class="container-fluid">
 
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h3 class="card-title">Informasi Kas Pusat</h3>
-
-                        <a href="{{ route('kas-pusat.edit') }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-edit"></i> Edit Saldo Awal
-                        </a>
+                <div class="card card-secondary card-outline shadow">
+                    <div class="card-header bg-secondary">
+                        <h3 class="card-title text-white font-weight-bold">
+                            <i class="fas fa-info-circle mr-1"></i> Status Keuangan Utama
+                        </h3>
                     </div>
 
                     <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-12 text-right">
+                                <a href="{{ route('kas-pusat.edit') }}" class="btn btn-warning elevation-2">
+                                    <i class="fas fa-edit mr-1"></i> Edit Saldo Awal
+                                </a>
+                            </div>
+                        </div>
 
                         <div class="row">
-
-                            <!-- Saldo Awal -->
                             <div class="col-md-6">
-                                <div class="small-box bg-info">
-                                    <div class="inner">
-                                        <h4>Saldo Awal</h4>
-                                        <div class="saldo-box">
+                                <div class="info-box shadow-lg">
+                                    <span class="info-box-icon bg-primary elevation-1">
+                                        <i class="fas fa-hand-holding-usd"></i>
+                                    </span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Saldo Awal (Dana Dasar)</span>
+                                        <span class="info-box-number text-primary">
                                             Rp {{ number_format($kas->saldo_awal, 0, ',', '.') }}
-                                        </div>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-wallet"></i>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Saldo Saat Ini -->
                             <div class="col-md-6">
-                                <div class="small-box bg-success">
-                                    <div class="inner">
-                                        <h4>Saldo Saat Ini</h4>
-                                        <div class="saldo-box">
-                                            Rp {{ number_format($kas->saldo_saat_ini, 0, ',', '.') }}
-                                        </div>
-                                    </div>
-                                    <div class="icon">
+                                <div class="info-box shadow-lg">
+                                    <span class="info-box-icon bg-success elevation-1">
                                         <i class="fas fa-money-bill-wave"></i>
+                                    </span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Saldo Saat Ini (Aktual)</span>
+                                        <span class="info-box-number text-success">
+                                            Rp {{ number_format($kas->saldo_saat_ini, 0, ',', '.') }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
 
-                        <hr>
+                        <hr class="my-4">
 
-                        <div class="card-info">
-                            <p><strong>Diperbarui:</strong> {{ $kas->updated_at->format('d/m/Y H:i') }}</p>
-                            <p>Kas Pusat digunakan untuk mencatat saldo utama perusahaan, termasuk semua pemasukan dan pengeluaran yang berasal dari transaksi barang maupun operasional.</p>
+                        <div class="card-info text-muted">
+                            <p class="mb-2">
+                                <strong class="text-dark"><i class="far fa-clock mr-1"></i>Terakhir Diperbarui:</strong>
+                                {{ $kas->updated_at->format('d F Y \j\a\m H:i') }}
+                            </p>
+                            <p>
+                                Kas Pusat berfungsi sebagai **sumber dana utama** perusahaan yang mencatat setiap pemasukan dan pengeluaran
+                                yang terjadi melalui sistem. Saldo ini bersifat **real-time** dan mencerminkan posisi likuiditas perusahaan.
+                            </p>
                         </div>
-
                     </div>
                 </div>
-
             </div>
         </section>
-
     </div>
-
     @include('include.footerSistem')
-
 </div>
 
 @include('services.ToastModal')
@@ -121,6 +122,7 @@
 <script>
     $(document).ready(function() {
         @if (session('success') || session('error'))
+            // Pastikan Anda memiliki include.ToastModal yang benar
             $('#toastNotification').toast({
                 delay: 3000,
                 autohide: true
@@ -128,6 +130,5 @@
         @endif
     });
 </script>
-
 </body>
 </html>

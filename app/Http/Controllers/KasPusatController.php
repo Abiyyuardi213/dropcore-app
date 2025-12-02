@@ -28,13 +28,13 @@ class KasPusatController extends Controller
         return view('keuangan.kas_pusat.edit', compact('kas'));
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'saldo_awal' => 'required|numeric|min:0',
         ]);
 
-        $kas = KasPusat::first();
+        $kas = KasPusat::findOrFail($id);
 
         $kas->saldo_awal = $request->saldo_awal;
         $kas->saldo_saat_ini = $request->saldo_awal;

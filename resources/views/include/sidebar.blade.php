@@ -54,84 +54,98 @@
                                 request()->is('kota*') ||
                                 request()->is('kecamatan*') ||
                                 request()->is('kelurahan*') ||
-                                request()->is('supplier') ||
+                                request()->is('supplier*') ||
                                 request()->is('kondisi-barang*');
                 @endphp
+
                 <li class="nav-item has-treeview {{ $isMaster ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ $isMaster ? 'active' : '' }}">
+                    <a href="#" class="nav-link {{ $isMaster ? 'active' : '' }} font-weight-bold">
                         <i class="nav-icon fas fa-folder-open"></i>
                         <p>
                             Master Data
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
-                    <ul class="nav nav-treeview" style="{{ $isMaster ? 'display: block;' : '' }}">
+
+                    <ul class="nav nav-treeview" style="{{ $isMaster ? 'display:block;' : '' }}">
+
                         <li class="nav-item">
-                            <a href="{{ url('dashboard-master') }}" class="nav-link">
+                            <a href="{{ url('dashboard-master') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-warehouse"></i>
                                 <p>Dashboard Master</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ url('role') }}" class="nav-link">
+                            <a href="{{ url('role') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-user-shield"></i>
                                 <p>Master Peran</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ url('user') }}" class="nav-link">
+                            <a href="{{ url('user') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-users-cog"></i>
                                 <p>Master Pengguna</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ route('category.index') }}" class="nav-link">
+                            <a href="{{ route('category.index') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-tags"></i>
                                 <p>Master Kategori</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ route('wilayah.index') }}" class="nav-link">
+                            <a href="{{ route('wilayah.index') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-globe"></i>
                                 <p>Master Wilayah</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ route('provinsi.index') }}" class="nav-link">
+                            <a href="{{ route('provinsi.index') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-map"></i>
                                 <p>Master Provinsi</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ route('kota.index') }}" class="nav-link">
+                            <a href="{{ route('kota.index') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-city"></i>
                                 <p>Master Kota</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ route('kecamatan.index') }}" class="nav-link">
+                            <a href="{{ route('kecamatan.index') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-map"></i>
                                 <p>Master Kecamatan</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ route('kelurahan.index') }}" class="nav-link">
+                            <a href="{{ route('kelurahan.index') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-map"></i>
                                 <p>Master Kelurahan</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ route('supplier.index') }}" class="nav-link">
+                            <a href="{{ route('supplier.index') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-truck"></i>
                                 <p>Master Supplier</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ route('kondisi-barang.index') }}" class="nav-link">
-                                <i class="nav-icon fas fa-truck"></i>
+                            <a href="{{ route('kondisi-barang.index') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-box-open"></i>
                                 <p>Master Kondisi Barang</p>
                             </a>
                         </li>
+
                     </ul>
                 </li>
 
@@ -142,8 +156,9 @@
                                 request()->is('jabatan*') ||
                                 request()->is('pegawai*');
                 @endphp
+
                 <li class="nav-item has-treeview {{ $isOffice ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ $isOffice ? 'active' : '' }}">
+                    <a href="#" class="nav-link {{ $isOffice ? 'active' : '' }} font-weight-bold">
                         <i class="nav-icon fas fa-building"></i>
                         <p>
                             Master Office
@@ -152,117 +167,143 @@
                     </a>
 
                     <ul class="nav nav-treeview" style="{{ $isOffice ? 'display: block;' : '' }}">
+
                         <li class="nav-item">
-                            <a href="{{ url('dashboardOffice') }}" class="nav-link">
+                            <a href="{{ url('dashboardOffice') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Dashboard Office</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ url('kantor') }}" class="nav-link">
+                            <a href="{{ url('kantor') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-building"></i>
                                 <p>Master Kantor</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ url('divisi') }}" class="nav-link">
+                            <a href="{{ url('divisi') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-sitemap"></i>
                                 <p>Master Divisi</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ url('jabatan') }}" class="nav-link">
+                            <a href="{{ url('jabatan') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-user-tie"></i>
                                 <p>Master Jabatan</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ url('pegawai') }}" class="nav-link">
+                            <a href="{{ url('pegawai') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-id-card"></i>
                                 <p>Master Pegawai</p>
                             </a>
                         </li>
+
                     </ul>
                 </li>
 
                 @php
-                    $isGudang = request()->is('dashboardGudang*') || request()->is('gudang*') || request()->is('areaGudang*') || request()->is('rak-gudang*');
+                    $isGudang = request()->is('dashboardGudang*') ||
+                                request()->is('gudang*') ||
+                                request()->is('areaGudang*') ||
+                                request()->is('rak-gudang*');
                 @endphp
+
                 <li class="nav-item has-treeview {{ $isGudang ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ $isGudang ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-warehouse"></i> {{-- ganti dari fa-map-marker-alt --}}
+                    <a href="#" class="nav-link {{ $isGudang ? 'active' : '' }} font-weight-bold">
+                        <i class="nav-icon fas fa-warehouse"></i>
                         <p>
                             Gudang
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
+
                     <ul class="nav nav-treeview" style="{{ $isGudang ? 'display: block;' : '' }}">
+
                         <li class="nav-item">
-                            <a href="{{ url('dashboardGudang') }}" class="nav-link">
-                                <i class="nav-icon fas fa-chart-pie"></i> {{-- lebih representatif untuk dashboard --}}
+                            <a href="{{ url('dashboardGudang') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-chart-pie"></i>
                                 <p>Dashboard Gudang</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ url('gudang') }}" class="nav-link">
-                                <i class="nav-icon fas fa-building"></i> {{-- tetap relevan untuk gudang --}}
+                            <a href="{{ url('gudang') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-building"></i>
                                 <p>Gudang</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ route('areaGudang.index') }}" class="nav-link">
-                                <i class="nav-icon fas fa-th-large"></i> {{--  --}}
+                            <a href="{{ route('areaGudang.index') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-th-large"></i>
                                 <p>Area Gudang</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ route('rak-gudang.index') }}" class="nav-link">
-                                <i class="nav-icon fas fa-layer-group"></i> {{--  --}}
+                            <a href="{{ route('rak-gudang.index') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-layer-group"></i>
                                 <p>Rak Gudang</p>
                             </a>
                         </li>
+
                     </ul>
                 </li>
 
                 @php
-                    $isProduk = request()->is('dashboardProduk*') || request()->is('product*') || request()->is('stok*');
+                    $isProduk = request()->is('dashboardProduk*') ||
+                                request()->is('product*') ||
+                                request()->is('stok*');
                 @endphp
+
                 <li class="nav-item has-treeview {{ $isProduk ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ $isProduk ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-boxes"></i> {{-- Ikon untuk grup produk secara umum --}}
+                    <a href="#" class="nav-link {{ $isProduk ? 'active' : '' }} font-weight-bold">
+                        <i class="nav-icon fas fa-boxes"></i>
                         <p>
                             Produk
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
+
                     <ul class="nav nav-treeview" style="{{ $isProduk ? 'display: block;' : '' }}">
+
                         <li class="nav-item">
-                            <a href="{{ url('dashboardProduk') }}" class="nav-link">
-                                <i class="nav-icon fas fa-tachometer-alt"></i> {{-- Ikon dashboard --}}
+                            <a href="{{ url('dashboardProduk') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>Dashboard Produk</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ url('product') }}" class="nav-link">
-                                <i class="nav-icon fas fa-box"></i> {{-- Representasi satu produk --}}
+                            <a href="{{ url('product') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-box"></i>
                                 <p>Produk</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a href="{{ route('stok.index') }}" class="nav-link">
-                                <i class="nav-icon fas fa-warehouse"></i> {{-- Representasi stok/gudang --}}
+                            <a href="{{ route('stok.index') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-warehouse"></i>
                                 <p>Stok Produk</p>
                             </a>
                         </li>
+
                     </ul>
                 </li>
 
                 @php
-                    $isKeuangan = request()->is('dashboardKeuangan*') || request()->is('kas-pusat*');
+                    $isKeuangan = request()->is('dashboardKeuangan*') ||
+                                request()->is('kas-pusat*');
                 @endphp
+
                 <li class="nav-item has-treeview {{ $isKeuangan ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ $isKeuangan ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-wallet"></i> {{-- Ikon grup Keuangan --}}
+                    <a href="#" class="nav-link {{ $isKeuangan ? 'active' : '' }} font-weight-bold">
+                        <i class="nav-icon fas fa-wallet"></i>
                         <p>
                             Keuangan
                             <i class="right fas fa-angle-left"></i>
@@ -270,19 +311,21 @@
                     </a>
 
                     <ul class="nav nav-treeview" style="{{ $isKeuangan ? 'display: block;' : '' }}">
+
                         <li class="nav-item">
-                            <a href="{{ url('dashboardKeuangan') }}" class="nav-link">
-                                <i class="nav-icon fas fa-chart-line"></i> {{-- Ikon dashboard --}}
+                            <a href="{{ url('dashboardKeuangan') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Dashboard Keuangan</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ url('kas-pusat') }}" class="nav-link">
-                                <i class="nav-icon fas fa-coins"></i> {{-- Ikon kas pusat --}}
+                            <a href="{{ url('kas-pusat') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-coins"></i>
                                 <p>Kas Pusat</p>
                             </a>
                         </li>
+
                     </ul>
                 </li>
 
