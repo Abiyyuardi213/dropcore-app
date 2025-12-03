@@ -298,7 +298,9 @@
 
                 @php
                     $isKeuangan = request()->is('dashboardKeuangan*') ||
-                                request()->is('kas-pusat*');
+                                request()->is('kas-pusat*') ||
+                                request()->is('sumber-keuangan*') ||
+                                request()->is('keuangan*');
                 @endphp
 
                 <li class="nav-item has-treeview {{ $isKeuangan ? 'menu-open' : '' }}">
@@ -323,6 +325,20 @@
                             <a href="{{ url('kas-pusat') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-coins"></i>
                                 <p>Kas Pusat</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ url('sumber-keuangan') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-money-bill-wave"></i>
+                                <p>Sumber Keuangan</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ url('keuangan') }}" class="nav-link text-sm pl-4">
+                                <i class="nav-icon fas fa-wallet"></i>
+                                <p>Keuangan</p>
                             </a>
                         </li>
 

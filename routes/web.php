@@ -29,12 +29,14 @@ use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\KantorController;
 use App\Http\Controllers\KasPusatController;
+use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\KondisiBarangController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PenerimaanBarangController;
 use App\Http\Controllers\PengeluaranBarangController;
 use App\Http\Controllers\RiwayatAktivitasLogController;
 use App\Http\Controllers\RiwayatAktivitasProdukController;
+use App\Http\Controllers\SumberKeuanganController;
 use App\Http\Controllers\SupplierController;
 use Whoops\Run;
 
@@ -76,6 +78,24 @@ Route::middleware(['role:admin,staff'])->group(function () {
     Route::get('/kas-pusat/edit', [KasPusatController::class, 'edit'])->name('kas-pusat.edit');
     // Route::post('/kas-pusat/update', [KasPusatController::class, 'update'])->name('kas-pusat.update');
     Route::put('/kas-pusat/update/{id}', [KasPusatController::class, 'update'])->name('kas-pusat.update');
+
+    Route::prefix('sumber-keuangan')->group(function () {
+        Route::get('/', [SumberKeuanganController::class, 'index'])->name('sumber-keuangan.index');
+        Route::get('/create', [SumberKeuanganController::class, 'create'])->name('sumber-keuangan.create');
+        Route::post('/store', [SumberKeuanganController::class, 'store'])->name('sumber-keuangan.store');
+        Route::get('/edit/{id}', [SumberKeuanganController::class, 'edit'])->name('sumber-keuangan.edit');
+        Route::put('/update/{id}', [SumberKeuanganController::class, 'update'])->name('sumber-keuangan.update');
+        Route::delete('/delete/{id}', [SumberKeuanganController::class, 'destroy'])->name('sumber-keuangan.destroy');
+    });
+
+    Route::prefix('keuangan')->group(function () {
+        Route::get('/', [KeuanganController::class, 'index'])->name('keuangan.index');
+        Route::get('/create', [KeuanganController::class, 'create'])->name('keuangan.create');
+        Route::post('/store', [KeuanganController::class, 'store'])->name('keuangan.store');
+        Route::get('/edit/{id}', [KeuanganController::class, 'edit'])->name('keuangan.edit');
+        Route::put('/update/{id}', [KeuanganController::class, 'update'])->name('keuangan.update');
+        Route::delete('/delete/{id}', [KeuanganController::class, 'destroy'])->name('keuangan.destroy');
+    });
 
     Route::post('gudang/{id}/toggle-status', [GudangController::class, 'toggleStatus'])->name('gudang.toggleStatus');
     Route::resource('gudang', GudangController::class);
