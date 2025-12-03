@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Keuangan;
 use App\Models\SumberKeuangan;
+use App\Models\KasPusat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KeuanganController extends Controller
 {
@@ -37,10 +39,23 @@ class KeuanganController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        Keuangan::create($request->all());
+        DB::transaction(function () use ($request) {
+
+            $transaksi = Keuangan::create($request->all());
+
+            $kas = KasPusat::first();
+
+            if ($request->jenis_transaksi == 'pemasukkan') {
+                $kas->saldo_saat_ini += $request->jumlah;
+            } else {
+                $kas->saldo_saat_ini -= $request->jumlah;
+            }
+
+            $kas->save();
+        });
 
         return redirect()->route('keuangan.index')
-            ->with('success', 'Data keuangan berhasil ditambahkan.');
+            ->with('success', 'Transaksi berhasil ditambahkan & saldo kas pusat diperbarui.');
     }
 
     public function edit($id)
@@ -61,19 +76,51 @@ class KeuanganController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        $keuangan = Keuangan::findOrFail($id);
-        $keuangan->update($request->all());
+        DB::transaction(function () use ($request, $id) {
+
+            $transaksi = Keuangan::findOrFail($id);
+            $kas = KasPusat::first();
+
+            if ($transaksi->jenis_transaksi == 'pemasukkan') {
+                $kas->saldo_saat_ini -= $transaksi->jumlah;
+            } else {
+                $kas->saldo_saat_ini += $transaksi->jumlah;
+            }
+
+            $transaksi->update($request->all());
+
+            if ($request->jenis_transaksi == 'pemasukkan') {
+                $kas->saldo_saat_ini += $request->jumlah;
+            } else {
+                $kas->saldo_saat_ini -= $request->jumlah;
+            }
+
+            $kas->save();
+        });
 
         return redirect()->route('keuangan.index')
-            ->with('success', 'Data keuangan berhasil diperbarui.');
+            ->with('success', 'Transaksi berhasil diperbarui & saldo kas pusat diperbaiki.');
     }
 
     public function destroy($id)
     {
-        $keuangan = Keuangan::findOrFail($id);
-        $keuangan->delete();
+        DB::transaction(function () use ($id) {
+
+            $transaksi = Keuangan::findOrFail($id);
+            $kas = KasPusat::first();
+
+            if ($transaksi->jenis_transaksi == 'pemasukkan') {
+                $kas->saldo_saat_ini -= $transaksi->jumlah;
+            } else {
+                $kas->saldo_saat_ini += $transaksi->jumlah;
+            }
+
+            $kas->save();
+
+            $transaksi->delete();
+        });
 
         return redirect()->route('keuangan.index')
-            ->with('success', 'Data keuangan berhasil dihapus.');
+            ->with('success', 'Transaksi berhasil dihapus & saldo kas pusat dikembalikan.');
     }
 }

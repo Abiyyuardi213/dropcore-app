@@ -14,6 +14,10 @@
         .table td, .table th {
             vertical-align: middle;
         }
+        .info-box-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -39,6 +43,38 @@
         <section class="content">
             <div class="container-fluid">
 
+                <!-- Statistik Pemasukkan & Pengeluaran -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="info-box shadow-lg">
+                            <span class="info-box-icon bg-success elevation-1">
+                                <i class="fas fa-arrow-down"></i>
+                            </span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Total Pemasukkan</span>
+                                <span class="info-box-number text-success">
+                                    Rp {{ number_format($data->where('jenis_transaksi', 'pemasukkan')->sum('jumlah'), 0, ',', '.') }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-box shadow-lg">
+                            <span class="info-box-icon bg-danger elevation-1">
+                                <i class="fas fa-arrow-up"></i>
+                            </span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Total Pengeluaran</span>
+                                <span class="info-box-number text-danger">
+                                    Rp {{ number_format($data->where('jenis_transaksi', 'pengeluaran')->sum('jumlah'), 0, ',', '.') }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daftar Transaksi Keuangan -->
                 <div class="card shadow-sm">
                     <div class="card-header d-flex align-items-center">
                         <h3 class="card-title">Daftar Transaksi Keuangan</h3>

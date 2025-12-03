@@ -12,8 +12,7 @@ class KasPusat extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'saldo_awal',
-        'saldo_saat_ini',
+        'saldo',
     ];
 
     protected static function booted()
@@ -23,30 +22,30 @@ class KasPusat extends Model
                 $kas->id = (string) Str::uuid();
             }
 
-            if ($kas->saldo_saat_ini === null) {
-                $kas->saldo_saat_ini = $kas->saldo_awal ?? 0;
+            if ($kas->saldo === null) {
+                $kas->saldo = 0;
             }
         });
     }
 
     public function tambahSaldo($jumlah)
     {
-        $this->saldo_saat_ini += $jumlah;
+        $this->saldo += $jumlah;
         $this->save();
 
-        return $this->saldo_saat_ini;
+        return $this->saldo;
     }
 
     public function kurangiSaldo($jumlah)
     {
-        $this->saldo_saat_ini -= $jumlah;
+        $this->saldo -= $jumlah;
 
-        if ($this->saldo_saat_ini < 0) {
-            $this->saldo_saat_ini = 0;
+        if ($this->saldo < 0) {
+            $this->saldo = 0;
         }
 
         $this->save();
 
-        return $this->saldo_saat_ini;
+        return $this->saldo;
     }
 }

@@ -13,8 +13,7 @@ class KasPusatController extends Controller
 
         if (!$kas) {
             $kas = KasPusat::create([
-                'saldo_awal' => 0,
-                'saldo_saat_ini' => 0,
+                'saldo' => 0,
             ]);
         }
 
@@ -31,13 +30,12 @@ class KasPusatController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'saldo_awal' => 'required|numeric|min:0',
+            'saldo' => 'required|numeric|min:0',
         ]);
 
         $kas = KasPusat::findOrFail($id);
 
-        $kas->saldo_awal = $request->saldo_awal;
-        $kas->saldo_saat_ini = $request->saldo_awal;
+        $kas->saldo = $request->saldo;
         $kas->save();
 
         return redirect()->route('kas-pusat.index')

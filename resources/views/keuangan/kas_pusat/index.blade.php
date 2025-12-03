@@ -15,9 +15,8 @@
             font-weight: 700;
             color: #343a40;
         }
-        /* Styling untuk info-box kustom agar sedikit lebih besar */
         .info-box-number {
-            font-size: 1.5rem; /* Membuat angka saldo lebih besar */
+            font-size: 1.5rem;
             font-weight: 700;
         }
         .card-info {
@@ -63,6 +62,7 @@
                         </div>
 
                         <div class="row">
+                            <!-- Card Saldo Awal -->
                             <div class="col-md-6">
                                 <div class="info-box shadow-lg">
                                     <span class="info-box-icon bg-primary elevation-1">
@@ -77,6 +77,7 @@
                                 </div>
                             </div>
 
+                            <!-- Card Saldo Saat Ini -->
                             <div class="col-md-6">
                                 <div class="info-box shadow-lg">
                                     <span class="info-box-icon bg-success elevation-1">
@@ -100,15 +101,17 @@
                                 {{ $kas->updated_at->format('d F Y \j\a\m H:i') }}
                             </p>
                             <p>
-                                Kas Pusat berfungsi sebagai **sumber dana utama** perusahaan yang mencatat setiap pemasukan dan pengeluaran
-                                yang terjadi melalui sistem. Saldo ini bersifat **real-time** dan mencerminkan posisi likuiditas perusahaan.
+                                Kas Pusat berfungsi sebagai <strong>sumber dana utama</strong> perusahaan yang mencatat setiap pemasukan dan pengeluaran
+                                yang terjadi melalui sistem. Saldo saat ini bersifat <strong>real-time</strong> dan mencerminkan posisi likuiditas perusahaan.
                             </p>
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
     </div>
+
     @include('include.footerSistem')
 </div>
 
@@ -122,7 +125,6 @@
 <script>
     $(document).ready(function() {
         @if (session('success') || session('error'))
-            // Pastikan Anda memiliki include.ToastModal yang benar
             $('#toastNotification').toast({
                 delay: 3000,
                 autohide: true
