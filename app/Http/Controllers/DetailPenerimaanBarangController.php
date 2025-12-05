@@ -11,6 +11,7 @@ use App\Models\Products;
 use App\Models\RakGudang;
 use App\Models\Stok;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class DetailPenerimaanBarangController extends Controller
@@ -93,61 +94,90 @@ class DetailPenerimaanBarangController extends Controller
             'rak_id'        => 'required',
         ]);
 
-        $subtotal = $request->qty * $request->harga;
+        DB::transaction(function () use ($request) {
 
-        $detail = DetailPenerimaanBarang::create([
-            'id'            => Str::uuid(),
-            'penerimaan_id' => $request->penerimaan_id,
-            'produk_id'     => $request->produk_id,
-            'qty'           => $request->qty,
-            'harga'         => $request->harga,
-            'subtotal'      => $subtotal,
-            'gudang_id'     => $request->gudang_id,
-            'area_id'       => $request->area_id,
-            'rak_id'        => $request->rak_id,
-        ]);
+            $subtotal = $request->qty * $request->harga;
 
-        $stok = Stok::firstOrCreate(
-            [
-                'produk_id' => $request->produk_id,
-                'gudang_id' => $request->gudang_id,
-                'area_id'   => $request->area_id,
-                'rak_id'    => $request->rak_id,
-            ],
-            [
-                'quantity' => 0
-            ]
-        );
+            $detail = DetailPenerimaanBarang::create([
+                'id'            => Str::uuid(),
+                'penerimaan_id' => $request->penerimaan_id,
+                'produk_id'     => $request->produk_id,
+                'qty'           => $request->qty,
+                'harga'         => $request->harga,
+                'subtotal'      => $subtotal,
+                'gudang_id'     => $request->gudang_id,
+                'area_id'       => $request->area_id,
+                'rak_id'        => $request->rak_id,
+            ]);
 
-        $stok->quantity += $request->qty;
-        $stok->save();
+            $stok = Stok::firstOrCreate(
+                [
+                    'produk_id' => $request->produk_id,
+                    'gudang_id' => $request->gudang_id,
+                    'area_id'   => $request->area_id,
+                    'rak_id'    => $request->rak_id,
+                ],
+                ['quantity' => 0]
+            );
 
-        $kas = KasPusat::first();
+            $stok->quantity += $request->qty;
+            $stok->save();
 
-        if ($kas) {
-            $kas->kurangiSaldo($subtotal);
-        }
+            $kas = KasPusat::first();
+            if ($kas) {
+                $kas->kurangiSaldo($subtotal);
+            }
+        });
 
         return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke penerimaan.');
     }
 
+    // public function destroy($id)
+    // {
+    //     $detail = DetailPenerimaanBarang::findOrFail($id);
+
+    //     $stok = Stok::where('produk_id', $detail->produk_id)
+    //                 ->where('gudang_id', $detail->gudang_id)
+    //                 ->where('area_id', $detail->area_id)
+    //                 ->where('rak_id', $detail->rak_id)
+    //                 ->first();
+
+    //     if ($stok) {
+    //         $stok->quantity -= $detail->qty;
+    //         if ($stok->quantity < 0) $stok->quantity = 0;
+    //         $stok->save();
+    //     }
+
+    //     $detail->delete();
+
+    //     return redirect()->back()->with('success', 'Detail penerimaan berhasil dihapus.');
+    // }
+
     public function destroy($id)
     {
-        $detail = DetailPenerimaanBarang::findOrFail($id);
+        DB::transaction(function () use ($id) {
 
-        $stok = Stok::where('produk_id', $detail->produk_id)
-                    ->where('gudang_id', $detail->gudang_id)
-                    ->where('area_id', $detail->area_id)
-                    ->where('rak_id', $detail->rak_id)
-                    ->first();
+            $detail = DetailPenerimaanBarang::findOrFail($id);
 
-        if ($stok) {
-            $stok->quantity -= $detail->qty;
-            if ($stok->quantity < 0) $stok->quantity = 0;
-            $stok->save();
-        }
+            $stok = Stok::where('produk_id', $detail->produk_id)
+                        ->where('gudang_id', $detail->gudang_id)
+                        ->where('area_id', $detail->area_id)
+                        ->where('rak_id', $detail->rak_id)
+                        ->first();
 
-        $detail->delete();
+            if ($stok) {
+                $stok->quantity -= $detail->qty;
+                if ($stok->quantity < 0) $stok->quantity = 0;
+                $stok->save();
+            }
+
+            $kas = KasPusat::first();
+            if ($kas) {
+                $kas->tambahSaldo($detail->subtotal);
+            }
+
+            $detail->delete();
+        });
 
         return redirect()->back()->with('success', 'Detail penerimaan berhasil dihapus.');
     }

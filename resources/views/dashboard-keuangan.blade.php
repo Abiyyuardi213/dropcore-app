@@ -97,6 +97,19 @@
                     </div>
 
                 </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h3 class="card-title">Grafik Keuangan 12 Bulan Terakhir</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="keuanganChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -112,12 +125,53 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 <script src="{{ asset('resources/js/ToastScript.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     $(document).ready(function () {
         $('[data-widget="treeview"]').each(function () {
             AdminLTE.Treeview._jQueryInterface.call($(this));
         });
+    });
+
+    const bulan = @json($dataBulanan->pluck('bulan'));
+    const pemasukkan = @json($dataBulanan->pluck('total_pemasukkan'));
+    const pengeluaran = @json($dataBulanan->pluck('total_pengeluaran'));
+
+    const ctx = document.getElementById('keuanganChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: bulan,
+            datasets: [
+                {
+                    label: 'Pemasukkan',
+                    data: pemasukkan,
+                    borderWidth: 3,
+                    tension: 0.4,
+                },
+                {
+                    label: 'Pengeluaran',
+                    data: pengeluaran,
+                    borderWidth: 3,
+                    tension: 0.4,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
     });
 </script>
 
