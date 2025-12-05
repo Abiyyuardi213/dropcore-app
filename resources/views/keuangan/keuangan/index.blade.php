@@ -8,12 +8,10 @@
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
-        .table td, .table th {
-            vertical-align: middle;
-        }
         .info-box-number {
             font-size: 1.5rem;
             font-weight: 700;
@@ -39,7 +37,6 @@
             </div>
         </div>
 
-        <!-- Content -->
         <section class="content">
             <div class="container-fluid">
 
@@ -58,7 +55,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-md-6">
                         <div class="info-box shadow-lg">
                             <span class="info-box-icon bg-danger elevation-1">
@@ -76,68 +72,82 @@
 
                 <!-- Daftar Transaksi Keuangan -->
                 <div class="card shadow-sm">
-                    <div class="card-header d-flex align-items-center">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h3 class="card-title">Daftar Transaksi Keuangan</h3>
                         <a href="{{ route('keuangan.create') }}" class="btn btn-primary btn-sm ml-auto">
                             <i class="fas fa-plus"></i> Tambah Transaksi
                         </a>
                     </div>
-
                     <div class="card-body">
-                        @if ($data->isEmpty())
-                            <div class="alert alert-info">
-                                Belum ada transaksi keuangan. Tambahkan transaksi untuk memulai.
-                            </div>
-                        @else
-                            <div class="table-responsive">
-                                <table class="table table-striped table-bordered">
-                                    <thead class="thead-light">
+                        <div class="table-responsive">
+                            <table id="keuanganTable" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Jenis Transaksi</th>
+                                        <th>Jumlah</th>
+                                        <th>Sumber Keuangan</th>
+                                        <th>Tanggal</th>
+                                        <th>Keterangan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($data as $index => $item)
                                         <tr>
-                                            <th style="width: 60px" class="text-center">No</th>
-                                            <th>Jenis Transaksi</th>
-                                            <th>Jumlah</th>
-                                            <th>Sumber Keuangan</th>
-                                            <th>Tanggal</th>
-                                            <th>Keterangan</th>
-                                            <th style="width: 150px" class="text-center">Aksi</th>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td class="text-capitalize">{{ $item->jenis_transaksi }}</td>
+                                            <td>Rp {{ number_format($item->jumlah, 0, ',', '.') }}</td>
+                                            <td>{{ $item->sumber ? $item->sumber->nama_sumber : '-' }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($item->tanggal_transaksi)->format('d/m/Y') }}</td>
+                                            <td>{{ $item->keterangan ?? '-' }}</td>
+                                            <td class="text-center">
+                                                <a href="{{ route('keuangan.edit', $item->id) }}" class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <button class="btn btn-danger btn-sm delete-keuangan-btn"
+                                                    data-toggle="modal"
+                                                    data-target="#deleteKeuanganModal"
+                                                    data-keuangan-id="{{ $item->id }}">
+                                                    <i class="fas fa-trash"></i> Hapus
+                                                </button>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($data as $index => $item)
-                                            <tr>
-                                                <td class="text-center">{{ $index + 1 }}</td>
-                                                <td class="text-capitalize">{{ $item->jenis_transaksi }}</td>
-                                                <td>Rp {{ number_format($item->jumlah, 0, ',', '.') }}</td>
-                                                <td>{{ $item->sumber ? $item->sumber->nama_sumber : '-' }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($item->tanggal_transaksi)->format('d/m/Y') }}</td>
-                                                <td>{{ $item->keterangan ?? '-' }}</td>
-                                                <td class="text-center">
-                                                    <a href="{{ route('keuangan.edit', $item->id) }}" class="btn btn-warning btn-sm">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <form action="{{ route('keuangan.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
             </div>
         </section>
-
     </div>
 
     @include('include.footerSistem')
+</div>
+
+<!-- Modal Konfirmasi Hapus -->
+<div class="modal fade" id="deleteKeuanganModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.
+            </div>
+            <form id="deleteForm" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @include('services.ToastModal')
@@ -146,16 +156,34 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        @if (session('success') || session('error'))
-            $('#toastNotification').toast({
-                delay: 3000,
-                autohide: true
-            }).toast('show');
-        @endif
+$(document).ready(function () {
+    $("#keuanganTable").DataTable({
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true
     });
+
+    $('.delete-keuangan-btn').click(function () {
+        let keuanganId = $(this).data('keuangan-id');
+        let deleteUrl = "{{ url('keuangan') }}/" + keuanganId;
+        $('#deleteForm').attr('action', deleteUrl);
+    });
+
+    @if (session('success') || session('error'))
+        $('#toastNotification').toast({
+            delay: 3000,
+            autohide: true
+        }).toast('show');
+    @endif
+});
 </script>
 
 </body>

@@ -297,7 +297,7 @@
                 </li>
 
                 @php
-                    $isKeuangan = request()->is('dashboardKeuangan*') ||
+                    $isKeuangan = request()->is('dashboard-keuangan*') ||
                                 request()->is('kas-pusat*') ||
                                 request()->is('sumber-keuangan*') ||
                                 request()->is('keuangan*');
@@ -315,7 +315,7 @@
                     <ul class="nav nav-treeview" style="{{ $isKeuangan ? 'display: block;' : '' }}">
 
                         <li class="nav-item">
-                            <a href="{{ url('dashboardKeuangan') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ url('dashboard-keuangan') }}" class="nav-link text-sm pl-4">
                                 <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Dashboard Keuangan</p>
                             </a>

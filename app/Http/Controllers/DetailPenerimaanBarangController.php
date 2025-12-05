@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AreaGudang;
 use App\Models\DetailPenerimaanBarang;
 use App\Models\Gudang;
+use App\Models\KasPusat;
 use App\Models\PenerimaanBarang;
 use App\Models\Products;
 use App\Models\RakGudang;
@@ -34,6 +35,52 @@ class DetailPenerimaanBarangController extends Controller
         ));
     }
 
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'penerimaan_id' => 'required',
+    //         'produk_id'     => 'required',
+    //         'qty'           => 'required|numeric|min:1',
+    //         'harga'         => 'required|numeric|min:0',
+    //         'gudang_id'     => 'required',
+    //         'area_id'       => 'required',
+    //         'rak_id'        => 'required',
+    //     ]);
+
+    //     $subtotal = $request->qty * $request->harga;
+
+    //     // Tambah detail penerimaan
+    //     $detail = DetailPenerimaanBarang::create([
+    //         'id'            => Str::uuid(),
+    //         'penerimaan_id' => $request->penerimaan_id,
+    //         'produk_id'     => $request->produk_id,
+    //         'qty'           => $request->qty,
+    //         'harga'         => $request->harga,
+    //         'subtotal'      => $subtotal,
+    //         'gudang_id'     => $request->gudang_id,
+    //         'area_id'       => $request->area_id,
+    //         'rak_id'        => $request->rak_id,
+    //     ]);
+
+    //     // Update stok
+    //     $stok = Stok::firstOrCreate(
+    //         [
+    //             'produk_id' => $request->produk_id,
+    //             'gudang_id' => $request->gudang_id,
+    //             'area_id'   => $request->area_id,
+    //             'rak_id'    => $request->rak_id,
+    //         ],
+    //         [
+    //             'quantity' => 0
+    //         ]
+    //     );
+
+    //     $stok->quantity += $request->qty;
+    //     $stok->save();
+
+    //     return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke penerimaan.');
+    // }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -48,7 +95,6 @@ class DetailPenerimaanBarangController extends Controller
 
         $subtotal = $request->qty * $request->harga;
 
-        // Tambah detail penerimaan
         $detail = DetailPenerimaanBarang::create([
             'id'            => Str::uuid(),
             'penerimaan_id' => $request->penerimaan_id,
@@ -61,7 +107,6 @@ class DetailPenerimaanBarangController extends Controller
             'rak_id'        => $request->rak_id,
         ]);
 
-        // Update stok
         $stok = Stok::firstOrCreate(
             [
                 'produk_id' => $request->produk_id,
@@ -77,6 +122,12 @@ class DetailPenerimaanBarangController extends Controller
         $stok->quantity += $request->qty;
         $stok->save();
 
+        $kas = KasPusat::first();
+
+        if ($kas) {
+            $kas->kurangiSaldo($subtotal);
+        }
+
         return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke penerimaan.');
     }
 
@@ -84,7 +135,6 @@ class DetailPenerimaanBarangController extends Controller
     {
         $detail = DetailPenerimaanBarang::findOrFail($id);
 
-        // Kurangi stok
         $stok = Stok::where('produk_id', $detail->produk_id)
                     ->where('gudang_id', $detail->gudang_id)
                     ->where('area_id', $detail->area_id)
@@ -97,7 +147,6 @@ class DetailPenerimaanBarangController extends Controller
             $stok->save();
         }
 
-        // Hapus detail
         $detail->delete();
 
         return redirect()->back()->with('success', 'Detail penerimaan berhasil dihapus.');

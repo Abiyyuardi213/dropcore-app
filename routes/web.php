@@ -20,6 +20,7 @@ use App\Http\Controllers\MutasiStokController;
 use App\Http\Controllers\ProvinsiController;
 use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardKeuanganController;
 use App\Http\Controllers\DashboardMasterController;
 use App\Http\Controllers\DashboardOfficeController;
 use App\Http\Controllers\DetailPenerimaanBarangController;
@@ -73,6 +74,8 @@ Route::middleware(['role:admin,staff'])->group(function () {
     Route::resource('category', CategoryController::class);
 
     Route::resource('product', ProductController::class);
+
+    Route::get('dashboard-keuangan', [DashboardKeuanganController::class, 'index'])->name('dashboard-keuangan');
 
     Route::get('/kas-pusat', [KasPusatController::class, 'index'])->name('kas-pusat.index');
     Route::get('/kas-pusat/edit', [KasPusatController::class, 'edit'])->name('kas-pusat.edit');
