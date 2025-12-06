@@ -24,24 +24,6 @@ class PenerimaanBarangController extends Controller
         return view('penerimaan_barang.create', compact('suppliers', 'no_penerimaan'));
     }
 
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'supplier_id'        => 'required|exists:suppliers,id',
-    //         'tanggal_penerimaan' => 'required|date',
-    //         'keterangan'         => 'nullable|string',
-    //     ]);
-
-    //     PenerimaanBarang::createPenerimaan([
-    //         'supplier_id'        => $request->supplier_id,
-    //         'tanggal_penerimaan' => $request->tanggal_penerimaan,
-    //         'keterangan'         => $request->keterangan,
-    //     ]);
-
-    //     return redirect()->route('penerimaan.index')
-    //         ->with('success', 'Penerimaan barang berhasil ditambahkan.');
-    // }
-
     public function store(Request $request)
     {
         $request->validate([
