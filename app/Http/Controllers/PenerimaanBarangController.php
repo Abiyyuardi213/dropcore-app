@@ -3,113 +3,191 @@
 namespace App\Http\Controllers;
 
 use App\Models\PenerimaanBarang;
-use App\Models\Supplier;
+use App\Models\DetailPenerimaanBarang;
+use App\Models\Distributor;
+use App\Models\Products;
+use App\Models\Gudang;
+use App\Models\KondisiBarang;
+use App\Models\Stok;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PenerimaanBarangController extends Controller
 {
     public function index()
     {
-        $data = PenerimaanBarang::with('supplier')->orderBy('created_at', 'desc')->get();
-
+        $data = PenerimaanBarang::with(['distributor', 'user'])->latest()->get();
+        // Fallback for supplier_id if distributor relation is empty (legacy support if needed, but we focus on distributor)
         return view('penerimaan_barang.index', compact('data'));
     }
 
     public function create()
     {
-        $suppliers = Supplier::orderBy('nama_supplier')->get();
+        $distributors = Distributor::orderBy('nama_distributor')->get();
+        $products = Products::orderBy('name')->get();
+        // Eager load structure for dynamic dropdowns
+        $gudangs = Gudang::with('areas.raks')->orderBy('nama_gudang')->get();
+        $kondisis = KondisiBarang::all();
         $no_penerimaan = PenerimaanBarang::generateNomorPenerimaan();
 
-        return view('penerimaan_barang.create', compact('suppliers', 'no_penerimaan'));
+        return view('penerimaan_barang.create', compact('distributors', 'products', 'gudangs', 'kondisis', 'no_penerimaan'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'supplier_id'        => 'required|exists:suppliers,id',
+            'distributor_id'     => 'required|exists:distributors,id',
             'tanggal_penerimaan' => 'required|date',
+            'referensi'          => 'nullable|string|max:100',
             'keterangan'         => 'nullable|string',
+
+            // Details Validation - array inputs
+            'items'              => 'required|array|min:1',
+            'items.*.produk_id'  => 'required|exists:products,id',
+            'items.*.qty'        => 'required|integer|min:1',
+            'items.*.kondisi_id' => 'required|exists:kondisi_barang,id',
+            'items.*.gudang_id'  => 'required|exists:gudang,id',
+            'items.*.area_id'    => 'required|exists:area_gudang,id',
+            'items.*.rak_id'     => 'required|exists:rak_gudang,id',
+            'items.*.harga'      => 'nullable|numeric|min:0', // Optional price
         ]);
 
-        $penerimaan = PenerimaanBarang::createPenerimaan([
-            'supplier_id'        => $request->supplier_id,
-            'tanggal_penerimaan' => $request->tanggal_penerimaan,
-            'keterangan'         => $request->keterangan,
-        ]);
+        try {
+            DB::beginTransaction();
 
-        return redirect()->route('penerimaan-barang.detail', $penerimaan->id)
-            ->with('success', 'Penerimaan barang berhasil ditambahkan, silakan tambahkan produk.');
+            // 1. Create Header
+            $penerimaan = PenerimaanBarang::create([
+                'distributor_id'     => $request->distributor_id,
+                'user_id'            => optional(Auth::user())->id,
+                'tanggal_penerimaan' => $request->tanggal_penerimaan,
+                'referensi'          => $request->referensi,
+                'keterangan'         => $request->keterangan,
+                'status'             => 'completed', // Direct complete/post
+            ]);
+
+            // 2. Process Details & Update Stock
+            foreach ($request->items as $item) {
+                $qty = $item['qty'];
+                $harga = $item['harga'] ?? 0;
+                $subtotal = $qty * $harga;
+
+                // Create Detail
+                DetailPenerimaanBarang::create([
+                    'penerimaan_id' => $penerimaan->id,
+                    'produk_id'     => $item['produk_id'],
+                    'qty'           => $qty,
+                    'kondisi_id'    => $item['kondisi_id'],
+                    'gudang_id'     => $item['gudang_id'],
+                    'area_id'       => $item['area_id'],
+                    'rak_id'        => $item['rak_id'],
+                    'harga'         => $harga,
+                    'subtotal'      => $subtotal,
+                ]);
+
+                // Update Stock (Search existing or create new)
+                $stok = Stok::where('produk_id', $item['produk_id'])
+                    ->where('gudang_id', $item['gudang_id'])
+                    ->where('area_id', $item['area_id'])
+                    ->where('rak_id', $item['rak_id'])
+                    ->where('kondisi_id', $item['kondisi_id'])
+                    ->first();
+
+                if ($stok) {
+                    $stok->quantity += $qty;
+                    $stok->save();
+                } else {
+                    Stok::create([
+                        'produk_id'  => $item['produk_id'],
+                        'gudang_id'  => $item['gudang_id'],
+                        'area_id'    => $item['area_id'],
+                        'rak_id'     => $item['rak_id'],
+                        'kondisi_id' => $item['kondisi_id'],
+                        'quantity'   => $qty,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('penerimaan-barang.index')
+                ->with('success', 'Penerimaan barang berhasil disimpan dan stok telah bertambah.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+        }
     }
-
-    public function edit($id)
-    {
-        $penerimaan = PenerimaanBarang::findOrFail($id);
-        $suppliers  = Supplier::orderBy('nama_supplier')->get();
-
-        return view('penerimaan_barang.edit', compact('penerimaan', 'suppliers'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'supplier_id'        => 'required|exists:suppliers,id',
-            'tanggal_penerimaan' => 'required|date',
-            'keterangan'         => 'nullable|string',
-        ]);
-
-        $penerimaan = PenerimaanBarang::findOrFail($id);
-
-        $penerimaan->updatePenerimaan([
-            'supplier_id'        => $request->supplier_id,
-            'tanggal_penerimaan' => $request->tanggal_penerimaan,
-            'keterangan'         => $request->keterangan,
-        ]);
-
-        return redirect()->route('penerimaan.index')
-            ->with('success', 'Penerimaan barang berhasil diperbarui.');
-    }
-
-    // public function show($id)
-    // {
-    //     $penerimaan = PenerimaanBarang::with('supplier')->findOrFail($id);
-
-    //     return view('penerimaan_barang.show', compact('penerimaan'));
-    // }
 
     public function show($id)
     {
         $penerimaan = PenerimaanBarang::with([
+            'distributor',
+            'user',
             'details.produk',
             'details.gudang',
             'details.area',
-            'details.rak'
+            'details.rak',
+            'details.kondisi'
         ])->findOrFail($id);
 
         return view('penerimaan_barang.show', compact('penerimaan'));
     }
 
-    public function destroy($id)
-    {
-        $penerimaan = PenerimaanBarang::findOrFail($id);
-        $penerimaan->deletePenerimaan();
-
-        return redirect()->route('penerimaan.index')
-            ->with('success', 'Penerimaan barang berhasil dihapus.');
-    }
-
-    public function generatePDF($id)
+    public function print($id)
     {
         $penerimaan = PenerimaanBarang::with([
-            'supplier',
+            'distributor',
+            'user',
             'details.produk',
             'details.gudang',
             'details.area',
-            'details.rak'
+            'details.rak',
+            'details.kondisi'
         ])->findOrFail($id);
 
-        $pdf = Pdf::loadView('penerimaan_barang.pdf', compact('penerimaan'));
+        return view('penerimaan_barang.invoice', compact('penerimaan'));
+    }
 
-        return $pdf->stream('Penerimaan_'.$penerimaan->no_penerimaan.'.pdf');
+    // Disable Edit/Update for now to maintain stock integrity simpler.
+    // Real world often allows voiding/reversing instead of direct edit.
+
+    public function destroy($id)
+    {
+        // For now, strict deletion without stock reversal logic for simplicity unless requested?
+        // User asked for "Real World". Real world: Reverse stock on delete/void.
+
+        try {
+            DB::beginTransaction();
+            $penerimaan = PenerimaanBarang::with('details')->findOrFail($id);
+
+            // Reverse Stock
+            foreach ($penerimaan->details as $detail) {
+                $stok = Stok::where('produk_id', $detail->produk_id)
+                    ->where('gudang_id', $detail->gudang_id)
+                    ->where('area_id', $detail->area_id)
+                    ->where('rak_id', $detail->rak_id)
+                    ->where('kondisi_id', $detail->kondisi_id)
+                    ->first();
+
+                if ($stok) {
+                    if ($stok->quantity < $detail->qty) {
+                        throw new \Exception("Gagal menghapus! Stok barang {$detail->produk->name} saat ini kurang dari jumlah yang diterima dulu. Barang mungkin sudah terpakai.");
+                    }
+                    $stok->quantity -= $detail->qty;
+                    $stok->save();
+                } else {
+                    // Weird case: Stock record missing but we are deleting receipt. 
+                    // Just ignore or throw? Ignore is safer to allow deletion of bad data.
+                }
+            }
+
+            $penerimaan->delete();
+            DB::commit();
+            return redirect()->route('penerimaan-barang.index')->with('success', 'Penerimaan barang dibatalkan dan stok dikembalikan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', $e->getMessage());
+        }
     }
 }

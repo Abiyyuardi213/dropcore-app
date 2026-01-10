@@ -9,6 +9,7 @@ use App\Models\Provinsi;
 use Illuminate\Http\Request;
 use App\Models\Supplier;
 use App\Models\Wilayah;
+use Illuminate\Support\Facades\Storage;
 
 class SupplierController extends Controller
 {
@@ -22,8 +23,8 @@ class SupplierController extends Controller
     {
         $wilayahs = Wilayah::where('status_wilayah', 1)->get();
         $provinsis = Provinsi::where('status_provinsi', 1)
-                         ->orderBy('provinsi', 'asc')
-                         ->get();
+            ->orderBy('provinsi', 'asc')
+            ->get();
         $kotas = Kota::all();
         $kecamatans = Kecamatan::all();
         $kelurahans = Kelurahan::all();
@@ -40,10 +41,16 @@ class SupplierController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'kode_supplier' => 'nullable|string|unique:suppliers,kode_supplier',
             'nama_supplier' => 'required|string|max:255',
+            'penanggung_jawab' => 'nullable|string|max:255',
             'alamat' => 'nullable|string',
             'no_telepon' => 'nullable|string',
             'email' => 'nullable|email',
+            'website' => 'nullable|url',
+            'keterangan' => 'nullable|string',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'tipe_supplier' => 'nullable|string',
             'wilayah_id' => 'required|uuid',
             'provinsi_id' => 'required|uuid',
             'kota_id' => 'required|uuid',
@@ -52,7 +59,14 @@ class SupplierController extends Controller
             'status' => 'nullable|boolean',
         ]);
 
-        Supplier::createSupplier($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('public/suppliers');
+            $data['logo'] = Storage::url($path);
+        }
+
+        Supplier::createSupplier($data);
 
         return redirect()->route('supplier.index')->with('success', 'Supplier berhasil ditambahkan.');
     }
@@ -67,17 +81,28 @@ class SupplierController extends Controller
         $kelurahans = Kelurahan::all();
 
         return view('supplier.edit', compact(
-            'supplier', 'wilayahs', 'provinsis', 'kotas', 'kecamatans', 'kelurahans'
+            'supplier',
+            'wilayahs',
+            'provinsis',
+            'kotas',
+            'kecamatans',
+            'kelurahans'
         ));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
+            'kode_supplier' => 'nullable|string|unique:suppliers,kode_supplier,' . $id,
             'nama_supplier' => 'required|string|max:255',
+            'penanggung_jawab' => 'nullable|string|max:255',
             'alamat' => 'nullable|string',
             'no_telepon' => 'nullable|string',
             'email' => 'nullable|email',
+            'website' => 'nullable|url',
+            'keterangan' => 'nullable|string',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'tipe_supplier' => 'nullable|string',
             'wilayah_id' => 'required|uuid',
             'provinsi_id' => 'required|uuid',
             'kota_id' => 'required|uuid',
@@ -87,7 +112,20 @@ class SupplierController extends Controller
         ]);
 
         $supplier = Supplier::findOrFail($id);
-        $supplier->updateSupplier($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($supplier->logo) {
+                $oldPath = str_replace('/storage/', 'public/', $supplier->logo);
+                Storage::delete($oldPath);
+            }
+
+            $path = $request->file('logo')->store('public/suppliers');
+            $data['logo'] = Storage::url($path);
+        }
+
+        $supplier->updateSupplier($data);
 
         return redirect()->route('supplier.index')->with('success', 'Supplier berhasil diperbarui.');
     }

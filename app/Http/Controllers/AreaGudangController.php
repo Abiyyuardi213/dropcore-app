@@ -23,11 +23,16 @@ class AreaGudangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'gudang_id' => 'required|exists:gudang,id',
-            'kode_area' => 'required|string|max:255|unique:area_gudang,kode_area',
-            'nama_area' => 'required|string|max:255',
-            'keterangan' => 'nullable|string',
-            'area_status' => 'required|boolean',
+            'gudang_id'      => 'required|exists:gudang,id',
+            'kode_area'      => 'required|string|max:255|unique:area_gudang,kode_area',
+            'nama_area'      => 'required|string|max:255',
+            'jenis_area'     => 'nullable|string|max:100',
+            'pic'            => 'nullable|string|max:255',
+            'kapasitas_area' => 'nullable|string|max:100',
+            'suhu'           => 'nullable|string|max:50',
+            'kelembaban'     => 'nullable|string|max:50',
+            'keterangan'     => 'nullable|string',
+            'area_status'    => 'required|boolean',
         ]);
 
         AreaGudang::createArea($request->all());
@@ -35,21 +40,32 @@ class AreaGudangController extends Controller
         return redirect()->route('areaGudang.index')->with('success', 'Area gudang berhasil ditambahkan.');
     }
 
+    public function show($id)
+    {
+        $area = AreaGudang::with('gudang')->findOrFail($id);
+        return view('areaGudang.show', compact('area'));
+    }
+
     public function edit($id)
     {
         $area = AreaGudang::findOrFail($id);
-        $gudangs = Gudang::all(); // atau dengan filter sesuai kebutuhan
+        $gudangs = Gudang::where('gudang_status', 1)->get();
         return view('areaGudang.edit', compact('area', 'gudangs'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'gudang_id' => 'required|exists:gudang,id',
-            'kode_area' => 'required|string|max:255|unique:area_gudang,kode_area,' . $id,
-            'nama_area' => 'required|string|max:255',
-            'keterangan' => 'nullable|string',
-            'area_status' => 'required|boolean',
+            'gudang_id'      => 'required|exists:gudang,id',
+            'kode_area'      => 'required|string|max:255|unique:area_gudang,kode_area,' . $id,
+            'nama_area'      => 'required|string|max:255',
+            'jenis_area'     => 'nullable|string|max:100',
+            'pic'            => 'nullable|string|max:255',
+            'kapasitas_area' => 'nullable|string|max:100',
+            'suhu'           => 'nullable|string|max:50',
+            'kelembaban'     => 'nullable|string|max:50',
+            'keterangan'     => 'nullable|string',
+            'area_status'    => 'required|boolean',
         ]);
 
         $area = AreaGudang::findOrFail($id);

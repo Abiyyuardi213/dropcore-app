@@ -14,10 +14,19 @@ class Distributor extends Model
     protected $fillable = [
         'kode_distributor',
         'nama_distributor',
+        'tipe_distributor', // Baru
+        'status',           // Baru
         'telepon',
         'email',
         'alamat',
         'kota_id',
+        'pic_nama',         // Baru
+        'pic_telepon',      // Baru
+        'npwp',             // Baru
+        'website',          // Baru
+        'keterangan',       // Baru
+        'latitude',         // Baru
+        'longitude',        // Baru
     ];
 
     protected static function booted()
@@ -40,25 +49,14 @@ class Distributor extends Model
 
     public static function createDistributor($data)
     {
-        return self::create([
-            'kode_distributor' => self::generateKodeDistributor(),
-            'nama_distributor' => $data['nama_distributor'],
-            'telepon'          => $data['telepon'] ?? null,
-            'email'            => $data['email'] ?? null,
-            'alamat'           => $data['alamat'] ?? null,
-            'kota_id'          => $data['kota_id'] ?? null,
-        ]);
+        // Gabungkan data input dengan kode distributor otomatis
+        $data['kode_distributor'] = self::generateKodeDistributor();
+        return self::create($data); // Lebih ringkas & dinamis
     }
 
     public function updateDistributor($data)
     {
-        return $this->update([
-            'nama_distributor' => $data['nama_distributor'] ?? $this->nama_distributor,
-            'telepon'          => $data['telepon'] ?? $this->telepon,
-            'email'            => $data['email'] ?? $this->email,
-            'alamat'           => $data['alamat'] ?? $this->alamat,
-            'kota_id'          => $data['kota_id'] ?? $this->kota_id,
-        ]);
+        return $this->update($data); // Lebih ringkas & dinamis
     }
 
     public function deleteDistributor()

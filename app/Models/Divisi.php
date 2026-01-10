@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Divisi extends Model
 {
+    use HasFactory, SoftDeletes;
+
     protected $table = 'divisi';
     protected $keyType = 'string';
     public $incrementing = false;
@@ -20,69 +24,15 @@ class Divisi extends Model
 
     protected static function booted()
     {
-        static::creating(function ($divisi) {
-            if (!$divisi->id) {
-                $divisi->id = (string) Str::uuid();
+        static::creating(function ($model) {
+            if (!$model->id) {
+                $model->id = (string) Str::uuid();
             }
         });
     }
 
-    public static function generateKode($name)
+    public function jabatans()
     {
-        $inisial = strtoupper(implode('', array_map(function($word) {
-            return $word[0];
-        }, explode(' ', $name))));
-
-        $number = rand(10000000, 99999999);
-        return $inisial . $number;
-    }
-
-    public static function createDivisi($data)
-    {
-        return self::create([
-            'kode'  => self::generateKode($data['name']),
-            'name'      => $data['name'],
-            'deskripsi'       => $data['deskripsi'] ?? null,
-            'status'       => $data['status'] ?? true,
-        ]);
-    }
-
-    // public function updateDivisi($data)
-    // {
-    //     return $this->update([
-    //         'kode'  => $data['kode'] ?? $this->kode,
-    //         'name'      => $data['name'] ?? $this->name,
-    //         'deskripsi'       => $data['deskripsi'] ?? $this->deskripsi,
-    //         'status'       => $data['status'] ?? $this->status,
-    //     ]);
-    // }
-
-    public function updateDivisi($data)
-    {
-        $newName = $data['name'] ?? $this->name;
-
-        if ($newName !== $this->name) {
-            $newKode = self::generateKode($newName);
-        } else {
-            $newKode = $this->kode;
-        }
-
-        return $this->update([
-            'kode'       => $newKode,
-            'name'       => $newName,
-            'deskripsi'  => $data['deskripsi'] ?? $this->deskripsi,
-            'status'     => $data['status'] ?? $this->status,
-        ]);
-    }
-
-    public function deleteDivisi()
-    {
-        return $this->delete();
-    }
-
-    public function toggleStatus()
-    {
-        $this->status = !$this->status;
-        $this->save();
+        return $this->hasMany(Jabatan::class, 'divisi_id');
     }
 }

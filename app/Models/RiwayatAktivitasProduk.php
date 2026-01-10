@@ -33,9 +33,9 @@ class RiwayatAktivitasProduk extends Model
     {
         return self::create([
             'produk_id'     => $data['produk_id'],
-            'tipe_aktivitas'=> $data['tipe_aktivitas'],
+            'tipe_aktivitas' => $data['tipe_aktivitas'],
             'deskripsi'     => $data['deskripsi'] ?? null,
-            'user_id' => $data['user_id'] ?? Auth::user()->id,
+            'user_id' => $data['user_id'] ?? optional(Auth::user())->id,
         ]);
     }
 

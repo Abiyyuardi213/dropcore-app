@@ -8,7 +8,10 @@ use App\Models\Gudang;
 use App\Models\AreaGudang;
 use App\Models\RakGudang;
 use App\Models\Stok;
+use App\Models\KondisiBarang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class MutasiStokController extends Controller
 {
@@ -39,34 +42,94 @@ class MutasiStokController extends Controller
 
     public function create()
     {
-        $productIds = Stok::select('produk_id')->groupBy('produk_id')->pluck('produk_id');
-        $products = Products::whereIn('id', $productIds)->get();
+        $products = Products::orderBy('name', 'asc')->get();
+        $gudangs = Gudang::with('areas.raks')->orderBy('nama_gudang', 'asc')->get();
+        $kondisis = KondisiBarang::all();
 
-        $gudangs = Gudang::all();
-        $areas = AreaGudang::all();
-        $raks = RakGudang::all();
-
-        return view('mutasi-stok.create', compact('products', 'gudangs', 'areas', 'raks'));
+        return view('mutasi-stok.create', compact('products', 'gudangs', 'kondisis'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'produk_id' => 'required|exists:products,id',
-            'gudang_asal_id' => 'required|exists:gudang,id',
-            'area_asal_id' => 'nullable|exists:area_gudang,id',
-            'rak_asal_id' => 'nullable|exists:rak_gudang,id',
-            'gudang_tujuan_id' => 'required|exists:gudang,id',
-            'area_tujuan_id' => 'nullable|exists:area_gudang,id',
-            'rak_tujuan_id' => 'nullable|exists:rak_gudang,id',
-            'quantity' => 'required|integer|min:1',
-            'tanggal_mutasi' => 'required|date',
-            'keterangan' => 'nullable|string',
+            'jenis_mutasi'      => 'required|in:masuk,keluar,pindah',
+            'referensi'         => 'nullable|string|max:50',
+            'produk_id'         => 'required|exists:products,id',
+            'kondisi_id'        => 'required|exists:kondisi_barang,id',
+
+            // Asal (Wajib jika Keluar/Pindah)
+            'gudang_asal_id'    => 'required_if:jenis_mutasi,keluar,pindah|nullable|exists:gudang,id',
+            'area_asal_id'      => 'nullable|exists:area_gudang,id',
+            'rak_asal_id'       => 'nullable|exists:rak_gudang,id',
+
+            // Tujuan (Wajib jika Masuk/Pindah)
+            'gudang_tujuan_id'  => 'required_if:jenis_mutasi,masuk,pindah|nullable|exists:gudang,id',
+            'area_tujuan_id'    => 'nullable|exists:area_gudang,id',
+            'rak_tujuan_id'     => 'nullable|exists:rak_gudang,id',
+
+            'quantity'          => 'required|integer|min:1',
+            'tanggal_mutasi'    => 'required|date',
+            'keterangan'        => 'nullable|string',
         ]);
 
-        MutasiStok::createMutasi($validated);
+        try {
+            DB::beginTransaction();
 
-        return redirect()->route('mutasi-stok.index')->with('success', 'Mutasi stok berhasil ditambahkan.');
+            $qty = $validated['quantity'];
+            $produkId = $validated['produk_id'];
+            $kondisiId = $validated['kondisi_id'];
+            $jenis = $validated['jenis_mutasi'];
+
+            // 1. Handle Source (Pengurangan Stok) untuk Keluar & Pindah
+            if (in_array($jenis, ['keluar', 'pindah'])) {
+                $stokAsal = Stok::where('produk_id', $produkId)
+                    ->where('kondisi_id', $kondisiId)
+                    ->where('gudang_id', $validated['gudang_asal_id'])
+                    ->where('area_id', $validated['area_asal_id'])
+                    ->where('rak_id', $validated['rak_asal_id'])
+                    ->first();
+
+                if (!$stokAsal || $stokAsal->quantity < $qty) {
+                    throw new \Exception("Stok tidak mencukupi di lokasi asal (Tersedia: " . ($stokAsal->quantity ?? 0) . ")");
+                }
+
+                $stokAsal->quantity -= $qty;
+                $stokAsal->save();
+            }
+
+            // 2. Handle Destination (Penambahan Stok) untuk Masuk & Pindah
+            if (in_array($jenis, ['masuk', 'pindah'])) {
+                $stokTujuan = Stok::where('produk_id', $produkId)
+                    ->where('kondisi_id', $kondisiId)
+                    ->where('gudang_id', $validated['gudang_tujuan_id'])
+                    ->where('area_id', $validated['area_tujuan_id'])
+                    ->where('rak_id', $validated['rak_tujuan_id'])
+                    ->first();
+
+                if ($stokTujuan) {
+                    $stokTujuan->quantity += $qty;
+                    $stokTujuan->save();
+                } else {
+                    Stok::create([
+                        'produk_id' => $produkId,
+                        'gudang_id' => $validated['gudang_tujuan_id'],
+                        'area_id' => $validated['area_tujuan_id'],
+                        'rak_id' => $validated['rak_tujuan_id'],
+                        'quantity' => $qty,
+                        'kondisi_id' => $kondisiId
+                    ]);
+                }
+            }
+
+            // 3. Catat Mutasi
+            MutasiStok::createMutasi($validated);
+
+            DB::commit();
+            return redirect()->route('mutasi-stok.index')->with('success', 'Mutasi stok berhasil tercatat.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', $e->getMessage())->withInput();
+        }
     }
 
     // public function edit($id)
@@ -86,38 +149,18 @@ class MutasiStokController extends Controller
     public function edit($id)
     {
         $mutasi = MutasiStok::with(['produk', 'gudangAsal', 'areaAsal', 'rakAsal', 'gudangTujuan', 'areaTujuan', 'rakTujuan'])
-                    ->findOrFail($id);
+            ->findOrFail($id);
 
-        $productIds = Stok::select('produk_id')->groupBy('produk_id')->pluck('produk_id');
-        $products = Products::whereIn('id', $productIds)->get();
+        $products = Products::orderBy('name', 'asc')->get();
+        $gudangs = Gudang::with('areas.raks')->orderBy('nama_gudang', 'asc')->get();
+        $kondisis = KondisiBarang::all();
 
-        $gudangs = Gudang::all();
-        $areas = AreaGudang::all();
-        $raks = RakGudang::all();
-
-        return view('mutasi-stok.edit', compact('mutasi', 'products', 'gudangs', 'areas', 'raks'));
+        return view('mutasi-stok.edit', compact('mutasi', 'products', 'gudangs', 'kondisis'));
     }
 
     public function update(Request $request, $id)
     {
-        $mutasi = MutasiStok::findOrFail($id);
-
-        $validated = $request->validate([
-            'produk_id' => 'required|exists:products,id',
-            'gudang_asal_id' => 'required|exists:gudang,id',
-            'area_asal_id' => 'nullable|exists:area_gudang,id',
-            'rak_asal_id' => 'nullable|exists:rak_gudang,id',
-            'gudang_tujuan_id' => 'required|exists:gudang,id',
-            'area_tujuan_id' => 'nullable|exists:area_gudang,id',
-            'rak_tujuan_id' => 'nullable|exists:rak_gudang,id',
-            'quantity' => 'required|integer|min:1',
-            'tanggal_mutasi' => 'required|date',
-            'keterangan' => 'nullable|string',
-        ]);
-
-        $mutasi->updateMutasi($validated);
-
-        return redirect()->route('mutasi-stok.index')->with('success', 'Mutasi stok berhasil diperbarui.');
+        return back()->with('error', 'Update mutasi tidak diizinkan.');
     }
 
     public function lokasiAsalProduk($produk_id)
@@ -145,8 +188,8 @@ class MutasiStokController extends Controller
     public function getStokByProduk($produk_id)
     {
         $stok = Stok::with(['gudang', 'area', 'rak'])
-                    ->where('produk_id', $produk_id)
-                    ->get();
+            ->where('produk_id', $produk_id)
+            ->get();
 
         return response()->json($stok);
     }
@@ -168,9 +211,26 @@ class MutasiStokController extends Controller
             'rakAsal',
             'gudangTujuan',
             'areaTujuan',
-            'rakTujuan'
+            'rakTujuan',
+            'user'
         ])->findOrFail($id);
 
         return view('mutasi-stok.show', compact('mutasi'));
+    }
+
+    public function print($id)
+    {
+        $mutasi = MutasiStok::with([
+            'produk',
+            'gudangAsal',
+            'areaAsal',
+            'rakAsal',
+            'gudangTujuan',
+            'areaTujuan',
+            'rakTujuan',
+            'user'
+        ])->findOrFail($id);
+
+        return view('mutasi-stok.invoice', compact('mutasi'));
     }
 }

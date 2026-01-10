@@ -18,6 +18,11 @@ class RakGudang extends Model
         'area_id',
         'kode_rak',
         'keterangan',
+        'jenis_rak',
+        'posisi',
+        'kapasitas_max',
+        'dimensi',
+        'bahan_rak',
         'rak_status',
     ];
 
@@ -60,22 +65,32 @@ class RakGudang extends Model
     public static function createRak($data)
     {
         return self::create([
-            'gudang_id'   => $data['gudang_id'],
-            'area_id'     => $data['area_id'],
-            'kode_rak'    => $data['kode_rak'],
-            'keterangan'  => $data['keterangan'] ?? null,
-            'rak_status'  => $data['rak_status'] ?? true,
+            'gudang_id'     => $data['gudang_id'],
+            'area_id'       => $data['area_id'],
+            'kode_rak'      => $data['kode_rak'],
+            'keterangan'    => $data['keterangan'] ?? null,
+            'jenis_rak'     => $data['jenis_rak'] ?? null,
+            'posisi'        => $data['posisi'] ?? null,
+            'kapasitas_max' => $data['kapasitas_max'] ?? null,
+            'dimensi'       => $data['dimensi'] ?? null,
+            'bahan_rak'     => $data['bahan_rak'] ?? null,
+            'rak_status'    => $data['rak_status'] ?? true,
         ]);
     }
 
     public function updateRak($data)
     {
         $this->update([
-            'gudang_id'   => $data['gudang_id']   ?? $this->gudang_id,
-            'area_id'     => $data['area_id']     ?? $this->area_id,
-            'kode_rak'    => $data['kode_rak']    ?? $this->kode_rak,
-            'keterangan'  => $data['keterangan']  ?? $this->keterangan,
-            'rak_status'  => $data['rak_status']  ?? $this->rak_status,
+            'gudang_id'     => $data['gudang_id']   ?? $this->gudang_id,
+            'area_id'       => $data['area_id']     ?? $this->area_id,
+            'kode_rak'      => $data['kode_rak']    ?? $this->kode_rak,
+            'keterangan'    => $data['keterangan']  ?? $this->keterangan,
+            'jenis_rak'     => $data['jenis_rak']   ?? $this->jenis_rak,
+            'posisi'        => $data['posisi']      ?? $this->posisi,
+            'kapasitas_max' => $data['kapasitas_max'] ?? $this->kapasitas_max,
+            'dimensi'       => $data['dimensi']     ?? $this->dimensi,
+            'bahan_rak'     => $data['bahan_rak']   ?? $this->bahan_rak,
+            'rak_status'    => $data['rak_status']  ?? $this->rak_status,
         ]);
     }
 

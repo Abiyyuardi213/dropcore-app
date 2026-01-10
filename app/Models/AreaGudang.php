@@ -17,6 +17,11 @@ class AreaGudang extends Model
         'gudang_id',
         'kode_area',
         'nama_area',
+        'jenis_area',
+        'pic',
+        'kapasitas_area',
+        'suhu',
+        'kelembaban',
         'keterangan',
         'area_status',
     ];
@@ -60,22 +65,32 @@ class AreaGudang extends Model
     public static function createArea($data)
     {
         return self::create([
-            'gudang_id'   => $data['gudang_id'],
-            'kode_area'   => $data['kode_area'],
-            'nama_area'   => $data['nama_area'],
-            'keterangan'  => $data['keterangan'] ?? null,
-            'area_status' => $data['area_status'] ?? true,
+            'gudang_id'      => $data['gudang_id'],
+            'kode_area'      => $data['kode_area'],
+            'nama_area'      => $data['nama_area'],
+            'jenis_area'     => $data['jenis_area'] ?? null,
+            'pic'            => $data['pic'] ?? null,
+            'kapasitas_area' => $data['kapasitas_area'] ?? null,
+            'suhu'           => $data['suhu'] ?? null,
+            'kelembaban'     => $data['kelembaban'] ?? null,
+            'keterangan'     => $data['keterangan'] ?? null,
+            'area_status'    => $data['area_status'] ?? true,
         ]);
     }
 
     public function updateArea($data)
     {
         $this->update([
-            'gudang_id'   => $data['gudang_id'] ?? $this->gudang_id,
-            'kode_area'   => $data['kode_area'] ?? $this->kode_area,
-            'nama_area'   => $data['nama_area'] ?? $this->nama_area,
-            'keterangan'  => $data['keterangan'] ?? $this->keterangan,
-            'area_status' => $data['area_status'] ?? $this->area_status,
+            'gudang_id'      => $data['gudang_id'] ?? $this->gudang_id,
+            'kode_area'      => $data['kode_area'] ?? $this->kode_area,
+            'nama_area'      => $data['nama_area'] ?? $this->nama_area,
+            'jenis_area'     => $data['jenis_area'] ?? $this->jenis_area,
+            'pic'            => $data['pic'] ?? $this->pic,
+            'kapasitas_area' => $data['kapasitas_area'] ?? $this->kapasitas_area,
+            'suhu'           => $data['suhu'] ?? $this->suhu,
+            'kelembaban'     => $data['kelembaban'] ?? $this->kelembaban,
+            'keterangan'     => $data['keterangan'] ?? $this->keterangan,
+            'area_status'    => $data['area_status'] ?? $this->area_status,
         ]);
     }
 
@@ -87,6 +102,11 @@ class AreaGudang extends Model
     public function deleteArea()
     {
         return $this->delete();
+    }
+
+    public function raks()
+    {
+        return $this->hasMany(RakGudang::class, 'area_id');
     }
 
     public function toggleStatus()

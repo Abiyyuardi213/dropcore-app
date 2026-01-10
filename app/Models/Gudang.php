@@ -15,7 +15,11 @@ class Gudang extends Model
 
     protected $fillable = [
         'nama_gudang',
+        'jenis_gudang',
         'lokasi',
+        'pic',
+        'kapasitas',
+        'luas_area',
         'deskripsi',
         'gudang_status',
     ];
@@ -60,7 +64,11 @@ class Gudang extends Model
     {
         return self::create([
             'nama_gudang'    => $data['nama_gudang'],
+            'jenis_gudang'   => $data['jenis_gudang'] ?? 'Utama',
             'lokasi'         => $data['lokasi'],
+            'pic'            => $data['pic'] ?? null,
+            'kapasitas'      => $data['kapasitas'] ?? null,
+            'luas_area'      => $data['luas_area'] ?? null,
             'deskripsi'      => $data['deskripsi'] ?? null,
             'gudang_status'  => $data['gudang_status'] ?? true,
         ]);
@@ -70,7 +78,11 @@ class Gudang extends Model
     {
         $this->update([
             'nama_gudang'   => $data['nama_gudang'],
+            'jenis_gudang'  => $data['jenis_gudang'] ?? $this->jenis_gudang,
             'lokasi'        => $data['lokasi'] ?? $this->lokasi,
+            'pic'           => $data['pic'] ?? $this->pic,
+            'kapasitas'     => $data['kapasitas'] ?? $this->kapasitas,
+            'luas_area'     => $data['luas_area'] ?? $this->luas_area,
             'deskripsi'     => $data['deskripsi'] ?? $this->deskripsi,
             'gudang_status' => $data['gudang_status'] ?? $this->gudang_status,
         ]);
@@ -79,6 +91,11 @@ class Gudang extends Model
     public function deleteGudang()
     {
         return $this->delete();
+    }
+
+    public function areas()
+    {
+        return $this->hasMany(AreaGudang::class, 'gudang_id');
     }
 
     public function toggleStatus()

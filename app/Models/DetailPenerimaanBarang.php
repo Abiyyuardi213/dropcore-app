@@ -19,6 +19,7 @@ class DetailPenerimaanBarang extends Model
         'qty',
         'harga',
         'subtotal',
+        'kondisi_id', // Add this
         'gudang_id',
         'area_id',
         'rak_id',
@@ -116,5 +117,10 @@ class DetailPenerimaanBarang extends Model
     public function rak()
     {
         return $this->belongsTo(RakGudang::class, 'rak_id');
+    }
+
+    public function kondisi()
+    {
+        return $this->belongsTo(KondisiBarang::class, 'kondisi_id');
     }
 }

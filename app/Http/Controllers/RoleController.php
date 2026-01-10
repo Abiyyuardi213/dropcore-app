@@ -13,10 +13,7 @@ class RoleController extends Controller
         return view('role.index', compact('roles'));
     }
 
-    public function create()
-    {
-        return view('role.create');
-    }
+
 
     public function store(Request $request)
     {
@@ -29,12 +26,6 @@ class RoleController extends Controller
         Role::createRole($request->all());
 
         return redirect()->route('role.index')->with('success', 'Role berhasil ditambahkan.');
-    }
-
-    public function edit($id)
-    {
-        $role = Role::findOrFail($id);
-        return view('role.edit', compact('role'));
     }
 
     public function update(Request $request, $id)

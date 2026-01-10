@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
+        rel="stylesheet">
     <style>
         .toggle-status {
             width: 50px;
@@ -47,6 +49,7 @@
         }
     </style>
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         @include('include.navbarSistem')
@@ -86,7 +89,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($gudangs as $index => $gudang)
+                                        @foreach ($gudangs as $index => $gudang)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $gudang->nama_gudang }}</td>
@@ -98,12 +101,16 @@
                                                         {{ $gudang->gudang_status ? 'checked' : '' }}>
                                                 </td>
                                                 <td class="text-center">
-                                                    <a href="{{ route('gudang.edit', $gudang->id) }}" class="btn btn-info btn-sm">
+                                                    <a href="{{ route('gudang.show', $gudang->id) }}"
+                                                        class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-eye"></i> Detail
+                                                    </a>
+                                                    <a href="{{ route('gudang.edit', $gudang->id) }}"
+                                                        class="btn btn-info btn-sm">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </a>
                                                     <button class="btn btn-danger btn-sm delete-gudang-btn"
-                                                        data-toggle="modal"
-                                                        data-target="#deleteGudangModal"
+                                                        data-toggle="modal" data-target="#deleteGudangModal"
                                                         data-gudang-id="{{ $gudang->id }}">
                                                         <i class="fas fa-trash"></i> Hapus
                                                     </button>
@@ -123,42 +130,23 @@
         @include('include.footerSistem')
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteGudangModal" tabindex="-1" aria-labelledby="deleteGudangModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteGudangModalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus gudang ini? Tindakan ini tidak dapat dibatalkan.
-                </div>
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    @include('services.ToastModal')
     @include('services.LogoutModal')
+
+    <!-- Hidden Delete Form -->
+    <form id="deleteForm" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-    <script src="{{ asset('js/ToastScript.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $("#gudangTable").DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -168,45 +156,81 @@
                 "autoWidth": false,
                 "responsive": true
             });
-        });
 
-        $(document).ready(function () {
-            $('.delete-gudang-btn').click(function () {
+            // Flash Message SweetAlert
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            @elseif (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: "{{ session('error') }}",
+                });
+            @endif
+
+            // Delete Confirmation
+            $('.delete-gudang-btn').click(function() {
                 let gudangId = $(this).data('gudang-id');
                 let deleteUrl = "{{ url('gudang') }}/" + gudangId;
-                $('#deleteForm').attr('action', deleteUrl);
-            });
-        });
 
-        $(document).ready(function () {
-            $(".toggle-status").change(function () {
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data gudang yang dihapus tidak dapat dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#deleteForm').attr('action', deleteUrl);
+                        $('#deleteForm').submit();
+                    }
+                });
+            });
+
+            // Toggle Status
+            $(".toggle-status").change(function() {
                 let gudangId = $(this).data("gudang-id");
                 let status = $(this).prop("checked") ? 1 : 0;
+                let originalState = !$(this).prop("checked");
+                let checkbox = $(this);
 
                 $.post("{{ url('gudang') }}/" + gudangId + "/toggle-status", {
                     _token: '{{ csrf_token() }}',
-                    gudang_status: status
-                }, function (res) {
+                    gudang_status: status // Sesuaikan dengan controller
+                }, function(res) {
                     if (res.success) {
-                        $(".toast-body").text(res.message);
-                        $("#toastNotification").toast({ autohide: true, delay: 3000 }).toast("show");
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                        });
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: res.message
+                        });
                     } else {
-                        alert("Gagal memperbarui status.");
+                        Swal.fire('Gagal!', 'Gagal memperbarui status.', 'error');
+                        checkbox.prop("checked", originalState);
                     }
-                }).fail(function () {
-                    alert("Terjadi kesalahan dalam mengubah status.");
+                }).fail(function() {
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem.', 'error');
+                    checkbox.prop("checked", originalState);
                 });
             });
         });
-
-        $(document).ready(function() {
-            @if (session('success') || session('error'))
-                $('#toastNotification').toast({
-                    delay: 3000,
-                    autohide: true
-                }).toast('show');
-            @endif
-        });
     </script>
 </body>
+
 </html>

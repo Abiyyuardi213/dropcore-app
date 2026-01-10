@@ -16,8 +16,13 @@ class Products extends Model
     protected $fillable = [
         'sku',
         'name',
+        'merk',
         'description',
+        'dimensi',
+        'berat',
         'price',
+        'min_stock',
+        'max_stock',
         'category_id',
         'uom_id',
         'image',
@@ -89,13 +94,21 @@ class Products extends Model
 
     public static function createProduct($data)
     {
-        $data['sku'] = self::generateSKU($data['name']);
+        // Use provided SKU or generate one
+        if (empty($data['sku'])) {
+            $data['sku'] = self::generateSKU($data['name']);
+        }
 
         return self::create([
             'sku'         => $data['sku'],
             'name'        => $data['name'],
-            'description' => $data['description'],
+            'merk'        => $data['merk'] ?? null,
+            'description' => $data['description'] ?? null,
+            'dimensi'     => $data['dimensi'] ?? null,
+            'berat'       => $data['berat'] ?? null,
             'price'       => str_replace(',', '', $data['price']),
+            'min_stock'   => $data['min_stock'] ?? 0,
+            'max_stock'   => $data['max_stock'] ?? null,
             'category_id' => $data['category_id'],
             'uom_id'      => $data['uom_id'],
             'image'       => $data['image'] ?? null,
@@ -104,16 +117,22 @@ class Products extends Model
 
     public function updateProduct($data)
     {
-        if (isset($data['name'])) {
+        // Only regenerate SKU if name changes AND SKU wasn't manually provided/updated
+        if (isset($data['name']) && $data['name'] !== $this->name && empty($data['sku'])) {
             $data['sku'] = self::generateSKU($data['name']);
         }
 
         return $this->update([
             'sku'         => $data['sku']        ?? $this->sku,
             'name'        => $data['name']       ?? $this->name,
-            'description' => $data['description']?? $this->description,
+            'merk'        => $data['merk']       ?? $this->merk,
+            'description' => $data['description'] ?? $this->description,
+            'dimensi'     => $data['dimensi']    ?? $this->dimensi,
+            'berat'       => $data['berat']      ?? $this->berat,
             'price'       => isset($data['price']) ? str_replace(',', '', $data['price']) : $this->price,
-            'category_id' => $data['category_id']?? $this->category_id,
+            'min_stock'   => $data['min_stock']  ?? $this->min_stock,
+            'max_stock'   => $data['max_stock']  ?? $this->max_stock,
+            'category_id' => $data['category_id'] ?? $this->category_id,
             'uom_id'      => $data['uom_id']     ?? $this->uom_id,
             'image'       => $data['image']      ?? $this->image,
         ]);

@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dropcore - Pengeluaran Barang</title>
+    <title>Pengeluaran Barang | DropCore</title>
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -18,7 +21,6 @@
 
         <div class="content-wrapper">
 
-            <!-- Header -->
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
@@ -29,110 +31,101 @@
                 </div>
             </div>
 
-            <!-- Content -->
             <section class="content">
                 <div class="container-fluid">
 
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card card-outline card-warning">
+                        <div class="card-header">
                             <h3 class="card-title">Daftar Pengeluaran Barang</h3>
-                            <a href="{{ route('pengeluaran-barang.create') }}" class="btn btn-primary btn-sm ml-auto">
-                                <i class="fas fa-plus"></i> Tambah Pengeluaran
-                            </a>
+                            <div class="card-tools">
+                                <a href="{{ route('pengeluaran-barang.create') }}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-plus"></i> Tambah Pengeluaran
+                                </a>
+                            </div>
                         </div>
 
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="pengeluaranTable" class="table table-bordered table-striped">
+                                <table id="pengeluaranTable" class="table table-hover text-nowrap">
                                     <thead>
                                         <tr>
                                             <th>No</th>
                                             <th>No. Pengeluaran</th>
                                             <th>Tanggal</th>
-                                            <th>Keterangan</th>
-                                            <th>Aksi</th>
+                                            <th>Tujuan (Penerima)</th>
+                                            <th>Ref.</th>
+                                            <th>User</th>
+                                            <th>Status</th>
+                                            <th class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
-                                        @foreach($data as $index => $p)
-                                        <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td>{{ $p->no_pengeluaran }}</td>
-                                            <td>{{ $p->tanggal_pengeluaran }}</td>
-                                            <td>{{ $p->keterangan ?? '-' }}</td>
-
-                                            <td class="text-center">
-                                                <a href="{{ route('pengeluaran-barang.show', $p->id) }}"
-                                                   class="btn btn-secondary btn-sm">
-                                                    <i class="fas fa-eye"></i> Detail
-                                                </a>
-
-                                                {{--
-                                                <a href="{{ route('pengeluaran-barang.edit', $p->id) }}"
-                                                   class="btn btn-info btn-sm">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </a>
-
-                                                <button class="btn btn-danger btn-sm delete-btn"
-                                                    data-toggle="modal"
-                                                    data-target="#deletePengeluaranModal"
-                                                    data-id="{{ $p->id }}">
-                                                    <i class="fas fa-trash"></i> Hapus
-                                                </button>
-                                                --}}
-                                            </td>
-                                        </tr>
+                                        @foreach ($data as $index => $item)
+                                            <tr>
+                                                <td>{{ $index + 1 }}</td>
+                                                <td class="text-bold text-primary">{{ $item->no_pengeluaran }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($item->tanggal_pengeluaran)->format('d M Y') }}
+                                                </td>
+                                                <td>
+                                                    @if ($item->tipe_penerima == 'distributor')
+                                                        <span class="badge badge-info"><i class="fas fa-truck"></i>
+                                                            Dist.</span>
+                                                        {{ $item->distributor->nama_distributor ?? 'Unknown' }}
+                                                    @else
+                                                        <span class="badge badge-success"><i class="fas fa-user"></i>
+                                                            Kons.</span>
+                                                        {{ $item->nama_konsumen }}
+                                                    @endif
+                                                </td>
+                                                <td>{{ $item->referensi ?? '-' }}</td>
+                                                <td>{{ $item->user->name ?? 'System' }}</td>
+                                                <td>
+                                                    @if ($item->status == 'completed')
+                                                        <span class="badge badge-success">Completed</span>
+                                                    @elseif($item->status == 'canceled')
+                                                        <span class="badge badge-danger">Canceled</span>
+                                                    @else
+                                                        <span
+                                                            class="badge badge-secondary">{{ ucfirst($item->status) }}</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    <a href="{{ route('pengeluaran-barang.show', $item->id) }}"
+                                                        class="btn btn-info btn-xs" title="Lihat Detail">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{{ route('pengeluaran-barang.print', $item->id) }}"
+                                                        target="_blank" class="btn btn-secondary btn-xs"
+                                                        title="Cetak Surat Jalan">
+                                                        <i class="fas fa-print"></i>
+                                                    </a>
+                                                    <button class="btn btn-danger btn-xs btn-delete"
+                                                        data-id="{{ $item->id }}" title="Batal / Hapus">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                    <form id="delete-form-{{ $item->id }}"
+                                                        action="{{ route('pengeluaran-barang.destroy', $item->id) }}"
+                                                        method="POST" style="display: none;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                    </form>
+                                                </td>
+                                            </tr>
                                         @endforeach
                                     </tbody>
 
                                 </table>
                             </div>
-
-                            <div id="tablePagination"></div>
                         </div>
                     </div>
-
                 </div>
             </section>
-
         </div>
 
         @include('include.footerSistem')
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deletePengeluaranModal" tabindex="-1" aria-labelledby="deletePengeluaranModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span>&times;</span>
-                    </button>
-                </div>
-
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus pengeluaran barang ini? Tindakan ini tidak dapat dibatalkan.
-                </div>
-
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Hapus
-                        </button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-
-    @include('services.ToastModal')
     @include('services.LogoutModal')
 
     <!-- Script -->
@@ -141,10 +134,10 @@
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-    <script src="{{ asset('js/ToastScript.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $("#pengeluaranTable").DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -152,27 +145,50 @@
                 "ordering": true,
                 "info": true,
                 "autoWidth": false,
-                "responsive": true
+                "responsive": true,
+                "order": [
+                    [2, "desc"]
+                ]
             });
-        });
 
-        // Modal Delete
-        $('.delete-btn').click(function () {
-            let id = $(this).data('id');
-            let url = "{{ url('pengeluaran/delete') }}/" + id;
-            $('#deleteForm').attr('action', url);
-        });
+            // SweetAlert Delete
+            $('.btn-delete').click(function() {
+                let id = $(this).data('id');
+                Swal.fire({
+                    title: 'Batalkan Pengeluaran?',
+                    text: "Menghapus data ini akan MENGEMBALIKAN stok barang ke gudang!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus & Refund Stok!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#delete-form-' + id).submit();
+                    }
+                });
+            });
 
-        // Toast notification
-        $(document).ready(function() {
-            @if (session('success') || session('error'))
-                $('#toastNotification').toast({
-                    delay: 3000,
-                    autohide: true
-                }).toast('show');
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            @endif
+
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: '{{ session('error') }}',
+                });
             @endif
         });
     </script>
-
 </body>
+
 </html>

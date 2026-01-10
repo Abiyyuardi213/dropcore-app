@@ -21,15 +21,25 @@ class GudangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_gudang' => 'required|string|max:255',
-            'lokasi' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'nama_gudang'   => 'required|string|max:255',
+            'jenis_gudang'  => 'required|string|max:50',
+            'lokasi'        => 'required|string|max:255',
+            'pic'           => 'nullable|string|max:255',
+            'kapasitas'     => 'nullable|string|max:100',
+            'luas_area'     => 'nullable|string|max:100',
+            'deskripsi'     => 'nullable|string',
             'gudang_status' => 'required|boolean',
         ]);
 
         Gudang::createGudang($request->all());
 
         return redirect()->route('gudang.index')->with('success', 'Gudang berhasil ditambahkan.');
+    }
+
+    public function show($id)
+    {
+        $gudang = Gudang::findOrFail($id);
+        return view('gudang.show', compact('gudang'));
     }
 
     public function edit($id)
@@ -41,9 +51,13 @@ class GudangController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama_gudang' => 'required|string|max:255',
-            'lokasi' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'nama_gudang'   => 'required|string|max:255',
+            'jenis_gudang'  => 'required|string|max:50',
+            'lokasi'        => 'required|string|max:255',
+            'pic'           => 'nullable|string|max:255',
+            'kapasitas'     => 'nullable|string|max:100',
+            'luas_area'     => 'nullable|string|max:100',
+            'deskripsi'     => 'nullable|string',
             'gudang_status' => 'required|boolean',
         ]);
 

@@ -22,17 +22,13 @@ use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardKeuanganController;
 use App\Http\Controllers\DashboardMasterController;
-use App\Http\Controllers\DashboardOfficeController;
+
 use App\Http\Controllers\DetailPenerimaanBarangController;
 use App\Http\Controllers\DetailPengeluaranBarangController;
 use App\Http\Controllers\DistributorController;
-use App\Http\Controllers\DivisiController;
-use App\Http\Controllers\JabatanController;
-use App\Http\Controllers\KantorController;
 use App\Http\Controllers\KasPusatController;
 use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\KondisiBarangController;
-use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PenerimaanBarangController;
 use App\Http\Controllers\PengeluaranBarangController;
 use App\Http\Controllers\RiwayatAktivitasLogController;
@@ -69,8 +65,6 @@ Route::middleware(['role:admin,staff'])->group(function () {
 
     Route::resource('user', UserController::class);
 
-    Route::resource('pegawai', PegawaiController::class);
-
     Route::resource('category', CategoryController::class);
 
     Route::resource('product', ProductController::class);
@@ -103,19 +97,8 @@ Route::middleware(['role:admin,staff'])->group(function () {
     Route::post('gudang/{id}/toggle-status', [GudangController::class, 'toggleStatus'])->name('gudang.toggleStatus');
     Route::resource('gudang', GudangController::class);
 
-    Route::get('dashboardOffice', [DashboardOfficeController::class, 'index'])->name('dashboardOffice');
-
-    Route::post('kantor/{id}/toggle-status', [KantorController::class, 'toggleStatus'])->name('kantor.toggleStatus');
-    Route::resource('kantor', KantorController::class);
-
-    Route::post('divisi/{id}/toggle-status', [DivisiController::class, 'toggleStatus'])->name('divisi.toggleStatus');
-    Route::resource('divisi', DivisiController::class);
-
     //Route::post('distributor/{id}/toggle-status', [DistributorController::class, 'toggleStatus'])->name('distributor.toggleStatus');
     Route::resource('distributor', DistributorController::class);
-
-    Route::post('jabatan/{id}/toggle-status', [JabatanController::class, 'toggleStatus'])->name('jabatan.toggleStatus');
-    Route::resource('jabatan', JabatanController::class);
 
     Route::post('areaGudang/{id}/toggle-status', [AreaGudangController::class, 'toggleStatus'])->name('areaGudang.toggleStatus');
     Route::resource('areaGudang', AreaGudangController::class);
@@ -134,6 +117,7 @@ Route::middleware(['role:admin,staff'])->group(function () {
 
     Route::get('/stok/produk/{produk_id}', [MutasiStokController::class, 'getStokByProduk']);
     Route::get('/lokasi-asal-produk/{produk_id}', [MutasiStokController::class, 'lokasiAsalProduk']);
+    Route::get('mutasi-stok/{id}/print', [MutasiStokController::class, 'print'])->name('mutasi-stok.print');
     Route::resource('mutasi-stok', MutasiStokController::class);
 
     Route::post('wilayah/{id}/toggle-status', [WilayahController::class, 'toggleStatus'])->name('wilayah.toggleStatus');
@@ -158,12 +142,15 @@ Route::middleware(['role:admin,staff'])->group(function () {
     Route::get('penerimaan-barang/{id}/pdf', [PenerimaanBarangController::class, 'generatePDF'])
         ->name('penerimaan-barang.pdf');
 
-    Route::resource('penerimaan-barang', PenerimaanBarangController::class);
+    Route::get('penerimaan-barang/{id}/print', [PenerimaanBarangController::class, 'print'])->name('penerimaan-barang.print');
 
-    Route::get(
-        'penerimaan-barang/{id}/detail',
-        [DetailPenerimaanBarangController::class, 'index']
-    )->name('penerimaan-barang.detail');
+    // We are unifying creation in one step, so we might not need separate detail controller access for now, 
+    // but better keep the resource and maybe removing the old legacy 'detail' specific routes if they clash.
+    // The previous implementation used a 2-step process (Header -> Redirect to Detail). 
+    // New Implementation uses 1-step form. 
+    // So 'penerimaan-barang.detail' might be obsolete or just alias to 'show'.
+
+    Route::resource('penerimaan-barang', PenerimaanBarangController::class);
 
     Route::post(
         'detail-penerimaan/store',
@@ -178,8 +165,11 @@ Route::middleware(['role:admin,staff'])->group(function () {
     Route::get('pengeluaran-barang/{id}/pdf', [PengeluaranBarangController::class, 'generatePDF'])
         ->name('pengeluaran-barang.pdf');
 
+    Route::get('pengeluaran-barang/{id}/print', [PengeluaranBarangController::class, 'print'])->name('pengeluaran-barang.print');
+
     Route::resource('pengeluaran-barang', PengeluaranBarangController::class);
 
+    // Legacy details routes - can be deprecated or kept as fail-safe if old links exist
     Route::get(
         'pengeluaran-barang/{id}/detail',
         [DetailPengeluaranBarangController::class, 'index']
@@ -195,11 +185,11 @@ Route::middleware(['role:admin,staff'])->group(function () {
         [DetailPengeluaranBarangController::class, 'destroy']
     )->name('detail-pengeluaran.destroy');
 
-    Route::resource('riwayat-aktivitas-produk', RiwayatAktivitasProdukController::class)->only(['index','show']);
+    Route::resource('riwayat-aktivitas-produk', RiwayatAktivitasProdukController::class)->only(['index', 'show']);
 
-    Route::get('riwayat-logs', [RiwayatAktivitasLogController::class,'index'])->name('riwayat-log.index');
-    Route::get('riwayat-logs/{id}', [RiwayatAktivitasLogController::class,'show'])->name('riwayat-log.show');
-    Route::delete('riwayat-logs', [RiwayatAktivitasLogController::class,'destroyAll'])->name('riwayat-log.destroyAll');
+    Route::get('riwayat-logs', [RiwayatAktivitasLogController::class, 'index'])->name('riwayat-log.index');
+    Route::get('riwayat-logs/{id}', [RiwayatAktivitasLogController::class, 'show'])->name('riwayat-log.show');
+    Route::delete('riwayat-logs', [RiwayatAktivitasLogController::class, 'destroyAll'])->name('riwayat-log.destroyAll');
 });
 
 Route::middleware(['role:customer'])->group(function () {
@@ -209,4 +199,3 @@ Route::middleware(['role:customer'])->group(function () {
     Route::post('profil-customer', [UserController::class, 'updateProfilCustomer'])
         ->name('customer.profil.update');
 });
-

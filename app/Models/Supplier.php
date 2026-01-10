@@ -14,10 +14,16 @@ class Supplier extends Model
     public $incrementing = false;
 
     protected $fillable = [
+        'kode_supplier',
         'nama_supplier',
+        'penanggung_jawab',
         'email',
+        'website',
         'no_telepon',
         'alamat',
+        'keterangan',
+        'logo',
+        'tipe_supplier',
         'wilayah_id',
         'provinsi_id',
         'kota_id',
@@ -31,6 +37,9 @@ class Supplier extends Model
         static::creating(function ($supplier) {
             if (!$supplier->id) {
                 $supplier->id = (string) Str::uuid();
+            }
+            if (!$supplier->kode_supplier) {
+                $supplier->kode_supplier = 'SUP-' . strtoupper(Str::random(6));
             }
         });
 
@@ -65,10 +74,16 @@ class Supplier extends Model
     public static function createSupplier($data)
     {
         return self::create([
+            'kode_supplier' => $data['kode_supplier'] ?? null,
             'nama_supplier' => $data['nama_supplier'],
+            'penanggung_jawab' => $data['penanggung_jawab'] ?? null,
             'email'        => $data['email'],
+            'website'      => $data['website'] ?? null,
             'no_telepon'   => $data['no_telepon'],
             'alamat'       => $data['alamat'],
+            'keterangan'   => $data['keterangan'] ?? null,
+            'logo'         => $data['logo'] ?? null,
+            'tipe_supplier' => $data['tipe_supplier'] ?? null,
             'wilayah_id'   => $data['wilayah_id'],
             'provinsi_id'  => $data['provinsi_id'],
             'kota_id'      => $data['kota_id'],
@@ -81,10 +96,16 @@ class Supplier extends Model
     public function updateSupplier($data)
     {
         $this->update([
+            'kode_supplier' => $data['kode_supplier'] ?? $this->kode_supplier,
             'nama_supplier' => $data['nama_supplier'],
+            'penanggung_jawab' => $data['penanggung_jawab'] ?? $this->penanggung_jawab,
             'email'        => $data['email']        ?? $this->email,
+            'website'      => $data['website']      ?? $this->website,
             'no_telepon'   => $data['no_telepon']    ?? $this->no_telepon,
             'alamat'       => $data['alamat']       ?? $this->alamat,
+            'keterangan'   => $data['keterangan']   ?? $this->keterangan,
+            'logo'         => $data['logo']         ?? $this->logo,
+            'tipe_supplier' => $data['tipe_supplier'] ?? $this->tipe_supplier,
             'wilayah_id'   => $data['wilayah_id']   ?? $this->wilayah_id,
             'provinsi_id'  => $data['provinsi_id']  ?? $this->provinsi_id,
             'kota_id'      => $data['kota_id']      ?? $this->kota_id,

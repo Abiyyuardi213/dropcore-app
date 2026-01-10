@@ -31,9 +31,15 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'sku'           => 'nullable|string|unique:products,sku',
             'name'          => 'required|string|max:255',
+            'merk'          => 'nullable|string|max:100',
             'description'   => 'nullable|string|max:255',
+            'dimensi'       => 'nullable|string|max:50',
+            'berat'         => 'nullable|numeric|min:0',
             'price'         => 'required|numeric|min:0',
+            'min_stock'     => 'nullable|integer|min:0',
+            'max_stock'     => 'nullable|integer|min:0',
             'category_id'   => 'required|exists:product_category,id',
             'uom_id'        => 'required|exists:uoms,id',
             'image'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
@@ -74,9 +80,15 @@ class ProductController extends Controller
         $product = Products::findOrFail($id);
 
         $request->validate([
+            'sku'           => 'nullable|string|unique:products,sku,' . $id,
             'name'          => 'required|string|max:255',
+            'merk'          => 'nullable|string|max:100',
             'description'   => 'nullable|string|max:255',
+            'dimensi'       => 'nullable|string|max:50',
+            'berat'         => 'nullable|numeric|min:0',
             'price'         => 'required|numeric|min:0',
+            'min_stock'     => 'nullable|integer|min:0',
+            'max_stock'     => 'nullable|integer|min:0',
             'category_id'   => 'required|exists:product_category,id',
             'uom_id'        => 'required|exists:uoms,id',
             'image'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',

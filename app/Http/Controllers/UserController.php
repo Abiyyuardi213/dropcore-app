@@ -45,8 +45,8 @@ class UserController extends Controller
             'divisi_id'         => 'nullable|exists:divisi,id',
             'jabatan_id'        => 'nullable|exists:jabatan,id',
             'tanggal_bergabung' => 'nullable|date',
-            'jenis_kelamin'     => ['nullable', Rule::in(['L','P'])],
-            'status_kepegawaian'=> ['nullable', Rule::in(['aktif','nonaktif'])],
+            'jenis_kelamin'     => ['nullable', Rule::in(['L', 'P'])],
+            'status_kepegawaian' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
             'profile_picture'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
@@ -123,8 +123,8 @@ class UserController extends Controller
 
         $request->validate([
             'name'              => 'required|string|max:255',
-            'username'          => ['required','string','max:255', Rule::unique('users','username')->ignore($user->id)],
-            'email'             => ['nullable','email','max:255', Rule::unique('users','email')->ignore($user->id)],
+            'username'          => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($user->id)],
+            'email'             => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'no_telepon'        => 'nullable|string|max:20',
             'nik'               => 'nullable|string|max:50',
             'alamat'            => 'nullable|string',
@@ -133,15 +133,23 @@ class UserController extends Controller
             'divisi_id'         => 'nullable|exists:divisi,id',
             'jabatan_id'        => 'nullable|exists:jabatan,id',
             'tanggal_bergabung' => 'nullable|date',
-            'jenis_kelamin'     => ['nullable', Rule::in(['L','P'])],
-            'status_kepegawaian'=> ['nullable', Rule::in(['aktif','nonaktif'])],
+            'jenis_kelamin'     => ['nullable', Rule::in(['L', 'P'])],
+            'status_kepegawaian' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
             'profile_picture'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $data = $request->only([
-            'name','username','email','no_telepon','alamat','role_id',
-            'divisi_id','jabatan_id','tanggal_bergabung',
-            'jenis_kelamin','status_kepegawaian'
+            'name',
+            'username',
+            'email',
+            'no_telepon',
+            'alamat',
+            'role_id',
+            'divisi_id',
+            'jabatan_id',
+            'tanggal_bergabung',
+            'jenis_kelamin',
+            'status_kepegawaian'
         ]);
 
         if (!empty($request->password)) {
@@ -149,8 +157,8 @@ class UserController extends Controller
         }
 
         if ($request->hasFile('profile_picture')) {
-            if ($user->profile_picture && file_exists(public_path('uploads/profile/'.$user->profile_picture))) {
-                unlink(public_path('uploads/profile/'.$user->profile_picture));
+            if ($user->profile_picture && file_exists(public_path('uploads/profile/' . $user->profile_picture))) {
+                unlink(public_path('uploads/profile/' . $user->profile_picture));
             }
 
             $file = $request->file('profile_picture');
@@ -190,27 +198,29 @@ class UserController extends Controller
         $user = auth()->user();
 
         $request->validate([
-            'name'       => 'required|string|max:255',
-            'username'   => ['required', 'string', Rule::unique('users','username')->ignore($user->id)],
-            'email'      => ['nullable','email', Rule::unique('users','email')->ignore($user->id)],
-            'no_telepon' => 'nullable|string|max:20',
-            'password'   => 'nullable|min:6',
+            'name'          => 'required|string|max:255',
+            'username'      => ['required', 'string', Rule::unique('users', 'username')->ignore($user->id)],
+            'email'         => ['nullable', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'no_telepon'    => 'nullable|string|max:20',
+            'alamat'        => 'nullable|string',
+            'jenis_kelamin' => ['nullable', Rule::in(['L', 'P'])],
+            'password'      => 'nullable|min:6',
             'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
         ]);
 
-        $data = $request->only('name','username','email','no_telepon');
+        $data = $request->only('name', 'username', 'email', 'no_telepon', 'alamat', 'jenis_kelamin');
 
         if (!empty($request->password)) {
             $data['password'] = Hash::make($request->password);
         }
 
         if ($request->hasFile('profile_picture')) {
-            if ($user->profile_picture && file_exists(public_path('uploads/profile/'.$user->profile_picture))) {
-                unlink(public_path('uploads/profile/'.$user->profile_picture));
+            if ($user->profile_picture && file_exists(public_path('uploads/profile/' . $user->profile_picture))) {
+                unlink(public_path('uploads/profile/' . $user->profile_picture));
             }
 
             $file = $request->file('profile_picture');
-            $filename = uniqid().'.jpg'; // pakai jpg hasil crop
+            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/profile'), $filename);
 
             $data['profile_picture'] = $filename;
@@ -218,7 +228,7 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('user.profil')->with('success','Profil berhasil diperbarui');
+        return redirect()->route('user.profil')->with('success', 'Profil berhasil diperbarui');
     }
 
     public function profilCustomer()
@@ -242,14 +252,14 @@ class UserController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'username' => ['required', 'string', Rule::unique('users','username')->ignore($user->id)],
-            'email' => ['nullable','email', Rule::unique('users','email')->ignore($user->id)],
+            'username' => ['required', 'string', Rule::unique('users', 'username')->ignore($user->id)],
+            'email' => ['nullable', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'no_telepon' => 'nullable|string|max:20',
             'password' => 'nullable|min:6',
             'cropped_image' => 'nullable|string',
         ]);
 
-        $data = $request->only('name','username','email','no_telepon');
+        $data = $request->only('name', 'username', 'email', 'no_telepon');
 
         if (!empty($request->password)) {
             $data['password'] = Hash::make($request->password);
@@ -271,8 +281,8 @@ class UserController extends Controller
             }
 
             if (file_put_contents($path, $croppedImage)) {
-                if ($user->profile_picture && file_exists(public_path('uploads/profile/'.$user->profile_picture))) {
-                    unlink(public_path('uploads/profile/'.$user->profile_picture));
+                if ($user->profile_picture && file_exists(public_path('uploads/profile/' . $user->profile_picture))) {
+                    unlink(public_path('uploads/profile/' . $user->profile_picture));
                 }
 
                 $data['profile_picture'] = $filename;

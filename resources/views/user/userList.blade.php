@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
+        rel="stylesheet">
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         @include('include.navbarSistem')
@@ -49,7 +52,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($users as $index => $user)
+                                        @foreach ($users as $index => $user)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $user->name }}</td>
@@ -57,15 +60,16 @@
                                                 <td>{{ $user->no_telepon }}</td>
                                                 <td>{{ $user->role->role_name ?? '-' }}</td>
                                                 <td class="text-center">
-                                                    <a href="{{ route('user.show', $user->id) }}" class="btn btn-info btn-sm">
+                                                    <a href="{{ route('user.show', $user->id) }}"
+                                                        class="btn btn-info btn-sm">
                                                         <i class="fas fa-eye"></i> Detail
                                                     </a>
-                                                    <a href="{{ route('user.edit', $user->id) }}" class="btn btn-warning btn-sm">
+                                                    <a href="{{ route('user.edit', $user->id) }}"
+                                                        class="btn btn-warning btn-sm">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </a>
                                                     <button class="btn btn-danger btn-sm delete-user-btn"
-                                                        data-toggle="modal"
-                                                        data-target="#deleteUserModal"
+                                                        data-toggle="modal" data-target="#deleteUserModal"
                                                         data-user-id="{{ $user->id }}">
                                                         <i class="fas fa-trash"></i> Hapus
                                                     </button>
@@ -86,11 +90,13 @@
     </div>
 
     <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteUserModalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
+                    <h5 class="modal-title" id="deleteUserModalLabel"><i class="fas fa-exclamation-triangle"></i>
+                        Konfirmasi Hapus</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -118,9 +124,9 @@
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-    <script src="{{ asset('js/ToastScript.js') }}"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $("#userTable").DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -132,22 +138,14 @@
             });
         });
 
-        $(document).ready(function () {
-            $('.delete-user-btn').click(function () {
+        $(document).ready(function() {
+            $('.delete-user-btn').click(function() {
                 let userId = $(this).data('user-id');
                 let deleteUrl = "{{ url('user') }}/" + userId;
                 $('#deleteForm').attr('action', deleteUrl);
             });
         });
-
-        $(document).ready(function() {
-            @if (session('success') || session('error'))
-                $('#toastNotification').toast({
-                    delay: 3000,
-                    autohide: true
-                }).toast('show');
-            @endif
-        });
     </script>
 </body>
+
 </html>

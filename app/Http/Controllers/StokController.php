@@ -14,7 +14,7 @@ class StokController extends Controller
 {
     public function index()
     {
-        $stoks = Stok::orderBy('created_at', 'asc')->get();
+        $stoks = Stok::with(['produk', 'gudang', 'area', 'rak', 'kondisi'])->orderBy('created_at', 'asc')->get();
         $kondisis = KondisiBarang::all();
         return view('stok.index', compact('stoks', 'kondisis'));
     }
@@ -77,9 +77,10 @@ class StokController extends Controller
 
     public function getStokByProduk($produk_id)
     {
-        $stok = Stok::with(['gudang', 'area', 'rak'])
-                ->where('produk_id', $produk_id)
-                ->get();
+        $stok = Stok::with(['gudang', 'area', 'rak', 'kondisi'])
+            ->where('produk_id', $produk_id)
+            ->where('quantity', '>', 0)
+            ->get();
 
         return response()->json($stok);
     }

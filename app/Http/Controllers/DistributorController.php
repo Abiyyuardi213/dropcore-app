@@ -10,7 +10,7 @@ class DistributorController extends Controller
 {
     public function index()
     {
-        $distributors = Distributor::orderBy('created_at', 'asc')->get();
+        $distributors = Distributor::with('kota')->orderBy('created_at', 'asc')->get();
         return view('distributor.index', compact('distributors'));
     }
 
@@ -24,16 +24,25 @@ class DistributorController extends Controller
     {
         $request->validate([
             'nama_distributor' => 'required|string|max:255|unique:distributor,nama_distributor',
+            'tipe_distributor' => 'required|string|in:Principal,Distributor,Reseller',
+            'status'           => 'required|string|in:active,inactive,blacklisted',
             'telepon'          => 'nullable|string|max:20',
             'email'            => 'nullable|email|max:255',
             'alamat'           => 'nullable|string',
             'kota_id'          => 'nullable|exists:kota,id',
+            'pic_nama'         => 'nullable|string|max:255',
+            'pic_telepon'      => 'nullable|string|max:20',
+            'npwp'             => 'nullable|string|max:30',
+            'website'          => 'nullable|url|max:255',
+            'keterangan'       => 'nullable|string',
+            'latitude'         => 'nullable|numeric|between:-90,90',
+            'longitude'        => 'nullable|numeric|between:-180,180',
         ]);
 
         Distributor::createDistributor($request->all());
 
         return redirect()->route('distributor.index')
-                        ->with('success', 'Distributor berhasil ditambahkan.');
+            ->with('success', 'Distributor berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -48,18 +57,33 @@ class DistributorController extends Controller
         $distributor = Distributor::findOrFail($id);
 
         $request->validate([
-            'kode_distributor' => 'required|string|max:50|unique:distributors,kode_distributor,' . $id,
-            'name'             => 'required|string|max:255|unique:distributors,name,' . $id,
+            // 'kode_distributor' => 'required|string|max:50|unique:distributor,kode_distributor,' . $id, // Kode biasanya tidak diubah
+            'nama_distributor' => 'required|string|max:255|unique:distributor,nama_distributor,' . $id,
+            'tipe_distributor' => 'required|string|in:Principal,Distributor,Reseller',
+            'status'           => 'required|string|in:active,inactive,blacklisted',
             'telepon'          => 'nullable|string|max:20',
             'email'            => 'nullable|email|max:255',
             'alamat'           => 'nullable|string',
             'kota_id'          => 'nullable|exists:kota,id',
+            'pic_nama'         => 'nullable|string|max:255',
+            'pic_telepon'      => 'nullable|string|max:20',
+            'npwp'             => 'nullable|string|max:30',
+            'website'          => 'nullable|url|max:255',
+            'keterangan'       => 'nullable|string',
+            'latitude'         => 'nullable|numeric|between:-90,90',
+            'longitude'        => 'nullable|numeric|between:-180,180',
         ]);
 
         $distributor->updateDistributor($request->all());
 
         return redirect()->route('distributor.index')
-                         ->with('success', 'Distributor berhasil diperbarui.');
+            ->with('success', 'Distributor berhasil diperbarui.');
+    }
+
+    public function show($id)
+    {
+        $distributor = Distributor::with('kota')->findOrFail($id);
+        return view('distributor.show', compact('distributor'));
     }
 
     public function destroy($id)
@@ -68,7 +92,7 @@ class DistributorController extends Controller
         $distributor->deleteDistributor();
 
         return redirect()->route('distributor.index')
-                         ->with('success', 'Distributor berhasil dihapus.');
+            ->with('success', 'Distributor berhasil dihapus.');
     }
 
     // public function toggleStatus($id)

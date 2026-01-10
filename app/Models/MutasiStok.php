@@ -14,6 +14,7 @@ class MutasiStok extends Model
     protected $fillable = [
         'id',
         'produk_id',
+        'jenis_mutasi',
         'gudang_asal_id',
         'area_asal_id',
         'rak_asal_id',
@@ -21,6 +22,9 @@ class MutasiStok extends Model
         'area_tujuan_id',
         'rak_tujuan_id',
         'quantity',
+        'kondisi_id',
+        'referensi',
+        'user_id',
         'tanggal_mutasi',
         'keterangan',
     ];
@@ -34,17 +38,22 @@ class MutasiStok extends Model
         });
     }
 
+    // Static creator helper - updated
     public static function createMutasi(array $data)
     {
         return self::create([
             'produk_id' => $data['produk_id'],
+            'jenis_mutasi' => $data['jenis_mutasi'],
             'gudang_asal_id' => $data['gudang_asal_id'] ?? null,
             'area_asal_id' => $data['area_asal_id'] ?? null,
             'rak_asal_id' => $data['rak_asal_id'] ?? null,
-            'gudang_tujuan_id' => $data['gudang_tujuan_id'],
+            'gudang_tujuan_id' => $data['gudang_tujuan_id'] ?? null,
             'area_tujuan_id' => $data['area_tujuan_id'] ?? null,
             'rak_tujuan_id' => $data['rak_tujuan_id'] ?? null,
             'quantity' => $data['quantity'],
+            'kondisi_id' => $data['kondisi_id'] ?? null,
+            'referensi' => $data['referensi'] ?? null,
+            'user_id' => $data['user_id'] ?? auth()->id(),
             'tanggal_mutasi' => $data['tanggal_mutasi'] ?? now(),
             'keterangan' => $data['keterangan'] ?? null,
         ]);
@@ -52,23 +61,24 @@ class MutasiStok extends Model
 
     public function updateMutasi(array $data)
     {
-        return $this->update([
-            'produk_id' => $data['produk_id'] ?? $this->produk_id,
-            'gudang_asal_id' => $data['gudang_asal_id'] ?? $this->gudang_asal_id,
-            'area_asal_id' => $data['area_asal_id'] ?? $this->area_asal_id,
-            'rak_asal_id' => $data['rak_asal_id'] ?? $this->rak_asal_id,
-            'gudang_tujuan_id' => $data['gudang_tujuan_id'] ?? $this->gudang_tujuan_id,
-            'area_tujuan_id' => $data['area_tujuan_id'] ?? $this->area_tujuan_id,
-            'rak_tujuan_id' => $data['rak_tujuan_id'] ?? $this->rak_tujuan_id,
-            'quantity' => $data['quantity'] ?? $this->quantity,
-            'tanggal_mutasi' => $data['tanggal_mutasi'] ?? $this->tanggal_mutasi,
-            'keterangan' => $data['keterangan'] ?? $this->keterangan,
-        ]);
+        return $this->update(array_merge($data, [
+            'user_id' => auth()->id() // Update the user who modified it
+        ]));
     }
 
     public function produk()
     {
         return $this->belongsTo(Products::class, 'produk_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function kondisi()
+    {
+        return $this->belongsTo(KondisiBarang::class, 'kondisi_id');
     }
 
     public function gudangAsal()

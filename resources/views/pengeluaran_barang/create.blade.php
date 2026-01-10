@@ -1,230 +1,409 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Pengeluaran Barang</title>
-
+    <title>Pengeluaran Barang Baru - DropCore</title>
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap4-theme@1.0.0/dist/select2-bootstrap4.min.css"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+        }
+
+        .select2-container .select2-selection--single .select2-selection__rendered {
+            line-height: 24px !important;
+            padding-top: 5px;
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
+    <div class="wrapper">
+        @include('include.navbarSistem')
+        @include('include.sidebar')
 
-    @include('include.navbarSistem')
-    @include('include.sidebar')
-
-    <div class="content-wrapper">
-
-        <!-- Header -->
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">Tambah Pengeluaran Barang</h1>
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">Transaksi Pengeluaran Barang</h1>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <section class="content">
+                <div class="container-fluid">
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="fas fa-exclamation-triangle mr-2"></i> {{ session('error') }}
+                        </div>
+                    @endif
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0 pl-3">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('pengeluaran-barang.store') }}" method="POST" id="form-pengeluaran">
+                        @csrf
+
+                        {{-- HEADER --}}
+                        <div class="card card-warning card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-file-invoice mr-1"></i> Data Pengeluaran</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>No. Pengeluaran</label>
+                                            <input type="text" class="form-control" name="no_pengeluaran_display"
+                                                value="{{ $no_pengeluaran }}" readonly
+                                                style="background-color: #fcf8e3; font-weight: bold;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Tipe Penerima <span class="text-danger">*</span></label>
+                                            <select name="tipe_penerima" id="tipe_penerima" class="form-control"
+                                                required>
+                                                <option value="distributor"
+                                                    {{ old('tipe_penerima') == 'distributor' ? 'selected' : '' }}>
+                                                    Distributor / Retur</option>
+                                                <option value="konsumen"
+                                                    {{ old('tipe_penerima') == 'konsumen' ? 'selected' : '' }}>Konsumen
+                                                    / Pelanggan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Tanggal Keluar <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" name="tanggal_pengeluaran"
+                                                value="{{ old('tanggal_pengeluaran', date('Y-m-d')) }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>No. Referensi</label>
+                                            <input type="text" class="form-control" name="referensi"
+                                                value="{{ old('referensi') }}" placeholder="No. Invoice / PO">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Dynamic Section based on Type --}}
+                                <div id="section-distributor" class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Pilih Distributor <span class="text-danger">*</span></label>
+                                            <select name="distributor_id" class="form-control select2">
+                                                <option value="">-- Pilih Distributor --</option>
+                                                @foreach ($distributors as $d)
+                                                    <option value="{{ $d->id }}">{{ $d->nama_distributor }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="section-konsumen" class="row" style="display:none;">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Nama Konsumen <span class="text-danger">*</span></label>
+                                            <input type="text" name="nama_konsumen" class="form-control"
+                                                placeholder="Nama Lengkap">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Telepon</label>
+                                            <input type="text" name="telepon_konsumen" class="form-control"
+                                                placeholder="08...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Alamat</label>
+                                            <input type="text" name="alamat_konsumen" class="form-control"
+                                                placeholder="Alamat pengiriman">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Keterangan</label>
+                                    <textarea name="keterangan" class="form-control" rows="1" placeholder="Catatan...">{{ old('keterangan') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- DETAILS --}}
+                        <div class="card card-warning card-outline">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="card-title"><i class="fas fa-boxes mr-1"></i> Item Barang Keluar</h3>
+                                <button type="button" class="btn btn-success btn-sm" id="btn-add-row"><i
+                                        class="fas fa-plus"></i> Tambah Item</button>
+                            </div>
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-bordered table-striped" id="table-items">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th style="width: 25%;">Produk <span class="text-danger">*</span></th>
+                                            <th style="width: 30%;">Pilih Stok (Batch) <span
+                                                    class="text-danger">*</span></th>
+                                            <th style="width: 10%;">Qty <span class="text-danger">*</span></th>
+                                            <th style="width: 15%;">Harga Jual (Opsional)</th>
+                                            <th style="width: 15%;">Subtotal</th>
+                                            <th style="width: 5%;">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="4" class="text-right text-bold">Total Nilai:</td>
+                                            <td colspan="2"><span id="total-value" class="text-bold">Rp 0</span>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <div id="empty-state" class="text-center py-5">
+                                    <p class="text-muted">Klik "Tambah Item" untuk memilih barang.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-5">
+                            <div class="col-12 text-right">
+                                <a href="{{ route('pengeluaran-barang.index') }}"
+                                    class="btn btn-secondary mr-2">Batal</a>
+                                <button type="submit" class="btn btn-warning btn-lg"><i class="fas fa-save"></i>
+                                    Simpan & Kurangi Stok</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </div>
-
-        <!-- Main Content -->
-        <section class="content">
-            <div class="container-fluid">
-
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-dolly"></i> Form Tambah Pengeluaran Barang
-                        </h3>
-                    </div>
-
-                    <div class="card-body">
-
-                        @if(session('error'))
-                            <div class="alert alert-danger">{{ session('error') }}</div>
-                        @endif
-
-                        <form action="{{ route('pengeluaran-barang.store') }}" method="POST">
-                            @csrf
-
-                            <!-- Nomor Pengeluaran -->
-                            <div class="form-group">
-                                <label for="no_pengeluaran">Nomor Pengeluaran</label>
-                                <input type="text" name="no_pengeluaran" id="no_pengeluaran"
-                                       class="form-control" value="{{ $no_pengeluaran }}" readonly>
-                            </div>
-
-                            <!-- Tanggal Pengeluaran -->
-                            <div class="form-group">
-                                <label for="tanggal_pengeluaran">Tanggal Pengeluaran</label>
-                                <input type="date" name="tanggal_pengeluaran"
-                                       class="form-control @error('tanggal_pengeluaran') is-invalid @enderror"
-                                       value="{{ old('tanggal_pengeluaran', date('Y-m-d')) }}" required>
-                                @error('tanggal_pengeluaran')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <!-- Tipe Penerima -->
-                            <div class="form-group">
-                                <label for="tipe_penerima">Tipe Penerima</label>
-                                <select name="tipe_penerima" id="tipe_penerima"
-                                        class="form-control @error('tipe_penerima') is-invalid @enderror" required>
-                                    <option value="">-- Pilih Tipe Penerima --</option>
-                                    <option value="distributor" {{ old('tipe_penerima') == 'distributor' ? 'selected' : '' }}>
-                                        Distributor
-                                    </option>
-                                    <option value="konsumen" {{ old('tipe_penerima') == 'konsumen' ? 'selected' : '' }}>
-                                        Konsumen
-                                    </option>
-                                </select>
-                                @error('tipe_penerima')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <!-- Distributor Fields -->
-                            <div id="distributor-fields" style="display:none;">
-                                <div class="form-group">
-                                    <label for="distributor_id">Pilih Distributor</label>
-                                    <select name="distributor_id" id="distributor_id"
-                                            class="form-control @error('distributor_id') is-invalid @enderror">
-                                        <option value="">-- Pilih Distributor --</option>
-
-                                        @foreach($distributors as $distributor)
-                                            <option value="{{ $distributor->id }}"
-                                                {{ old('distributor_id') == $distributor->id ? 'selected' : '' }}>
-                                                {{ $distributor->nama_distributor }} ({{ $distributor->kode_distributor }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('distributor_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <!-- Konsumen Fields -->
-                            <div id="konsumen-fields" style="display:none;">
-
-                                <div class="form-group">
-                                    <label for="nama_konsumen">Nama Konsumen</label>
-                                    <input type="text" name="nama_konsumen" id="nama_konsumen"
-                                           class="form-control @error('nama_konsumen') is-invalid @enderror"
-                                           value="{{ old('nama_konsumen') }}" placeholder="Nama Konsumen">
-                                    @error('nama_konsumen')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="telepon_konsumen">Telepon Konsumen</label>
-                                    <input type="text" name="telepon_konsumen" id="telepon_konsumen"
-                                           class="form-control @error('telepon_konsumen') is-invalid @enderror"
-                                           value="{{ old('telepon_konsumen') }}" placeholder="Nomor Telepon">
-                                    @error('telepon_konsumen')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="alamat_konsumen">Alamat Konsumen</label>
-                                    <textarea name="alamat_konsumen" id="alamat_konsumen"
-                                              class="form-control @error('alamat_konsumen') is-invalid @enderror"
-                                              placeholder="Alamat Lengkap">{{ old('alamat_konsumen') }}</textarea>
-                                    @error('alamat_konsumen')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                            </div>
-
-                            <!-- Keterangan -->
-                            <div class="form-group">
-                                <label for="keterangan">Keterangan</label>
-                                <textarea name="keterangan"
-                                          class="form-control @error('keterangan') is-invalid @enderror"
-                                          placeholder="Tulis keterangan jika ada">{{ old('keterangan') }}</textarea>
-                                @error('keterangan')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <!-- Tombol -->
-                            <div class="mt-4">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Selanjutnya
-                                </button>
-                                <a href="{{ route('pengeluaran-barang.index') }}" class="btn btn-secondary">
-                                    Batal
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
+        @include('include.footerSistem')
     </div>
 
-    @include('include.footerSistem')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-</div>
+    <script>
+        const products = @json($products);
 
-@include('services.logoutModal')
+        $(document).ready(function() {
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+            // Toggle Type
+            $('#tipe_penerima').change(function() {
+                if ($(this).val() === 'distributor') {
+                    $('#section-distributor').show();
+                    $('#section-konsumen').hide();
+                } else {
+                    $('#section-distributor').hide();
+                    $('#section-konsumen').show();
+                }
+            }).trigger('change');
 
-<script>
-    $(document).ready(function () {
+            let rowIndex = 0;
 
-        const tipePenerima = $('#tipe_penerima');
-        const distributorFields = $('#distributor-fields');
-        const konsumenFields = $('#konsumen-fields');
+            // Add Row
+            $('#btn-add-row').click(function() {
+                $('#empty-state').hide();
 
-        function toggleReceiverFields() {
-            const selectedType = tipePenerima.val();
+                let productOpts = '<option value="">-- Produk --</option>';
+                products.forEach(p => productOpts +=
+                    `<option value="${p.id}">${p.name} (${p.code || '-'})</option>`);
 
-            distributorFields.hide();
-            konsumenFields.hide();
+                const tr = `
+                <tr id="row-${rowIndex}">
+                    <td>
+                        <select class="form-control select2-product" data-index="${rowIndex}">
+                            ${productOpts}
+                        </select>
+                        <input type="hidden" name="items[${rowIndex}][produk_id]" class="input-produk-id">
+                    </td>
+                    <td>
+                        <select class="form-control select2-stok" disabled data-index="${rowIndex}">
+                            <option value="">Pilih Produk Dulu</option>
+                        </select>
+                        {{-- Hidden fields to store chosen stock location --}}
+                        <input type="hidden" name="items[${rowIndex}][gudang_id]" class="input-gudang">
+                        <input type="hidden" name="items[${rowIndex}][area_id]" class="input-area">
+                        <input type="hidden" name="items[${rowIndex}][rak_id]" class="input-rak">
+                        <input type="hidden" name="items[${rowIndex}][kondisi_id]" class="input-kondisi">
+                    </td>
+                    <td>
+                        <input type="number" name="items[${rowIndex}][qty]" class="form-control input-qty" min="1" disabled placeholder="0">
+                        <small class="text-muted">Max: <span class="max-qty">0</span></small>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                           <div class="input-group-prepend"><span class="input-group-text">Rp</span></div> 
+                           <input type="number" name="items[${rowIndex}][harga]" class="form-control input-price" min="0" placeholder="0">
+                        </div>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control input-subtotal" readonly value="Rp 0">
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+                $('#table-items tbody').append(tr);
+                $(`#row-${rowIndex} .select2-product`).select2({
+                    theme: 'bootstrap4',
+                    width: '100%'
+                });
+                rowIndex++;
+            });
 
-            $('#distributor_id').prop('required', false);
-            $('#nama_konsumen').prop('required', false);
-            $('#telepon_konsumen').prop('required', false);
-            $('#alamat_konsumen').prop('required', false);
+            // Remove Row
+            $(document).on('click', '.btn-remove', function() {
+                $(this).closest('tr').remove();
+                calculateTotal();
+                if ($('#table-items tbody').children().length === 0) $('#empty-state').show();
+            });
 
-            if (selectedType === 'distributor') {
-                distributorFields.show();
-                $('#distributor_id').prop('required', true);
+            // On Product Change -> Fetch Stock
+            $(document).on('change', '.select2-product', function() {
+                const index = $(this).data('index');
+                const produkId = $(this).val();
+                const row = $(`#row-${index}`);
+
+                row.find('.input-produk-id').val(produkId);
+                const stockSelect = row.find('.select2-stok');
+
+                stockSelect.empty().append('<option value="">Loading...</option>').prop('disabled', true);
+                row.find('.input-qty').prop('disabled', true).val('');
+
+                if (!produkId) return;
+
+                $.get(`/stok/by-produk/${produkId}`, function(data) {
+                    stockSelect.empty().append('<option value="">-- Pilih Batch Stok --</option>');
+                    if (data.length > 0) {
+                        stockSelect.prop('disabled', false);
+                        data.forEach(stok => {
+                            const namaGudang = stok.gudang ? stok.gudang.nama_gudang :
+                                'Unknown';
+                            const area = stok.area ? stok.area.nama_area : '-';
+                            const rak = stok.rak ? stok.rak.kode_rak : '-';
+                            const kondisi = stok.kondisi ? stok.kondisi.nama_kondisi : '-';
+
+                            const label =
+                                `${namaGudang} [${area}-${rak}] (${kondisi}) : Tersedia ${stok.quantity}`;
+                            // We store the stock OBJECT in value as JSON string to parse, OR better, use data attributes
+                            const option = $(
+                            `<option value="${stok.id}">${label}</option>`);
+                            option.data('stok', stok);
+                            stockSelect.append(option);
+                        });
+                    } else {
+                        stockSelect.append('<option value="">Stok Habis / Tidak Tersedia</option>');
+                    }
+                });
+            });
+
+            // On Stock Batch Change
+            $(document).on('change', '.select2-stok', function() {
+                const index = $(this).data('index');
+                const row = $(`#row-${index}`);
+                const selectedOption = $(this).find('option:selected');
+                const stokData = selectedOption.data('stok');
+
+                if (stokData) {
+                    // Populate hidden location fields
+                    row.find('.input-gudang').val(stokData.gudang_id);
+                    row.find('.input-area').val(stokData.area_id);
+                    row.find('.input-rak').val(stokData.rak_id);
+                    row.find('.input-kondisi').val(stokData.kondisi_id);
+
+                    // Enable Qty and set max
+                    const qtyInput = row.find('.input-qty');
+                    qtyInput.prop('disabled', false);
+                    qtyInput.attr('max', stokData.quantity);
+                    row.find('.max-qty').text(stokData.quantity);
+                } else {
+                    row.find('.input-qty').prop('disabled', true);
+                    row.find('.max-qty').text('0');
+                }
+            });
+
+            // Calc
+            $(document).on('input', '.input-qty, .input-price', function() {
+                const row = $(this).closest('tr');
+                const qty = parseFloat(row.find('.input-qty').val()) || 0;
+                const max = parseFloat(row.find('.input-qty').attr('max')) || 0;
+
+                if (qty > max && max > 0) {
+                    // alert(`Maksimal stok tersedia hanya ${max}`); 
+                    // Alert is annoying
+                    row.find('.input-qty').addClass('is-invalid');
+                    // row.find('.input-qty').val(max); // Auto correct? Maybe not, just warn.
+                } else {
+                    row.find('.input-qty').removeClass('is-invalid');
+                }
+
+                const price = parseFloat(row.find('.input-price').val()) || 0;
+                row.find('.input-subtotal').val('Rp ' + (qty * price).toLocaleString('id-ID'));
+                calculateTotal();
+            });
+
+            function calculateTotal() {
+                let total = 0;
+                $('#table-items tbody tr').each(function() {
+                    const qty = parseFloat($(this).find('.input-qty').val()) || 0;
+                    const price = parseFloat($(this).find('.input-price').val()) || 0;
+                    total += (qty * price);
+                });
+                $('#total-value').text('Rp ' + total.toLocaleString('id-ID'));
             }
 
-            if (selectedType === 'konsumen') {
-                konsumenFields.show();
-                $('#nama_konsumen').prop('required', true);
-                $('#telepon_konsumen').prop('required', true);
-                $('#alamat_konsumen').prop('required', true);
-            }
+            // Prevent submit empty
+            $('#form-pengeluaran').on('submit', function(e) {
+                if ($('#table-items tbody tr').length === 0) {
+                    e.preventDefault();
+                    Swal.fire('Error', 'Minimal satu item barang harus dipilih.', 'error');
+                    return;
+                }
+                // Check validation again (HTML5 validation usually works, but check logic)
+                let valid = true;
+                $('.input-qty').each(function() {
+                    if ($(this).hasClass('is-invalid')) valid = false;
+                });
 
-            @if($errors->has('distributor_id'))
-                distributorFields.show();
-            @endif
-
-            @if($errors->has('nama_konsumen') || $errors->has('telepon_konsumen') || $errors->has('alamat_konsumen'))
-                konsumenFields.show();
-            @endif
-        }
-
-        toggleReceiverFields();
-        tipePenerima.on('change', toggleReceiverFields);
-
-    });
-</script>
-
+                if (!valid) {
+                    e.preventDefault();
+                    Swal.fire('Error', 'Input quantity melebihi stok yang tersedia.', 'error');
+                }
+            });
+        });
+    </script>
 </body>
+
 </html>
