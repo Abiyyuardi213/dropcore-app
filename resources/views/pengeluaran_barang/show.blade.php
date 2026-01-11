@@ -41,7 +41,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <h4>
-                                    <i class="fas fa-globe"></i> DropCore, Inc.
+                                    <i class="fas fa-globe"></i> PT Garuda Fiber
                                     <small class="float-right">Date: {{ date('d/m/Y') }}</small>
                                 </h4>
                             </div>
@@ -50,7 +50,7 @@
                             <div class="col-sm-4 invoice-col">
                                 Pengirim (Gudang)
                                 <address>
-                                    <strong>DropCore Logistics</strong><br>
+                                    <strong>PT Garuda Fiber Logistics</strong><br>
                                     Jl. Raya Gudang No. 1<br>
                                     Depok, Jawa Barat<br>
                                     Operator: {{ $pengeluaran->user->name ?? 'System' }}

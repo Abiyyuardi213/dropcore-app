@@ -1,59 +1,82 @@
-<!-- Toast Container di bawah navbar -->
+<!-- SweetAlert2 Toast Notification -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Legacy Support: Hidden Bootstrap Toast Structure for AJAX calls -->
 <div aria-live="polite" aria-atomic="true"
-    style="position: fixed; top: 70px; right: 20px; z-index: 9999; pointer-events: none;">
-    <div id="toastNotification" class="toast bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true"
-        data-bs-delay="3000" data-delay="3000" data-bs-autohide="true" data-autohide="true"
-        style="pointer-events: auto; width: 350px; max-width: none;">
-        <div class="toast-header bg-success text-white">
-            <i class="fas fa-check-circle mr-2 me-2"></i>
-            <strong class="mr-auto me-auto">Notifikasi</strong>
-            <!-- Bootstrap 4 Close -->
-            <button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast" aria-label="Close"
-                style="display: none;">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <!-- Bootstrap 5 Close -->
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"
-                style="display: none;"></button>
-        </div>
-        <div class="toast-body">
-            @if (session('success'))
-                {{ session('success') }}
-            @elseif (session('error'))
-                {{ session('error') }}
-            @endif
-        </div>
+    style="position: absolute; opacity: 0; z-index: -1; height: 0; overflow: hidden;">
+    <div id="toastNotification" class="toast">
+        <div class="toast-body"></div>
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var toastEl = document.getElementById('toastNotification');
-        if (!toastEl) return;
-
-        var toastBody = toastEl.querySelector('.toast-body');
-        var hasContent = toastBody && toastBody.textContent.trim().length > 0;
-
-        if (hasContent) {
-            // Determine if using Bootstrap 5 or 4
-            if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
-                // Bootstrap 5
-                // Show BS5 close button, hide BS4
-                if (toastEl.querySelector('.btn-close')) toastEl.querySelector('.btn-close').style.display =
-                    'block';
-
-                var toast = new bootstrap.Toast(toastEl);
-                toast.show();
-            } else if (typeof $ !== 'undefined' && $.fn.toast) {
-                // Bootstrap 4 (jQuery)
-                // Show BS4 close button, hide BS5
-                if (toastEl.querySelector('.close')) toastEl.querySelector('.close').style.display = 'block';
-
-                $(toastEl).toast({
-                    delay: 3000
-                });
-                $(toastEl).toast('show');
+        // Define Global Toast Mixin
+        window.Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
             }
+        });
+
+        // 1. Session Flash Messages (PHP)
+        @if (session('success'))
+            Toast.fire({
+                icon: 'success',
+                title: {!! json_encode(session('success')) !!}
+            });
+        @endif
+
+        @if (session('error'))
+            Toast.fire({
+                icon: 'error',
+                title: {!! json_encode(session('error')) !!}
+            });
+        @endif
+
+        @if (session('warning'))
+            Toast.fire({
+                icon: 'warning',
+                title: {!! json_encode(session('warning')) !!}
+            });
+        @endif
+
+        @if (session('info'))
+            Toast.fire({
+                icon: 'info',
+                title: {!! json_encode(session('info')) !!}
+            });
+        @endif
+
+        @if ($errors->any())
+            Toast.fire({
+                icon: 'error',
+                title: {!! json_encode($errors->first()) !!}
+            });
+        @endif
+
+        // 2. Legacy AJAX Support (jQuery)
+        // Intercept Bootstrap toast show event to trigger SweetAlert
+        if (typeof $ !== 'undefined') {
+            $('#toastNotification').on('show.bs.toast', function() {
+                var message = $(this).find('.toast-body').text();
+                // Simple heuristic to guess type if not explicit
+                var icon = 'success';
+                if (message.toLowerCase().includes('gagal') || message.toLowerCase().includes(
+                    'error')) {
+                    icon = 'error';
+                }
+
+                Toast.fire({
+                    icon: icon,
+                    title: message
+                });
+            });
         }
     });
 </script>

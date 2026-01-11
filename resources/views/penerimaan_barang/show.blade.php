@@ -41,7 +41,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <h4>
-                                    <i class="fas fa-globe"></i> DropCore, Inc.
+                                    <i class="fas fa-globe"></i> PT Garuda Fiber
                                     <small class="float-right">Date: {{ date('d/m/Y') }}</small>
                                 </h4>
                             </div>

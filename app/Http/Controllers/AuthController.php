@@ -105,9 +105,9 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         if ($roleName === 'customer') {
-            return redirect('/login-customer');
+            return redirect('/login-customer')->with('success', 'Logout berhasil! Sampai jumpa lagi.');
         }
 
-        return redirect('/login');
+        return redirect('/login')->with('success', 'Logout berhasil! Sampai jumpa lagi.');
     }
 }

@@ -6,7 +6,8 @@
 
         <!-- Dropdown user dipindah ke kiri -->
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
+                aria-expanded="false">
                 <i class="fas fa-user-circle"></i> {{ Auth::user()->username }}
             </a>
             <ul class="dropdown-menu" aria-labelledby="userDropdown">
@@ -20,9 +21,11 @@
                         <i class="fas fa-user"></i> Profile
                     </a>
                 </li>
-                <li><hr class="dropdown-divider"></li>
                 <li>
-                    <a class="dropdown-item text-danger" href="#" data-toggle="modal" data-target="#logoutModal">
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <a class="dropdown-item text-danger" href="#" onclick="confirmLogout(event)">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </li>

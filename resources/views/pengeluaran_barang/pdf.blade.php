@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Laporan Pengeluaran Barang - {{ $pengeluaran->no_pengeluaran }}</title>
@@ -13,7 +14,8 @@
             font-family: DejaVu Sans, sans-serif;
             font-size: 11px;
             margin: 40px;
-            color: #333; /* Hitam gelap */
+            color: #333;
+            /* Hitam gelap */
             line-height: 1.5;
         }
 
@@ -21,17 +23,21 @@
         .header {
             width: 100%;
             margin-bottom: 25px;
-            border-bottom: 3px solid #333; /* Garis pemisah hitam tebal */
+            border-bottom: 3px solid #333;
+            /* Garis pemisah hitam tebal */
             padding-bottom: 10px;
         }
+
         .header .logo {
             width: 100px;
         }
+
         .header-right {
             text-align: right;
             font-size: 11px;
             line-height: 1.6;
         }
+
         .title {
             font-size: 20px;
             font-weight: bold;
@@ -57,14 +63,19 @@
             margin-top: 5px;
             margin-bottom: 20px;
         }
+
         .info-block {
             font-size: 11px;
             padding: 10px;
-            border: 1px solid #ccc; /* Border abu-abu terang */
-            border-left: 5px solid #666; /* Garis vertikal menonjol */
+            border: 1px solid #ccc;
+            /* Border abu-abu terang */
+            border-left: 5px solid #666;
+            /* Garis vertikal menonjol */
             border-radius: 2px;
-            background-color: #f9f9f9; /* Latar belakang abu-abu sangat terang */
+            background-color: #f9f9f9;
+            /* Latar belakang abu-abu sangat terang */
         }
+
         .info-block strong {
             display: block;
             font-size: 12px;
@@ -78,19 +89,23 @@
             border-collapse: collapse;
             margin-top: 15px;
         }
+
         .product-table th {
-            background: #666; /* Header tabel abu-abu gelap */
+            background: #666;
+            /* Header tabel abu-abu gelap */
             color: white;
             font-weight: 600;
             padding: 8px;
             border: 1px solid #666;
             text-align: left;
         }
+
         .product-table td {
             padding: 7px 8px;
             border: 1px solid #ddd;
             vertical-align: top;
         }
+
         .product-table tbody tr:nth-child(even) {
             background-color: #f9f9f9;
         }
@@ -98,6 +113,7 @@
         .text-right {
             text-align: right;
         }
+
         .text-center {
             text-align: center;
         }
@@ -107,10 +123,12 @@
             margin-top: 15px;
             width: 100%;
         }
+
         .total-box td {
             padding: 6px 0;
             font-size: 12px;
         }
+
         .total-label {
             font-weight: bold;
             text-align: right;
@@ -118,10 +136,12 @@
             padding-right: 10px;
             color: #333;
         }
+
         .total-value {
             font-weight: bold;
             text-align: right;
-            border-top: 3px solid #333; /* Garis tebal hitam di atas nilai total */
+            border-top: 3px solid #333;
+            /* Garis tebal hitam di atas nilai total */
             padding-top: 5px;
             font-size: 14px;
             width: 150px;
@@ -139,6 +159,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <table class="header">
@@ -149,7 +170,8 @@
             </td>
             <td class="header-right" style="width: 50%;">
                 <strong>No Pengeluaran:</strong> <span style="color:#333;">{{ $pengeluaran->no_pengeluaran }}</span><br>
-                <strong>Tanggal Keluar:</strong> {{ \Carbon\Carbon::parse($pengeluaran->tanggal_pengeluaran)->format('d F Y') }}<br>
+                <strong>Tanggal Keluar:</strong>
+                {{ \Carbon\Carbon::parse($pengeluaran->tanggal_pengeluaran)->format('d F Y') }}<br>
                 <strong>Dicetak Pada:</strong> {{ date('d/m/Y H:i') }}
             </td>
         </tr>
@@ -162,7 +184,7 @@
             <td style="width: 48%;">
                 <div class="info-block">
                     <strong>Penerima Barang</strong><br>
-                    @if($pengeluaran->tipe_penerima === 'distributor')
+                    @if ($pengeluaran->tipe_penerima === 'distributor')
                         **{{ optional($pengeluaran->distributor)->nama_distributor ?? 'N/A' }}**<br>
                         Tipe: Distributor (Kode: {{ optional($pengeluaran->distributor)->kode_distributor ?? '-' }})
                     @else
@@ -175,7 +197,7 @@
             </td>
 
             <td style="width: 4%;">
-                </td>
+            </td>
 
             <td style="width: 48%;">
                 <div class="info-block">
@@ -202,7 +224,7 @@
         </thead>
         <tbody>
             @php $total = 0; @endphp
-            @foreach($pengeluaran->details as $d)
+            @foreach ($pengeluaran->details as $d)
                 @php $total += $d->subtotal; @endphp
                 <tr>
                     <td>{{ $d->produk->name ?? '-' }}</td>
@@ -210,8 +232,8 @@
                     <td>{{ $d->area->nama_area ?? '-' }}</td>
                     <td>{{ $d->rak->kode_rak ?? '-' }}</td>
                     <td class="text-right">{{ $d->qty }}</td>
-                    <td class="text-right">Rp {{ number_format($d->harga,0,',','.') }}</td>
-                    <td class="text-right">Rp {{ number_format($d->subtotal,0,',','.') }}</td>
+                    <td class="text-right">Rp {{ number_format($d->harga, 0, ',', '.') }}</td>
+                    <td class="text-right">Rp {{ number_format($d->subtotal, 0, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -221,7 +243,7 @@
         <tr>
             <td style="width: 70%;"></td>
             <td class="total-label">TOTAL PENGELUARAN:</td>
-            <td class="total-value">Rp {{ number_format($total,0,',','.') }}</td>
+            <td class="total-value">Rp {{ number_format($total, 0, ',', '.') }}</td>
         </tr>
     </table>
 
@@ -242,8 +264,9 @@
 
     <div class="footer">
         Laporan Pengeluaran ini otomatis dihasilkan oleh Sistem. Harap simpan sebagai bukti transaksi.<br>
-        Sistem Manajemen Informasi – PT DropCore Indonesia
+        Sistem Manajemen Informasi – PT Garuda Fiber
     </div>
 
 </body>
+
 </html>

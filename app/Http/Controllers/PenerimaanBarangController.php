@@ -146,7 +146,8 @@ class PenerimaanBarangController extends Controller
             'details.kondisi'
         ])->findOrFail($id);
 
-        return view('penerimaan_barang.invoice', compact('penerimaan'));
+        $pdf = Pdf::loadView('penerimaan_barang.pdf', compact('penerimaan'));
+        return $pdf->stream('Penerimaan-Barang-' . $penerimaan->no_penerimaan . '.pdf');
     }
 
     // Disable Edit/Update for now to maintain stock integrity simpler.

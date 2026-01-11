@@ -156,7 +156,8 @@ class PengeluaranBarangController extends Controller
             'details.kondisi'
         ])->findOrFail($id);
 
-        return view('pengeluaran_barang.invoice', compact('pengeluaran'));
+        $pdf = Pdf::loadView('pengeluaran_barang.pdf', compact('pengeluaran'));
+        return $pdf->stream('Surat-Jalan-' . $pengeluaran->no_pengeluaran . '.pdf');
     }
 
     public function destroy($id)
