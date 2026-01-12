@@ -140,13 +140,10 @@
                 "paging": true,
                 "lengthChange": false,
                 "searching": true,
-                "ordering": true,
+                "ordering": false, // Disable ordering to keep server side latest() order
                 "info": true,
                 "autoWidth": false,
-                "responsive": true,
-                "order": [
-                    [2, "desc"]
-                ] // Order by Date
+                "responsive": true
             });
 
             // SweetAlert Delete

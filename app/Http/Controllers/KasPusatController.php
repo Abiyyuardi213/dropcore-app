@@ -9,36 +9,20 @@ class KasPusatController extends Controller
 {
     public function index()
     {
-        $kas = KasPusat::first();
+        // Calculate Total Liquidity from all accounts
+        $totalLiquidity = \App\Models\SumberKeuangan::sum('saldo');
 
-        if (!$kas) {
-            $kas = KasPusat::create([
-                'saldo' => 0,
-            ]);
-        }
+        // Breakdown by Type
+        $bankTotal = \App\Models\SumberKeuangan::where('jenis', 'bank')->sum('saldo');
+        $cashTotal = \App\Models\SumberKeuangan::where('jenis', 'tunai')->sum('saldo');
+        $ewalletTotal = \App\Models\SumberKeuangan::where('jenis', 'e-wallet')->sum('saldo');
 
-        return view('keuangan.kas_pusat.index', compact('kas'));
-    }
+        // Recent Transactions
+        $recentTransactions = \App\Models\Keuangan::with(['sumber', 'kategori'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
 
-    public function edit()
-    {
-        $kas = KasPusat::first();
-
-        return view('keuangan.kas_pusat.edit', compact('kas'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'saldo' => 'required|numeric|min:0',
-        ]);
-
-        $kas = KasPusat::findOrFail($id);
-
-        $kas->saldo = $request->saldo;
-        $kas->save();
-
-        return redirect()->route('kas-pusat.index')
-            ->with('success', 'Saldo kas pusat berhasil diperbarui.');
+        return view('keuangan.kas_pusat.index', compact('totalLiquidity', 'bankTotal', 'cashTotal', 'ewalletTotal', 'recentTransactions'));
     }
 }

@@ -44,7 +44,7 @@ class AuthController extends Controller
             $request->session()->regenerate(); // Regenerate session ID to prevent fixation
 
             if ($user->role->role_name === 'admin') {
-                return redirect()->intended('/dashboard')->with('success', 'Login berhasil! Selamat datang kembali.');
+                return redirect()->intended('/admin/dashboard')->with('success', 'Login berhasil! Selamat datang kembali.');
             }
 
             if ($user->role->role_name === 'customer') {

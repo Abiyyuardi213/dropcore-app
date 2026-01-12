@@ -22,15 +22,17 @@ class SumberKeuanganController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_sumber' => 'required|string|max:255'
+            'nama_sumber' => 'required|string|max:255',
+            'jenis' => 'required|in:bank,tunai,e-wallet',
+            'nomor_rekening' => 'nullable|string|max:50',
+            'atas_nama' => 'nullable|string|max:255',
+            'saldo' => 'nullable|numeric|min:0'
         ]);
 
-        SumberKeuangan::create([
-            'nama_sumber' => $request->nama_sumber
-        ]);
+        SumberKeuangan::create($request->all());
 
         return redirect()->route('sumber-keuangan.index')
-            ->with('success', 'Sumber keuangan berhasil ditambahkan.');
+            ->with('success', 'Akun keuangan berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -43,16 +45,20 @@ class SumberKeuanganController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama_sumber' => 'required|string|max:255'
+            'nama_sumber' => 'required|string|max:255',
+            'jenis' => 'required|in:bank,tunai,e-wallet',
+            'nomor_rekening' => 'nullable|string|max:50',
+            'atas_nama' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean'
         ]);
 
         $sumber = SumberKeuangan::findOrFail($id);
-        $sumber->update([
-            'nama_sumber' => $request->nama_sumber
-        ]);
+
+        // Exclude saldo from direct update to prevent manipulation without transaction
+        $sumber->update($request->except(['saldo']));
 
         return redirect()->route('sumber-keuangan.index')
-            ->with('success', 'Sumber keuangan berhasil diperbarui.');
+            ->with('success', 'Akun keuangan berhasil diperbarui.');
     }
 
     public function destroy($id)

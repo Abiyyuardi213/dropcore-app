@@ -188,12 +188,21 @@
                             </div>
                         </div>
 
-                        <div class="row mb-5">
-                            <div class="col-12 text-right">
-                                <a href="{{ route('pengeluaran-barang.index') }}"
-                                    class="btn btn-secondary mr-2">Batal</a>
-                                <button type="submit" class="btn btn-warning btn-lg"><i class="fas fa-save"></i>
-                                    Simpan & Kurangi Stok</button>
+                        <input type="hidden" name="submit_action" id="submitAction" value="process">
+                        <div class="card-footer bg-white border-top">
+                            <div class="d-flex justify-content-end align-items-center">
+                                <a href="{{ route('pengeluaran-barang.index') }}" class="btn btn-secondary mr-2"
+                                    style="min-width: 120px;">
+                                    <i class="fas fa-times mr-1"></i> Batal
+                                </a>
+                                <button type="button" class="btn btn-warning mr-2" onclick="submitForm('draft')"
+                                    style="min-width: 180px;">
+                                    <i class="fas fa-save mr-1"></i> Simpan Draft
+                                </button>
+                                <button type="button" class="btn btn-success" onclick="submitForm('process')"
+                                    style="min-width: 180px;">
+                                    <i class="fas fa-check-circle mr-1"></i> Proses & Submit
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -211,6 +220,12 @@
 
     <script>
         const products = @json($products);
+
+        // Global Submit Handler
+        window.submitForm = function(action) {
+            $('#submitAction').val(action);
+            $('#form-pengeluaran').submit();
+        }
 
         $(document).ready(function() {
             $('.select2').select2({
@@ -235,7 +250,7 @@
             $('#btn-add-row').click(function() {
                 $('#empty-state').hide();
 
-                let productOpts = '<option value="">-- Produk --</option>';
+                let productOpts = '<option value="">-- Pilih Produk --</option>';
                 products.forEach(p => productOpts +=
                     `<option value="${p.id}">${p.name} (${p.code || '-'})</option>`);
 
@@ -258,8 +273,12 @@
                         <input type="hidden" name="items[${rowIndex}][kondisi_id]" class="input-kondisi">
                     </td>
                     <td>
-                        <input type="number" name="items[${rowIndex}][qty]" class="form-control input-qty" min="1" disabled placeholder="0">
-                        <small class="text-muted">Max: <span class="max-qty">0</span></small>
+                        <div class="input-group">
+                            <input type="number" name="items[${rowIndex}][qty]" class="form-control input-qty" min="1" disabled placeholder="0">
+                            <div class="input-group-append">
+                                <span class="input-group-text text-xs">Max: <span class="max-qty">0</span></span>
+                            </div>
+                        </div>
                     </td>
                     <td>
                         <div class="input-group">
@@ -268,7 +287,7 @@
                         </div>
                     </td>
                     <td>
-                        <input type="text" class="form-control input-subtotal" readonly value="Rp 0">
+                        <input type="text" class="form-control input-subtotal" readonly value="Rp 0" style="background-color: #f8f9fa;">
                     </td>
                     <td class="text-center">
                         <button type="button" class="btn btn-danger btn-sm btn-remove"><i class="fas fa-trash"></i></button>
@@ -301,10 +320,12 @@
 
                 stockSelect.empty().append('<option value="">Loading...</option>').prop('disabled', true);
                 row.find('.input-qty').prop('disabled', true).val('');
+                row.find('.max-qty').text('0');
 
                 if (!produkId) return;
 
-                $.get(`/stok/by-produk/${produkId}`, function(data) {
+                // CORRECTION: Admin Prefix added
+                $.get(`/admin/stok/by-produk/${produkId}`, function(data) {
                     stockSelect.empty().append('<option value="">-- Pilih Batch Stok --</option>');
                     if (data.length > 0) {
                         stockSelect.prop('disabled', false);
@@ -316,16 +337,19 @@
                             const kondisi = stok.kondisi ? stok.kondisi.nama_kondisi : '-';
 
                             const label =
-                                `${namaGudang} [${area}-${rak}] (${kondisi}) : Tersedia ${stok.quantity}`;
-                            // We store the stock OBJECT in value as JSON string to parse, OR better, use data attributes
+                                `${namaGudang} [${area}-${rak}] (${kondisi}) : Sisa ${stok.quantity}`;
+
                             const option = $(
-                            `<option value="${stok.id}">${label}</option>`);
+                                `<option value="${stok.id}">${label}</option>`);
                             option.data('stok', stok);
                             stockSelect.append(option);
                         });
                     } else {
                         stockSelect.append('<option value="">Stok Habis / Tidak Tersedia</option>');
                     }
+                }).fail(function() {
+                    stockSelect.empty().append('<option value="">Gagal memuat stok</option>');
+                    console.error('Failed to fetch stock');
                 });
             });
 
@@ -337,13 +361,12 @@
                 const stokData = selectedOption.data('stok');
 
                 if (stokData) {
-                    // Populate hidden location fields
                     row.find('.input-gudang').val(stokData.gudang_id);
                     row.find('.input-area').val(stokData.area_id);
                     row.find('.input-rak').val(stokData.rak_id);
-                    row.find('.input-kondisi').val(stokData.kondisi_id);
+                    row.find('.input-kondisi').val(stokData.kondisi_id || (stokData.kondisi ? stokData
+                        .kondisi.id : ''));
 
-                    // Enable Qty and set max
                     const qtyInput = row.find('.input-qty');
                     qtyInput.prop('disabled', false);
                     qtyInput.attr('max', stokData.quantity);
@@ -361,10 +384,16 @@
                 const max = parseFloat(row.find('.input-qty').attr('max')) || 0;
 
                 if (qty > max && max > 0) {
-                    // alert(`Maksimal stok tersedia hanya ${max}`); 
-                    // Alert is annoying
                     row.find('.input-qty').addClass('is-invalid');
-                    // row.find('.input-qty').val(max); // Auto correct? Maybe not, just warn.
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: `Stok hanya tersedia ${max}`,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    row.find('.input-qty').val(max);
                 } else {
                     row.find('.input-qty').removeClass('is-invalid');
                 }
@@ -377,8 +406,9 @@
             function calculateTotal() {
                 let total = 0;
                 $('#table-items tbody tr').each(function() {
-                    const qty = parseFloat($(this).find('.input-qty').val()) || 0;
-                    const price = parseFloat($(this).find('.input-price').val()) || 0;
+                    const row = $(this);
+                    const qty = parseFloat(row.find('.input-qty').val()) || 0;
+                    const price = parseFloat(row.find('.input-price').val()) || 0;
                     total += (qty * price);
                 });
                 $('#total-value').text('Rp ' + total.toLocaleString('id-ID'));
@@ -391,7 +421,6 @@
                     Swal.fire('Error', 'Minimal satu item barang harus dipilih.', 'error');
                     return;
                 }
-                // Check validation again (HTML5 validation usually works, but check logic)
                 let valid = true;
                 $('.input-qty').each(function() {
                     if ($(this).hasClass('is-invalid')) valid = false;

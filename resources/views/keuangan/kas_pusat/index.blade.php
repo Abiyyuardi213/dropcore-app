@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,17 +9,20 @@
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
+        rel="stylesheet">
 
     <style>
         .content-header h1 {
             font-weight: 700;
             color: #343a40;
         }
+
         .info-box-number {
             font-size: 1.5rem;
             font-weight: 700;
         }
+
         .card-info {
             font-size: 14px;
             line-height: 1.7;
@@ -27,110 +31,156 @@
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
-    @include('include.navbarSistem')
-    @include('include.sidebar')
+    <div class="wrapper">
+        @include('include.navbarSistem')
+        @include('include.sidebar')
 
-    <div class="content-wrapper">
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-12">
-                        <h1 class="m-0"><i class="fas fa-coins mr-2"></i>Kas Pusat Perusahaan</h1>
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <h1 class="m-0"><i class="fas fa-coins mr-2"></i>Kas Pusat Perusahaan</h1>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <section class="content">
+                <div class="container-fluid">
+
+                    <div class="card card-secondary card-outline shadow">
+                        <div class="card-header bg-secondary">
+                            <h3 class="card-title text-white font-weight-bold">
+                                <i class="fas fa-info-circle mr-1"></i> Status Keuangan Utama
+                            </h3>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- Summary Cards -->
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="info-box shadow-sm">
+                                        <span class="info-box-icon bg-info elevation-1"><i
+                                                class="fas fa-wallet"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Total Likuiditas</span>
+                                            <span class="info-box-number">Rp
+                                                {{ number_format($totalLiquidity, 0, ',', '.') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="info-box shadow-sm">
+                                        <span class="info-box-icon bg-primary elevation-1"><i
+                                                class="fas fa-university"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Saldo Bank</span>
+                                            <span class="info-box-number">Rp
+                                                {{ number_format($bankTotal, 0, ',', '.') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="info-box shadow-sm">
+                                        <span class="info-box-icon bg-success elevation-1"><i
+                                                class="fas fa-money-bill-wave"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Kas Tunai</span>
+                                            <span class="info-box-number">Rp
+                                                {{ number_format($cashTotal, 0, ',', '.') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="info-box shadow-sm">
+                                        <span class="info-box-icon bg-purple elevation-1"><i
+                                                class="fas fa-mobile-alt"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">E-Wallet</span>
+                                            <span class="info-box-number">Rp
+                                                {{ number_format($ewalletTotal, 0, ',', '.') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h5 class="text-secondary font-weight-bold mb-3"><i class="fas fa-history mr-2"></i>5
+                                Transaksi Terakhir</h5>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Tanggal</th>
+                                            <th>No. Transaksi</th>
+                                            <th>Keterangan</th>
+                                            <th>Akun</th>
+                                            <th class="text-right">Jumlah</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($recentTransactions as $trx)
+                                            <tr>
+                                                <td>{{ \Carbon\Carbon::parse($trx->tanggal_transaksi)->format('d/m/Y') }}
+                                                </td>
+                                                <td class="text-muted small">{{ $trx->no_transaksi }}</td>
+                                                <td>
+                                                    <span
+                                                        class="badge badge-light border">{{ $trx->kategori->nama ?? '-' }}</span><br>
+                                                    <small
+                                                        class="text-muted">{{ Str::limit($trx->keterangan, 30) }}</small>
+                                                </td>
+                                                <td>{{ $trx->sumber->nama_sumber ?? '-' }}</td>
+                                                <td
+                                                    class="text-right font-weight-bold {{ $trx->jenis_transaksi == 'pemasukkan' ? 'text-success' : 'text-danger' }}">
+                                                    {{ $trx->jenis_transaksi == 'pemasukkan' ? '+' : '-' }} Rp
+                                                    {{ number_format($trx->jumlah, 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">Belum ada transaksi
+                                                    terbaru.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-3 text-right">
+                                <a href="{{ route('keuangan.index') }}" class="btn btn-outline-secondary btn-sm">Lihat
+                                    Semua Transaksi <i class="fas fa-arrow-right ml-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
         </div>
 
-        <section class="content">
-            <div class="container-fluid">
-
-                <div class="card card-secondary card-outline shadow">
-                    <div class="card-header bg-secondary">
-                        <h3 class="card-title text-white font-weight-bold">
-                            <i class="fas fa-info-circle mr-1"></i> Status Keuangan Utama
-                        </h3>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-12 text-right">
-                                <a href="{{ route('kas-pusat.edit') }}" class="btn btn-warning elevation-2">
-                                    <i class="fas fa-edit mr-1"></i> Edit Saldo Awal
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <!-- Card Saldo Awal -->
-                            <div class="col-md-6">
-                                <div class="info-box shadow-lg">
-                                    <span class="info-box-icon bg-primary elevation-1">
-                                        <i class="fas fa-hand-holding-usd"></i>
-                                    </span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Saldo Awal (Dana Dasar)</span>
-                                        <span class="info-box-number text-primary">
-                                            Rp {{ number_format($kas->saldo_awal, 0, ',', '.') }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card Saldo Saat Ini -->
-                            <div class="col-md-6">
-                                <div class="info-box shadow-lg">
-                                    <span class="info-box-icon bg-success elevation-1">
-                                        <i class="fas fa-money-bill-wave"></i>
-                                    </span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Saldo Saat Ini (Aktual)</span>
-                                        <span class="info-box-number text-success">
-                                            Rp {{ number_format($kas->saldo_saat_ini, 0, ',', '.') }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        <div class="card-info text-muted">
-                            <p class="mb-2">
-                                <strong class="text-dark"><i class="far fa-clock mr-1"></i>Terakhir Diperbarui:</strong>
-                                {{ $kas->updated_at->format('d F Y \j\a\m H:i') }}
-                            </p>
-                            <p>
-                                Kas Pusat berfungsi sebagai <strong>sumber dana utama</strong> perusahaan yang mencatat setiap pemasukan dan pengeluaran
-                                yang terjadi melalui sistem. Saldo saat ini bersifat <strong>real-time</strong> dan mencerminkan posisi likuiditas perusahaan.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
+        @include('include.footerSistem')
     </div>
 
-    @include('include.footerSistem')
-</div>
+    @include('services.ToastModal')
+    @include('services.LogoutModal')
 
-@include('services.ToastModal')
-@include('services.LogoutModal')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-
-<script>
-    $(document).ready(function() {
-        @if (session('success') || session('error'))
-            $('#toastNotification').toast({
-                delay: 3000,
-                autohide: true
-            }).toast('show');
-        @endif
-    });
-</script>
+    <script>
+        $(document).ready(function() {
+            @if (session('success') || session('error'))
+                $('#toastNotification').toast({
+                    delay: 3000,
+                    autohide: true
+                }).toast('show');
+            @endif
+        });
+    </script>
 </body>
+
 </html>

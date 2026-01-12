@@ -16,9 +16,14 @@ class Divisi extends Model
     public $incrementing = false;
 
     protected $fillable = [
+        'parent_id',
         'kode',
         'name',
         'deskripsi',
+        'kepala_divisi',
+        'lokasi',
+        'email',
+        'logo',
         'status',
     ];
 

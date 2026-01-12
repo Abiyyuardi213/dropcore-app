@@ -16,13 +16,18 @@ class Keuangan extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'no_transaksi',
         'jenis_transaksi',
+        'kategori_keuangan_id',
         'jumlah',
-        'referensi_id',
-        'referensi_tabel',
         'sumber_id',
+        'referensi_id',
+        'referensi_tabel', // optional/legacy
         'keterangan',
         'tanggal_transaksi',
+        'status',
+        'bukti_transaksi',
+        'user_id'
     ];
 
     protected $casts = [
@@ -44,5 +49,15 @@ class Keuangan extends Model
     public function sumber()
     {
         return $this->belongsTo(SumberKeuangan::class, 'sumber_id');
+    }
+
+    public function kategori()
+    {
+        return $this->belongsTo(KategoriKeuangan::class, 'kategori_keuangan_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

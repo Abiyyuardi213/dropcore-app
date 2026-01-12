@@ -12,12 +12,12 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="userDropdown">
                 <li>
-                    <a class="dropdown-item" href="{{ url('dashboard') }}">
+                    <a class="dropdown-item" href="{{ route('dashboard') }}">
                         <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="{{ url('pengguna/profil') }}">
+                    <a class="dropdown-item" href="{{ route('user.profil') }}">
                         <i class="fas fa-user"></i> Profile
                     </a>
                 </li>

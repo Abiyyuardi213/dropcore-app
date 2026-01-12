@@ -35,6 +35,10 @@ use App\Http\Controllers\RiwayatAktivitasLogController;
 use App\Http\Controllers\RiwayatAktivitasProdukController;
 use App\Http\Controllers\SumberKeuanganController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\StockOpnameController;
+use App\Http\Controllers\DivisiController;
+use App\Http\Controllers\JabatanController;
 use Whoops\Run;
 
 Route::get('/', function () {
@@ -54,7 +58,7 @@ Route::get('/login-customer', function () {
 Route::post('/login-customer', [AuthController::class, 'loginCustomer'])
     ->name('login.customer');
 
-Route::middleware(['role:admin,staff'])->group(function () {
+Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
     Route::get('/pengguna/profil', [UserController::class, 'profil'])->name('user.profil');
@@ -190,6 +194,11 @@ Route::middleware(['role:admin,staff'])->group(function () {
     Route::get('riwayat-logs', [RiwayatAktivitasLogController::class, 'index'])->name('riwayat-log.index');
     Route::get('riwayat-logs/{id}', [RiwayatAktivitasLogController::class, 'show'])->name('riwayat-log.show');
     Route::delete('riwayat-logs', [RiwayatAktivitasLogController::class, 'destroyAll'])->name('riwayat-log.destroyAll');
+
+    Route::resource('laporan', LaporanController::class);
+    Route::resource('stock-opname', StockOpnameController::class);
+    Route::resource('divisi', DivisiController::class);
+    Route::resource('jabatan', JabatanController::class);
 });
 
 Route::middleware(['role:customer'])->group(function () {

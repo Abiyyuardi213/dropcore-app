@@ -91,13 +91,49 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label>Distributor / Supplier <span class="text-danger">*</span></label>
-                                            <select name="distributor_id" class="form-control select2" required>
+                                            <label>Sumber Pengirim <span class="text-danger">*</span></label>
+                                            <div class="d-flex align-items-center mt-2">
+                                                <div class="custom-control custom-radio mr-3">
+                                                    <input class="custom-control-input" type="radio"
+                                                        id="sourceSupplier" name="tipe_pengirim" value="supplier"
+                                                        checked>
+                                                    <label for="sourceSupplier"
+                                                        class="custom-control-label">Supplier</label>
+                                                </div>
+                                                <div class="custom-control custom-radio">
+                                                    <input class="custom-control-input" type="radio"
+                                                        id="sourceDistributor" name="tipe_pengirim" value="distributor">
+                                                    <label for="sourceDistributor"
+                                                        class="custom-control-label">Distributor</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" id="supplier-wrapper">
+                                        <div class="form-group">
+                                            <label>Pilih Supplier <span class="text-danger">*</span></label>
+                                            <select name="supplier_id" class="form-control select2" id="supplierSelect">
+                                                <option value="">-- Pilih Supplier --</option>
+                                                @foreach ($suppliers as $s)
+                                                    <option value="{{ $s->id }}"
+                                                        {{ old('supplier_id') == $s->id ? 'selected' : '' }}>
+                                                        {{ $s->nama_supplier }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" id="distributor-wrapper" style="display: none;">
+                                        <div class="form-group">
+                                            <label>Pilih Distributor <span class="text-danger">*</span></label>
+                                            <select name="distributor_id" class="form-control select2"
+                                                id="distributorSelect" disabled>
                                                 <option value="">-- Pilih Distributor --</option>
                                                 @foreach ($distributors as $d)
                                                     <option value="{{ $d->id }}"
                                                         {{ old('distributor_id') == $d->id ? 'selected' : '' }}>
-                                                        {{ $d->nama_distributor }}</option>
+                                                        {{ $d->nama_distributor }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -163,12 +199,21 @@
                             </div>
                         </div>
 
+                        {{-- Hidden Input for Action --}}
+                        <input type="hidden" name="submit_action" id="submitAction" value="process">
+
                         <div class="row mb-5">
                             <div class="col-12 text-right">
-                                <a href="{{ route('penerimaan-barang.index') }}" class="btn btn-secondary mr-2"><i
-                                        class="fas fa-times"></i> Batal</a>
-                                <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i>
-                                    Simpan & Update Stok</button>
+                                <a href="{{ route('penerimaan-barang.index') }}" class="btn btn-secondary mr-2">
+                                    <i class="fas fa-times"></i> Batal
+                                </a>
+                                <button type="button" class="btn btn-warning mr-2" onclick="submitForm('draft')">
+                                    <i class="fas fa-save"></i> Simpan Draft (Pending)
+                                </button>
+                                <button type="button" class="btn btn-primary btn-lg"
+                                    onclick="submitForm('process')">
+                                    <i class="fas fa-check-circle"></i> Proses Stok (Final)
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -198,7 +243,30 @@
 
     <script>
         $(document).ready(function() {
-            // Initialize basic Select2
+            // Toggle Source Logic
+            $('input[name="tipe_pengirim"]').change(function() {
+                if ($(this).val() === 'supplier') {
+                    $('#supplier-wrapper').show();
+                    $('#distributor-wrapper').hide();
+                    $('#supplierSelect').prop('disabled', false).prop('required', true);
+                    $('#distributorSelect').prop('disabled', true).prop('required', false);
+                } else {
+                    $('#supplier-wrapper').hide();
+                    $('#distributor-wrapper').show();
+                    $('#supplierSelect').prop('disabled', true).prop('required', false);
+                    $('#distributorSelect').prop('disabled', false).prop('required', true);
+                }
+            });
+
+            // Trigger change initially
+            $('input[name="tipe_pengirim"]:checked').trigger('change');
+
+            // Global Submit Function
+            window.submitForm = function(action) {
+                $('#submitAction').val(action);
+                $('#form-penerimaan').submit();
+            }
+
             $('.select2').select2({
                 theme: 'bootstrap4',
                 width: '100%'
@@ -309,7 +377,7 @@
                             // Store raks in data attribute
                             const opt = $(
                                 `<option value="${area.id}">${area.kode_area} - ${area.nama_area}</option>`
-                                );
+                            );
                             opt.data('raks', area.raks);
                             $areaSelect.append(opt);
                         });

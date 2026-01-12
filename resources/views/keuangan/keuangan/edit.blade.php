@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garuda Fiber - Tambah Transaksi Keuangan</title>
+    <title>Garuda Fiber - Edit Transaksi Keuangan</title>
 
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
@@ -25,7 +25,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Tambah Transaksi Keuangan</h1>
+                            <h1 class="m-0">Edit Transaksi Keuangan</h1>
                         </div>
                     </div>
                 </div>
@@ -36,12 +36,19 @@
                 <div class="container-fluid">
                     <div class="card shadow-sm">
                         <div class="card-header">
-                            <h3 class="card-title">Form Tambah Transaksi</h3>
+                            <h3 class="card-title">Form Edit Transaksi : <strong>{{ $data->no_transaksi }}</strong></h3>
                         </div>
 
                         <div class="card-body">
-                            <form action="{{ route('keuangan.store') }}" method="POST" enctype="multipart/form-data">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>Perhatian:</strong> Mengubah nominal
+                                atau jenis transaksi akan otomatis menyesuaikan kembali saldo akun terkait.
+                            </div>
+
+                            <form action="{{ route('keuangan.update', $data->id) }}" method="POST"
+                                enctype="multipart/form-data">
                                 @csrf
+                                @method('PUT')
 
                                 <div class="row">
                                     <div class="col-md-6">
@@ -50,12 +57,11 @@
                                             <select name="jenis_transaksi" id="jenis_transaksi"
                                                 class="form-control @error('jenis_transaksi') is-invalid @enderror"
                                                 required>
-                                                <option value="">-- Pilih Jenis --</option>
                                                 <option value="pemasukkan"
-                                                    {{ old('jenis_transaksi') == 'pemasukkan' ? 'selected' : '' }}>
+                                                    {{ old('jenis_transaksi', $data->jenis_transaksi) == 'pemasukkan' ? 'selected' : '' }}>
                                                     Pemasukkan (Income)</option>
                                                 <option value="pengeluaran"
-                                                    {{ old('jenis_transaksi') == 'pengeluaran' ? 'selected' : '' }}>
+                                                    {{ old('jenis_transaksi', $data->jenis_transaksi) == 'pengeluaran' ? 'selected' : '' }}>
                                                     Pengeluaran (Expense)</option>
                                             </select>
                                             @error('jenis_transaksi')
@@ -73,7 +79,7 @@
                                                 @foreach ($categories as $cat)
                                                     <option value="{{ $cat->id }}"
                                                         class="kategori-option {{ $cat->tipe }}"
-                                                        {{ old('kategori_keuangan_id') == $cat->id ? 'selected' : '' }}>
+                                                        {{ old('kategori_keuangan_id', $data->kategori_keuangan_id) == $cat->id ? 'selected' : '' }}>
                                                         [{{ $cat->kode }}] {{ $cat->nama }}
                                                     </option>
                                                 @endforeach
@@ -88,15 +94,14 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Akun Keuangan (Sumber/Tujuan)</label>
+                                            <label>Akun Keuangan</label>
                                             <select name="sumber_id"
                                                 class="form-control @error('sumber_id') is-invalid @enderror" required>
                                                 <option value="">-- Pilih Akun --</option>
                                                 @foreach ($sumberKeuangan as $sumber)
                                                     <option value="{{ $sumber->id }}"
-                                                        {{ old('sumber_id') == $sumber->id ? 'selected' : '' }}>
-                                                        {{ $sumber->nama_sumber }} (Saldo: Rp
-                                                        {{ number_format($sumber->saldo, 0, ',', '.') }})
+                                                        {{ old('sumber_id', $data->sumber_id) == $sumber->id ? 'selected' : '' }}>
+                                                        {{ $sumber->nama_sumber }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -110,7 +115,8 @@
                                             <label>Tanggal Transaksi</label>
                                             <input type="date" name="tanggal_transaksi"
                                                 class="form-control @error('tanggal_transaksi') is-invalid @enderror"
-                                                value="{{ old('tanggal_transaksi') ?? date('Y-m-d') }}" required>
+                                                value="{{ old('tanggal_transaksi', $data->tanggal_transaksi) }}"
+                                                required>
                                             @error('tanggal_transaksi')
                                                 <span class="invalid-feedback">{{ $message }}</span>
                                             @enderror
@@ -126,7 +132,7 @@
                                         </div>
                                         <input type="number" step="0.01" min="0" name="jumlah"
                                             class="form-control @error('jumlah') is-invalid @enderror"
-                                            value="{{ old('jumlah') }}" required>
+                                            value="{{ old('jumlah', $data->jumlah) }}" required>
                                     </div>
                                     @error('jumlah')
                                         <span class="invalid-feedback">{{ $message }}</span>
@@ -135,17 +141,24 @@
 
                                 <div class="form-group">
                                     <label>Keterangan</label>
-                                    <textarea name="keterangan" class="form-control" rows="3" placeholder="Deskripsi transaksi...">{{ old('keterangan') }}</textarea>
+                                    <textarea name="keterangan" class="form-control" rows="3">{{ old('keterangan', $data->keterangan) }}</textarea>
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Bukti Transaksi (Struk/Invoice)</label>
+                                    <label>Bukti Transaksi</label>
+                                    @if ($data->bukti_transaksi)
+                                        <div class="mb-2">
+                                            <a href="{{ asset('uploads/keuangan/' . $data->bukti_transaksi) }}"
+                                                target="_blank" class="btn btn-sm btn-info"><i class="fas fa-file"></i>
+                                                Liha File Saat Ini</a>
+                                        </div>
+                                    @endif
                                     <div class="custom-file">
                                         <input type="file" name="bukti_transaksi" class="custom-file-input"
                                             id="buktiFile">
-                                        <label class="custom-file-label" for="buktiFile">Pilih file...</label>
+                                        <label class="custom-file-label" for="buktiFile">Ubah file (kosongkan jika tidak
+                                            ingin mengubah)...</label>
                                     </div>
-                                    <small class="text-muted">Format: JPG, PNG, PDF. Max: 2MB.</small>
                                 </div>
 
                                 <div class="mt-4 d-flex justify-content-between">
@@ -153,7 +166,7 @@
                                         <i class="fas fa-arrow-left"></i> Kembali
                                     </a>
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Simpan Transaksi
+                                        <i class="fas fa-save"></i> Update Transaksi
                                     </button>
                                 </div>
 
@@ -174,7 +187,7 @@
                                         }
 
                                         $('#jenis_transaksi').change(filterCategories);
-                                        filterCategories(); // Run on load
+                                        filterCategories();
 
                                         // Custom File Input Label
                                         $(".custom-file-input").on("change", function() {

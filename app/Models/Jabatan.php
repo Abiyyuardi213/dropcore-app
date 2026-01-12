@@ -19,6 +19,10 @@ class Jabatan extends Model
         'kode_jabatan',
         'name',
         'deskripsi',
+        'tanggung_jawab',
+        'kualifikasi',
+        'gaji_pokok',
+        'tunjangan',
         'status',
     ];
 

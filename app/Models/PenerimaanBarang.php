@@ -15,13 +15,14 @@ class PenerimaanBarang extends Model
 
     protected $fillable = [
         'no_penerimaan',
+        'tipe_pengirim',
         'distributor_id',
+        'supplier_id',
         'tanggal_penerimaan',
         'referensi',
         'keterangan',
         'user_id',
         'status',
-        // 'supplier_id' // kept for legacy if needed but we prefer distributor
     ];
 
     protected static function booted()
@@ -44,8 +45,6 @@ class PenerimaanBarang extends Model
                 optional(Auth::user())->id
             );
         });
-
-        // Other logs omitted for brevity or can retain
     }
 
     public static function generateNomorPenerimaan()
@@ -68,6 +67,11 @@ class PenerimaanBarang extends Model
     public function distributor()
     {
         return $this->belongsTo(Distributor::class, 'distributor_id');
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 
     public function user()

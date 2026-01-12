@@ -9,6 +9,7 @@ use App\Models\Products;
 use App\Models\Gudang;
 use App\Models\KondisiBarang;
 use App\Models\Stok;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,7 @@ class PenerimaanBarangController extends Controller
 {
     public function index()
     {
-        $data = PenerimaanBarang::with(['distributor', 'user'])->latest()->get();
+        $data = PenerimaanBarang::with(['distributor', 'supplier', 'user'])->latest()->get();
         // Fallback for supplier_id if distributor relation is empty (legacy support if needed, but we focus on distributor)
         return view('penerimaan_barang.index', compact('data'));
     }
@@ -26,24 +27,27 @@ class PenerimaanBarangController extends Controller
     public function create()
     {
         $distributors = Distributor::orderBy('nama_distributor')->get();
+        $suppliers = Supplier::orderBy('nama_supplier')->get();
         $products = Products::orderBy('name')->get();
         // Eager load structure for dynamic dropdowns
         $gudangs = Gudang::with('areas.raks')->orderBy('nama_gudang')->get();
         $kondisis = KondisiBarang::all();
         $no_penerimaan = PenerimaanBarang::generateNomorPenerimaan();
 
-        return view('penerimaan_barang.create', compact('distributors', 'products', 'gudangs', 'kondisis', 'no_penerimaan'));
+        return view('penerimaan_barang.create', compact('distributors', 'suppliers', 'products', 'gudangs', 'kondisis', 'no_penerimaan'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'distributor_id'     => 'required|exists:distributors,id',
+            'tipe_pengirim'      => 'required|in:supplier,distributor',
+            'distributor_id'     => 'nullable|required_if:tipe_pengirim,distributor|exists:distributors,id',
+            'supplier_id'        => 'nullable|required_if:tipe_pengirim,supplier|exists:suppliers,id',
             'tanggal_penerimaan' => 'required|date',
             'referensi'          => 'nullable|string|max:100',
             'keterangan'         => 'nullable|string',
+            'submit_action'      => 'required|in:draft,process', // Button value
 
-            // Details Validation - array inputs
             'items'              => 'required|array|min:1',
             'items.*.produk_id'  => 'required|exists:products,id',
             'items.*.qty'        => 'required|integer|min:1',
@@ -51,23 +55,27 @@ class PenerimaanBarangController extends Controller
             'items.*.gudang_id'  => 'required|exists:gudang,id',
             'items.*.area_id'    => 'required|exists:area_gudang,id',
             'items.*.rak_id'     => 'required|exists:rak_gudang,id',
-            'items.*.harga'      => 'nullable|numeric|min:0', // Optional price
+            'items.*.harga'      => 'nullable|numeric|min:0',
         ]);
 
         try {
             DB::beginTransaction();
 
+            $status = ($request->submit_action === 'process') ? 'completed' : 'pending';
+
             // 1. Create Header
             $penerimaan = PenerimaanBarang::create([
-                'distributor_id'     => $request->distributor_id,
+                'tipe_pengirim'      => $request->tipe_pengirim,
+                'distributor_id'     => ($request->tipe_pengirim == 'distributor') ? $request->distributor_id : null,
+                'supplier_id'        => ($request->tipe_pengirim == 'supplier') ? $request->supplier_id : null,
                 'user_id'            => optional(Auth::user())->id,
                 'tanggal_penerimaan' => $request->tanggal_penerimaan,
                 'referensi'          => $request->referensi,
                 'keterangan'         => $request->keterangan,
-                'status'             => 'completed', // Direct complete/post
+                'status'             => $status,
             ]);
 
-            // 2. Process Details & Update Stock
+            // 2. Process Details
             foreach ($request->items as $item) {
                 $qty = $item['qty'];
                 $harga = $item['harga'] ?? 0;
@@ -86,33 +94,38 @@ class PenerimaanBarangController extends Controller
                     'subtotal'      => $subtotal,
                 ]);
 
-                // Update Stock (Search existing or create new)
-                $stok = Stok::where('produk_id', $item['produk_id'])
-                    ->where('gudang_id', $item['gudang_id'])
-                    ->where('area_id', $item['area_id'])
-                    ->where('rak_id', $item['rak_id'])
-                    ->where('kondisi_id', $item['kondisi_id'])
-                    ->first();
+                // 3. Update Stock ONLY if status is completed (Processed)
+                if ($status === 'completed') {
+                    $stok = Stok::where('produk_id', $item['produk_id'])
+                        ->where('gudang_id', $item['gudang_id'])
+                        ->where('area_id', $item['area_id'])
+                        ->where('rak_id', $item['rak_id'])
+                        ->where('kondisi_id', $item['kondisi_id'])
+                        ->first();
 
-                if ($stok) {
-                    $stok->quantity += $qty;
-                    $stok->save();
-                } else {
-                    Stok::create([
-                        'produk_id'  => $item['produk_id'],
-                        'gudang_id'  => $item['gudang_id'],
-                        'area_id'    => $item['area_id'],
-                        'rak_id'     => $item['rak_id'],
-                        'kondisi_id' => $item['kondisi_id'],
-                        'quantity'   => $qty,
-                    ]);
+                    if ($stok) {
+                        $stok->quantity += $qty;
+                        $stok->save();
+                    } else {
+                        Stok::create([
+                            'produk_id'  => $item['produk_id'],
+                            'gudang_id'  => $item['gudang_id'],
+                            'area_id'    => $item['area_id'],
+                            'rak_id'     => $item['rak_id'],
+                            'kondisi_id' => $item['kondisi_id'],
+                            'quantity'   => $qty,
+                        ]);
+                    }
                 }
             }
 
             DB::commit();
 
-            return redirect()->route('penerimaan-barang.index')
-                ->with('success', 'Penerimaan barang berhasil disimpan dan stok telah bertambah.');
+            $msg = ($status === 'completed')
+                ? 'Penerimaan barang berhasil diproses dan stok telah bertambah.'
+                : 'Penerimaan barang berhasil disimpan sebagai DRAFT (Stok belum bertambah).';
+
+            return redirect()->route('penerimaan-barang.index')->with('success', $msg);
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
