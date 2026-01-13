@@ -171,7 +171,7 @@
     @include('include.footerSistem')
 </div>
 
-@include('services.logoutModal')
+@include('services.LogoutModal')
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>

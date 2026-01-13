@@ -252,7 +252,7 @@
         @include('include.footerSistem')
     </div>
 
-    @include('services.logoutModal')
+    @include('services.LogoutModal')
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
