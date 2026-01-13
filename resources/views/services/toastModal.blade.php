@@ -68,7 +68,7 @@
                 // Simple heuristic to guess type if not explicit
                 var icon = 'success';
                 if (message.toLowerCase().includes('gagal') || message.toLowerCase().includes(
-                    'error')) {
+                        'error')) {
                     icon = 'error';
                 }
 
@@ -79,4 +79,6 @@
             });
         }
     });
+
+    //perbaiki toast modal
 </script>
