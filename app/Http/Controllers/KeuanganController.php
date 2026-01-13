@@ -18,9 +18,24 @@ class KeuanganController extends Controller
             $query->whereBetween('tanggal_transaksi', [$request->tanggal_awal, $request->tanggal_akhir]);
         }
 
+        if ($request->filled('jenis_transaksi')) {
+            $query->where('jenis_transaksi', $request->jenis_transaksi);
+        }
+
+        if ($request->filled('kategori_keuangan_id')) {
+            $query->where('kategori_keuangan_id', $request->kategori_keuangan_id);
+        }
+
+        if ($request->filled('sumber_id')) {
+            $query->where('sumber_id', $request->sumber_id);
+        }
+
         $data = $query->get();
 
-        return view('keuangan.keuangan.index', compact('data'));
+        $sumberKeuangan = SumberKeuangan::orderBy('nama_sumber', 'asc')->get();
+        $categories = \App\Models\KategoriKeuangan::orderBy('nama', 'asc')->get();
+
+        return view('keuangan.keuangan.index', compact('data', 'sumberKeuangan', 'categories'));
     }
 
     public function create()
@@ -134,21 +149,47 @@ class KeuanganController extends Controller
             ->with('success', 'Transaksi berhasil diperbarui dan saldo akun disesuaikan.');
     }
 
+    public function show($id)
+    {
+        $data = Keuangan::with(['sumber', 'kategori', 'user'])->findOrFail($id);
+        return view('keuangan.keuangan.show', compact('data'));
+    }
+
+    public function print($id)
+    {
+        $data = Keuangan::with(['sumber', 'kategori', 'user'])->findOrFail($id);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('keuangan.keuangan.pdf', compact('data'));
+        return $pdf->stream('Bukti-Transaksi-' . $data->no_transaksi . '.pdf');
+    }
+
     public function destroy($id)
     {
-        DB::transaction(function () use ($id) {
-            $transaksi = Keuangan::findOrFail($id);
-            $akun = SumberKeuangan::findOrFail($transaksi->sumber_id);
+        $transaksi = Keuangan::find($id);
 
-            // Revert Balance
-            if ($transaksi->jenis_transaksi == 'pemasukkan') {
-                $akun->decrement('saldo', $transaksi->jumlah);
-            } else {
-                $akun->increment('saldo', $transaksi->jumlah);
+        if (!$transaksi) {
+            return redirect()->route('keuangan.index')
+                ->with('error', 'Data transaksi tidak ditemukan.');
+        }
+
+        DB::transaction(function () use ($transaksi) {
+            $akun = SumberKeuangan::find($transaksi->sumber_id);
+
+            // Revert Balance only if source account still exists
+            if ($akun) {
+                if ($transaksi->jenis_transaksi == 'pemasukkan') {
+                    $akun->decrement('saldo', $transaksi->jumlah);
+                } else {
+                    $akun->increment('saldo', $transaksi->jumlah);
+                }
             }
 
-            if ($transaksi->bukti_transaksi && file_exists(public_path('uploads/keuangan/' . $transaksi->bukti_transaksi))) {
-                unlink(public_path('uploads/keuangan/' . $transaksi->bukti_transaksi));
+            // Safe Check: Delete file only if it looks like a file and exists
+            if ($transaksi->bukti_transaksi) {
+                $filePath = public_path('uploads/keuangan/' . $transaksi->bukti_transaksi);
+                // Check if file exists AND it's not just a UUID string (files usually have dots)
+                if (str_contains($transaksi->bukti_transaksi, '.') && file_exists($filePath)) {
+                    unlink($filePath);
+                }
             }
 
             $transaksi->delete();

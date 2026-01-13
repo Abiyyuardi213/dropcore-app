@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
         rel="stylesheet">
     <style>
@@ -42,6 +46,75 @@
 
             <section class="content">
                 <div class="container-fluid">
+                    {{-- Filter Section --}}
+                    <div class="card card-outline card-secondary collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-filter mr-1"></i> Filter Data Stok</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form action="{{ route('stok.index') }}" method="GET">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Produk</label>
+                                            <select name="produk_id" class="form-control select2bs4">
+                                                <option value="">-- Semua Produk --</option>
+                                                @foreach ($produks as $produk)
+                                                    <option value="{{ $produk->id }}"
+                                                        {{ request('produk_id') == $produk->id ? 'selected' : '' }}>
+                                                        {{ $produk->name }} ({{ $produk->sku }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Gudang</label>
+                                            <select name="gudang_id" class="form-control select2bs4">
+                                                <option value="">-- Semua Gudang --</option>
+                                                @foreach ($gudangs as $gudang)
+                                                    <option value="{{ $gudang->id }}"
+                                                        {{ request('gudang_id') == $gudang->id ? 'selected' : '' }}>
+                                                        {{ $gudang->nama_gudang }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Kondisi</label>
+                                            <select name="kondisi_id" class="form-control">
+                                                <option value="">-- Semua Kondisi --</option>
+                                                @foreach ($kondisis as $kondisi)
+                                                    <option value="{{ $kondisi->id }}"
+                                                        {{ request('kondisi_id') == $kondisi->id ? 'selected' : '' }}>
+                                                        {{ $kondisi->nama_kondisi }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 text-right">
+                                        <a href="{{ route('stok.index') }}" class="btn btn-default mr-1">
+                                            <i class="fas fa-sync-alt"></i> Reset
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search"></i> Tampilkan
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                     <div class="card card-primary card-outline">
                         <div class="card-header">
                             <h3 class="card-title">
@@ -120,7 +193,8 @@
                                                         class="btn btn-warning btn-sm" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <button type="button" class="btn btn-danger btn-sm delete-stok-btn"
+                                                    <button type="button"
+                                                        class="btn btn-danger btn-sm delete-stok-btn"
                                                         data-id="{{ $stok->id }}" title="Hapus">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
@@ -146,11 +220,18 @@
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+    <!-- Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function() {
+            // Initialize Select2
+            $('.select2bs4').select2({
+                theme: 'bootstrap4'
+            });
+
             // Initialize DataTable
             $("#stokTable").DataTable({
                 "language": {

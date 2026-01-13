@@ -76,6 +76,7 @@ Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
     Route::get('dashboard-keuangan', [DashboardKeuanganController::class, 'index'])->name('dashboard-keuangan');
 
     Route::get('/kas-pusat', [KasPusatController::class, 'index'])->name('kas-pusat.index');
+    Route::post('/kas-pusat/transfer', [KasPusatController::class, 'storeTransfer'])->name('kas-pusat.transfer');
     Route::get('/kas-pusat/edit', [KasPusatController::class, 'edit'])->name('kas-pusat.edit');
     // Route::post('/kas-pusat/update', [KasPusatController::class, 'update'])->name('kas-pusat.update');
     Route::put('/kas-pusat/update/{id}', [KasPusatController::class, 'update'])->name('kas-pusat.update');
@@ -95,7 +96,9 @@ Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
         Route::post('/store', [KeuanganController::class, 'store'])->name('keuangan.store');
         Route::get('/edit/{id}', [KeuanganController::class, 'edit'])->name('keuangan.edit');
         Route::put('/update/{id}', [KeuanganController::class, 'update'])->name('keuangan.update');
-        Route::delete('/delete/{id}', [KeuanganController::class, 'destroy'])->name('keuangan.destroy');
+        Route::match(['get', 'post', 'delete'], '/delete/{id}', [KeuanganController::class, 'destroy'])->name('keuangan.destroy');
+        Route::get('/detail/{id}', [KeuanganController::class, 'show'])->name('keuangan.show');
+        Route::get('/print/{id}', [KeuanganController::class, 'print'])->name('keuangan.print');
     });
 
     Route::post('gudang/{id}/toggle-status', [GudangController::class, 'toggleStatus'])->name('gudang.toggleStatus');

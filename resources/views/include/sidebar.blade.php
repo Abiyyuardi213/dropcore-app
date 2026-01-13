@@ -70,91 +70,104 @@
                     <ul class="nav nav-treeview" style="{{ $isMaster ? 'display:block;' : '' }}">
 
                         <li class="nav-item">
-                            <a href="{{ route('dashboard-master') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('dashboard-master') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/dashboard-master*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-warehouse"></i>
                                 <p>Dashboard Master</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('role.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('role.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/role*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-user-shield"></i>
                                 <p>Master Peran</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('divisi.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('divisi.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/divisi*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-sitemap"></i>
                                 <p>Master Divisi</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('jabatan.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('jabatan.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/jabatan*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-id-badge"></i>
                                 <p>Master Jabatan</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('user.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('user.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/user*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-users-cog"></i>
                                 <p>Master Pengguna</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('category.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('category.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/category*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-tags"></i>
                                 <p>Master Kategori</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('wilayah.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('wilayah.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/wilayah*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-globe"></i>
                                 <p>Master Wilayah</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('provinsi.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('provinsi.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/provinsi*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-map"></i>
                                 <p>Master Provinsi</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('kota.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('kota.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/kota*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-city"></i>
                                 <p>Master Kota</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('kecamatan.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('kecamatan.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/kecamatan*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-map"></i>
                                 <p>Master Kecamatan</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('kelurahan.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('kelurahan.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/kelurahan*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-map"></i>
                                 <p>Master Kelurahan</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('supplier.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('supplier.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/supplier*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-truck"></i>
                                 <p>Master Supplier</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('kondisi-barang.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('kondisi-barang.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/kondisi-barang*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-box-open"></i>
                                 <p>Master Kondisi Barang</p>
                             </a>
@@ -185,28 +198,32 @@
                     <ul class="nav nav-treeview" style="{{ $isGudang ? 'display: block;' : '' }}">
 
                         <li class="nav-item">
-                            <a href="{{ route('dashboardGudang') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('dashboardGudang') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/dashboardGudang*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-chart-pie"></i>
                                 <p>Dashboard Gudang</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('gudang.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('gudang.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/gudang*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-building"></i>
                                 <p>Gudang</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('areaGudang.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('areaGudang.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/areaGudang*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-th-large"></i>
                                 <p>Area Gudang</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('rak-gudang.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('rak-gudang.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/rak-gudang*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-layer-group"></i>
                                 <p>Rak Gudang</p>
                             </a>
@@ -234,21 +251,24 @@
                     <ul class="nav nav-treeview" style="{{ $isProduk ? 'display: block;' : '' }}">
 
                         <li class="nav-item">
-                            <a href="{{ route('dashboardProduk') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('dashboardProduk') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/dashboardProduk*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>Dashboard Produk</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('product.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('product.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/product*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-box"></i>
                                 <p>Produk</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('stok.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('stok.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/stok*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-warehouse"></i>
                                 <p>Stok Produk</p>
                             </a>
@@ -277,28 +297,32 @@
                     <ul class="nav nav-treeview" style="{{ $isKeuangan ? 'display: block;' : '' }}">
 
                         <li class="nav-item">
-                            <a href="{{ route('dashboard-keuangan') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('dashboard-keuangan') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/dashboard-keuangan*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-chart-line"></i>
                                 <p>Dashboard Keuangan</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('kas-pusat.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('kas-pusat.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/kas-pusat*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-coins"></i>
                                 <p>Kas Pusat</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('sumber-keuangan.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('sumber-keuangan.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/sumber-keuangan*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-money-bill-wave"></i>
                                 <p>Sumber Keuangan</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('keuangan.index') }}" class="nav-link text-sm pl-4">
+                            <a href="{{ route('keuangan.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/keuangan*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-wallet"></i>
                                 <p>Keuangan</p>
                             </a>
@@ -308,14 +332,16 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('distributor.index') }}" class="nav-link">
+                    <a href="{{ route('distributor.index') }}"
+                        class="nav-link {{ Request::is('admin/distributor*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-truck-moving"></i>
                         <p>Distributor</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('mutasi-stok.index') }}" class="nav-link">
+                    <a href="{{ route('mutasi-stok.index') }}"
+                        class="nav-link {{ Request::is('admin/mutasi-stok*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-exchange-alt"></i>
                         <p>Mutasi Stok</p>
                     </a>
@@ -330,7 +356,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('riwayat-aktivitas-produk.index') }}" class="nav-link">
+                    <a href="{{ route('riwayat-aktivitas-produk.index') }}"
+                        class="nav-link {{ Request::is('admin/riwayat-aktivitas-produk*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-history"></i>
                         <p>Riwayat Aktivitas Produk</p>
                     </a>
@@ -371,3 +398,12 @@
         </nav>
     </div>
 </aside>
+
+<style>
+    /* Styling khusus untuk sub-menu aktif agar berwarna kuning */
+    .nav-sidebar .nav-treeview>.nav-item>.nav-link.active {
+        background-color: #f39c12 !important;
+        color: #1f2d3d !important;
+        font-weight: bold;
+    }
+</style>

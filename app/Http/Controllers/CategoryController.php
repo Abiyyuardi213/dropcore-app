@@ -13,11 +13,6 @@ class CategoryController extends Controller
         return view('category.index', compact('categories'));
     }
 
-    public function create()
-    {
-        return view('category.create');
-    }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -30,11 +25,7 @@ class CategoryController extends Controller
         return redirect()->route('category.index')->with('success', 'Kategori berhasil ditambahkan.');
     }
 
-    public function edit($id)
-    {
-        $category = Category::findOrFail($id);
-        return view('category.edit', compact('category'));
-    }
+
 
     public function update(Request $request, $id)
     {

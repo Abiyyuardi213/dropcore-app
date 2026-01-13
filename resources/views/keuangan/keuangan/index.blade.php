@@ -79,9 +79,15 @@
                     <div class="card shadow-sm">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title">Daftar Transaksi Keuangan</h3>
-                            <a href="{{ route('keuangan.create') }}" class="btn btn-primary btn-sm ml-auto">
-                                <i class="fas fa-plus"></i> Tambah Transaksi
-                            </a>
+                            <div class="ml-auto">
+                                <button type="button" class="btn btn-default btn-sm mr-1" data-toggle="modal"
+                                    data-target="#filterModal">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <a href="{{ route('keuangan.create') }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus"></i> Tambah Transaksi
+                                </a>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -131,6 +137,18 @@
                                                 </td>
 
                                                 <td class="text-center">
+                                                    @if ($data->first()->status)
+                                                        <span
+                                                            class="badge {{ $item->status == 'approved' ? 'badge-success' : 'badge-warning' }}">
+                                                            {{ ucfirst($item->status) }}
+                                                        </span>
+                                                    @else
+                                                        <span class="badge badge-secondary">Pending</span>
+                                                    @endif
+                                                </td>
+
+                                                {{-- 
+                                                <td class="text-center">
                                                     @if ($item->bukti_transaksi)
                                                         <a href="{{ asset('uploads/keuangan/' . $item->bukti_transaksi) }}"
                                                             target="_blank" class="btn btn-xs btn-info"
@@ -139,15 +157,18 @@
                                                         </a>
                                                     @endif
                                                 </td>
+                                                --}}
 
                                                 <td class="text-center">
+                                                    <a href="{{ route('keuangan.show', $item->id) }}"
+                                                        class="btn btn-info btn-xs" title="Detail">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
                                                     <a href="{{ route('keuangan.edit', $item->id) }}"
                                                         class="btn btn-warning btn-xs" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <button class="btn btn-danger btn-xs delete-keuangan-btn"
-                                                        data-toggle="modal" data-target="#deleteKeuanganModal"
-                                                        data-keuangan-id="{{ $item->id }}"
                                                         data-delete-route="{{ route('keuangan.destroy', $item->id) }}">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
@@ -167,28 +188,7 @@
         @include('include.footerSistem')
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteKeuanganModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.
-                </div>
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+
 
     @include('services.ToastModal')
     @include('services.LogoutModal')
@@ -198,10 +198,11 @@
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function() {
-            $("#keuanganTable").DataTable({
+            var table = $("#keuanganTable").DataTable({
                 "paging": true,
                 "lengthChange": false,
                 "searching": true,
@@ -211,20 +212,119 @@
                 "responsive": true
             });
 
-            $('.delete-keuangan-btn').click(function() {
-                let keuanganId = $(this).data('keuangan-id');
-                let deleteUrl = "{{ url('keuangan') }}/" + keuanganId;
-                $('#deleteForm').attr('action', deleteUrl);
+            // SweetAlert Delete Confirmation with Event Delegation for DataTables
+            $(document).on('click', '.delete-keuangan-btn', function(e) {
+                e.preventDefault();
+                var deleteUrl = $(this).data('delete-route');
+
+                // Debugging (optional, removed in prod)
+                // console.log("Delete URL:", deleteUrl);
+
+                if (!deleteUrl) {
+                    Swal.fire('Error', 'URL Hapus tidak ditemukan', 'error');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data transaksi ini akan dihapus secara permanen dan saldo akan dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#deleteForm').attr('action', deleteUrl);
+                        $('#deleteForm').submit();
+                    }
+                });
             });
 
-            @if (session('success') || session('error'))
-                $('#toastNotification').toast({
-                    delay: 3000,
-                    autohide: true
-                }).toast('show');
-            @endif
+
         });
     </script>
+
+    <!-- Hidden Delete Form -->
+    <form id="deleteForm" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
+
+    <!-- Filter Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filterModalLabel">Filter Data Keuangan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ route('keuangan.index') }}" method="GET">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Rentang Tanggal</label>
+                            <div class="row">
+                                <div class="col-6">
+                                    <input type="date" name="tanggal_awal" class="form-control"
+                                        value="{{ request('tanggal_awal') }}">
+                                </div>
+                                <div class="col-6">
+                                    <input type="date" name="tanggal_akhir" class="form-control"
+                                        value="{{ request('tanggal_akhir') }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Jenis Transaksi</label>
+                            <select name="jenis_transaksi" class="form-control">
+                                <option value="">-- Semua Jenis --</option>
+                                <option value="pemasukkan"
+                                    {{ request('jenis_transaksi') == 'pemasukkan' ? 'selected' : '' }}>Pemasukkan
+                                </option>
+                                <option value="pengeluaran"
+                                    {{ request('jenis_transaksi') == 'pengeluaran' ? 'selected' : '' }}>Pengeluaran
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Kategori</label>
+                            <select name="kategori_keuangan_id" class="form-control">
+                                <option value="">-- Semua Kategori --</option>
+                                @foreach ($categories as $cat)
+                                    <option value="{{ $cat->id }}"
+                                        {{ request('kategori_keuangan_id') == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Akun Keuangan</label>
+                            <select name="sumber_id" class="form-control">
+                                <option value="">-- Semua Akun --</option>
+                                @foreach ($sumberKeuangan as $sumber)
+                                    <option value="{{ $sumber->id }}"
+                                        {{ request('sumber_id') == $sumber->id ? 'selected' : '' }}>
+                                        {{ $sumber->nama_sumber }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{{ route('keuangan.index') }}" class="btn btn-secondary">Reset</a>
+                        <button type="submit" class="btn btn-primary">Terapkan Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 </body>
 

@@ -41,9 +41,39 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'tanggal_bergabung' => 'date',
+    ];
+
     // ... (casts and booted remain same, skipped for brevity in replacement unless needing change)
 
-    // ... createPengguna updatePengguna methods ... (omitted from this targeted replacement if not changing logic)
+    // Boot method for UUID
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->{$model->getKeyName()})) {
+                $model->{$model->getKeyName()} = (string) Str::uuid();
+            }
+        });
+    }
+
+    // Custom wrappers methods
+    public static function createPengguna($data)
+    {
+        return self::create($data);
+    }
+
+    public function updatePengguna($data)
+    {
+        return $this->update($data);
+    }
+
+    public function deletePengguna()
+    {
+        return $this->delete();
+    }
 
     // Add relations
     public function role()
@@ -59,10 +89,5 @@ class User extends Authenticatable
     public function jabatan()
     {
         return $this->belongsTo(Jabatan::class, 'jabatan_id');
-    }
-
-    public function getAuthIdentifierName()
-    {
-        return 'username';
     }
 }

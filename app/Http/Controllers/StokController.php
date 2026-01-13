@@ -12,11 +12,29 @@ use App\Models\Stok;
 
 class StokController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $stoks = Stok::with(['produk', 'gudang', 'area', 'rak', 'kondisi'])->orderBy('created_at', 'asc')->get();
+        $query = Stok::with(['produk', 'gudang', 'area', 'rak', 'kondisi']);
+
+        // Filter Param
+        if ($request->filled('produk_id')) {
+            $query->where('produk_id', $request->produk_id);
+        }
+        if ($request->filled('gudang_id')) {
+            $query->where('gudang_id', $request->gudang_id);
+        }
+        if ($request->filled('kondisi_id')) {
+            $query->where('kondisi_id', $request->kondisi_id);
+        }
+
+        $stoks = $query->orderBy('created_at', 'asc')->get();
+
+        // Data untuk Filter Dropdown
+        $produks = Products::orderBy('name', 'asc')->get();
+        $gudangs = Gudang::orderBy('nama_gudang', 'asc')->get();
         $kondisis = KondisiBarang::all();
-        return view('stok.index', compact('stoks', 'kondisis'));
+
+        return view('stok.index', compact('stoks', 'produks', 'gudangs', 'kondisis'));
     }
 
     public function create()

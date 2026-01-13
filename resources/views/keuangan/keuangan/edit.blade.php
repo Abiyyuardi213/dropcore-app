@@ -115,7 +115,7 @@
                                             <label>Tanggal Transaksi</label>
                                             <input type="date" name="tanggal_transaksi"
                                                 class="form-control @error('tanggal_transaksi') is-invalid @enderror"
-                                                value="{{ old('tanggal_transaksi', $data->tanggal_transaksi) }}"
+                                                value="{{ old('tanggal_transaksi', $data->tanggal_transaksi ? \Carbon\Carbon::parse($data->tanggal_transaksi)->format('Y-m-d') : '') }}"
                                                 required>
                                             @error('tanggal_transaksi')
                                                 <span class="invalid-feedback">{{ $message }}</span>

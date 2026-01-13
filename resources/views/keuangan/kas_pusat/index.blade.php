@@ -39,8 +39,18 @@
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <h1 class="m-0"><i class="fas fa-coins mr-2"></i>Kas Pusat Perusahaan</h1>
+                        </div>
+                        <div class="col-sm-6 text-right">
+                            <a href="{{ route('sumber-keuangan.create', ['type' => 'bank']) }}"
+                                class="btn btn-default mr-2">
+                                <i class="fas fa-plus mr-1"></i> Kelola Akun Bank
+                            </a>
+                            <button type="button" class="btn btn-primary" data-toggle="modal"
+                                data-target="#transferModal">
+                                <i class="fas fa-exchange-alt mr-1"></i> Transfer Kas ke Saldo Bank
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -48,6 +58,16 @@
 
             <section class="content">
                 <div class="container-fluid">
+
+                    {{-- Error Alert --}}
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
 
                     <div class="card card-secondary card-outline shadow">
                         <div class="card-header bg-secondary">
@@ -162,6 +182,63 @@
         </div>
 
         @include('include.footerSistem')
+    </div>
+
+    {{-- Modal Transfer --}}
+    <div class="modal fade" id="transferModal" tabindex="-1" role="dialog" aria-labelledby="transferModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="transferModalLabel">Transfer Kas ke Bank</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ route('kas-pusat.transfer') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Dari Akun Kas (Tunai) <span class="text-danger">*</span></label>
+                            <select name="sumber_asal_id" class="form-control" required>
+                                <option value="">-- Pilih Kas Tunai --</option>
+                                @foreach ($listKas as $kas)
+                                    <option value="{{ $kas->id }}">
+                                        {{ $kas->nama_sumber }} (Saldo: Rp
+                                        {{ number_format($kas->saldo, 0, ',', '.') }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ke Akun Bank <span class="text-danger">*</span></label>
+                            <select name="sumber_tujuan_id" class="form-control" required>
+                                <option value="">-- Pilih Bank Tujuan --</option>
+                                @foreach ($listBank as $bank)
+                                    <option value="{{ $bank->id }}">
+                                        {{ $bank->nama_sumber }} ({{ $bank->nomor_rekening }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Jumlah Transfer (Rp) <span class="text-danger">*</span></label>
+                            <input type="number" name="jumlah" class="form-control" min="1"
+                                placeholder="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Keterangan</label>
+                            <textarea name="keterangan" class="form-control" rows="2" placeholder="Contoh: Setor tunai harian"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>
+                            Transfer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     @include('services.ToastModal')
