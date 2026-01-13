@@ -29,9 +29,10 @@ class PengeluaranBarangController extends Controller
         // Eager load structure for dynamic dropdowns
         $gudangs = Gudang::with('areas.raks')->orderBy('nama_gudang')->get();
         $kondisis = KondisiBarang::all();
+        $sumberKeuangan = \App\Models\SumberKeuangan::where('is_active', true)->orderBy('nama_sumber', 'asc')->get();
         $no_pengeluaran = PengeluaranBarang::generateNomorPengeluaran();
 
-        return view('pengeluaran_barang.create', compact('distributors', 'products', 'gudangs', 'kondisis', 'no_pengeluaran'));
+        return view('pengeluaran_barang.create', compact('distributors', 'products', 'gudangs', 'kondisis', 'no_pengeluaran', 'sumberKeuangan'));
     }
 
     public function store(Request $request)
@@ -42,6 +43,7 @@ class PengeluaranBarangController extends Controller
             'referensi'           => 'nullable|string|max:100',
             'keterangan'          => 'nullable|string',
             'submit_action'       => 'required|in:draft,process',
+            'sumber_id'          => 'required_if:submit_action,process|nullable|exists:sumber_keuangan,id',
 
             // Conditional Validation
             'distributor_id'      => 'nullable|required_if:tipe_penerima,distributor|exists:distributors,id',
@@ -64,6 +66,7 @@ class PengeluaranBarangController extends Controller
             DB::beginTransaction();
 
             $status = ($request->submit_action === 'process') ? 'completed' : 'pending';
+            $totalTransaksi = 0;
 
             // 1. Create Header
             $pengeluaran = PengeluaranBarang::create([
@@ -109,6 +112,7 @@ class PengeluaranBarangController extends Controller
 
                 $harga = $item['harga'] ?? 0;
                 $subtotal = $qty * $harga;
+                $totalTransaksi += $subtotal;
 
                 PengeluaranBarangDetail::create([
                     'pengeluaran_id' => $pengeluaran->id,
@@ -128,6 +132,35 @@ class PengeluaranBarangController extends Controller
                     $stok->quantity -= $qty;
                     $stok->save();
                 }
+            }
+
+            // 4. Financial Transaction (Income)
+            if ($status === 'completed' && $totalTransaksi > 0 && $request->sumber_id) {
+                $kategori = \App\Models\KategoriKeuangan::firstOrCreate(
+                    ['nama' => 'Penjualan Stok'],
+                    ['jenis' => 'pemasukkan', 'deskripsi' => 'Otomatis dari Pengeluaran Barang']
+                );
+
+                // Auto Generate Finance Transaction No
+                $date = date('Ymd');
+                $count = \App\Models\Keuangan::whereDate('created_at', today())->count() + 1;
+                $noTrx = 'TRX-' . $date . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+
+                \App\Models\Keuangan::create([
+                    'no_transaksi'         => $noTrx,
+                    'jenis_transaksi'      => 'pemasukkan',
+                    'kategori_keuangan_id' => $kategori->id,
+                    'sumber_id'            => $request->sumber_id,
+                    'jumlah'               => $totalTransaksi,
+                    'tanggal_transaksi'    => $request->tanggal_pengeluaran,
+                    'keterangan'           => 'Penjualan Stok Ref: ' . $pengeluaran->no_pengeluaran,
+                    'status'               => 'approved',
+                    'user_id'              => optional(Auth::user())->id,
+                ]);
+
+                // Increment Balance
+                $akun = \App\Models\SumberKeuangan::findOrFail($request->sumber_id);
+                $akun->increment('saldo', $totalTransaksi);
             }
 
             DB::commit();

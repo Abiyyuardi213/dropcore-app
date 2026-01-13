@@ -140,6 +140,21 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
+                                            <label>Sumber Dana (Pembayaran) <span class="text-danger">*</span></label>
+                                            <select name="sumber_id" class="form-control select2" required>
+                                                <option value="">-- Pilih Akun Pembayaran --</option>
+                                                @foreach ($sumberKeuangan as $sumber)
+                                                    <option value="{{ $sumber->id }}"
+                                                        {{ old('sumber_id') == $sumber->id ? 'selected' : '' }}>
+                                                        {{ $sumber->nama_sumber }}
+                                                        ({{ number_format($sumber->saldo, 0, ',', '.') }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
                                             <label>Tanggal Terima <span class="text-danger">*</span></label>
                                             <input type="date" class="form-control" name="tanggal_penerimaan"
                                                 value="{{ old('tanggal_penerimaan', date('Y-m-d')) }}" required>

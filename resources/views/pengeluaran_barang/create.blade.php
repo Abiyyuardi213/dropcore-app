@@ -146,6 +146,25 @@
                                     </div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Akun Penerimaan (Masuk ke Saldo) <span
+                                                    class="text-danger">*</span></label>
+                                            <select name="sumber_id" class="form-control select2" required>
+                                                <option value="">-- Pilih Akun Penerimaan --</option>
+                                                @foreach ($sumberKeuangan as $sumber)
+                                                    <option value="{{ $sumber->id }}"
+                                                        {{ old('sumber_id') == $sumber->id ? 'selected' : '' }}>
+                                                        {{ $sumber->nama_sumber }}
+                                                        ({{ number_format($sumber->saldo, 0, ',', '.') }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="form-group">
                                     <label>Keterangan</label>
                                     <textarea name="keterangan" class="form-control" rows="1" placeholder="Catatan...">{{ old('keterangan') }}</textarea>

@@ -29,12 +29,12 @@ class PenerimaanBarangController extends Controller
         $distributors = Distributor::orderBy('nama_distributor')->get();
         $suppliers = Supplier::orderBy('nama_supplier')->get();
         $products = Products::orderBy('name')->get();
-        // Eager load structure for dynamic dropdowns
         $gudangs = Gudang::with('areas.raks')->orderBy('nama_gudang')->get();
         $kondisis = KondisiBarang::all();
+        $sumberKeuangan = \App\Models\SumberKeuangan::where('is_active', true)->orderBy('nama_sumber', 'asc')->get();
         $no_penerimaan = PenerimaanBarang::generateNomorPenerimaan();
 
-        return view('penerimaan_barang.create', compact('distributors', 'suppliers', 'products', 'gudangs', 'kondisis', 'no_penerimaan'));
+        return view('penerimaan_barang.create', compact('distributors', 'suppliers', 'products', 'gudangs', 'kondisis', 'no_penerimaan', 'sumberKeuangan'));
     }
 
     public function store(Request $request)
@@ -46,7 +46,8 @@ class PenerimaanBarangController extends Controller
             'tanggal_penerimaan' => 'required|date',
             'referensi'          => 'nullable|string|max:100',
             'keterangan'         => 'nullable|string',
-            'submit_action'      => 'required|in:draft,process', // Button value
+            'submit_action'      => 'required|in:draft,process',
+            'sumber_id'          => 'required_if:submit_action,process|nullable|exists:sumber_keuangan,id', // Required if processing
 
             'items'              => 'required|array|min:1',
             'items.*.produk_id'  => 'required|exists:products,id',
@@ -62,6 +63,7 @@ class PenerimaanBarangController extends Controller
             DB::beginTransaction();
 
             $status = ($request->submit_action === 'process') ? 'completed' : 'pending';
+            $totalTransaksi = 0;
 
             // 1. Create Header
             $penerimaan = PenerimaanBarang::create([
@@ -80,6 +82,7 @@ class PenerimaanBarangController extends Controller
                 $qty = $item['qty'];
                 $harga = $item['harga'] ?? 0;
                 $subtotal = $qty * $harga;
+                $totalTransaksi += $subtotal;
 
                 // Create Detail
                 DetailPenerimaanBarang::create([
@@ -94,7 +97,7 @@ class PenerimaanBarangController extends Controller
                     'subtotal'      => $subtotal,
                 ]);
 
-                // 3. Update Stock ONLY if status is completed (Processed)
+                // 3. Update Stock ONLY if status is completed
                 if ($status === 'completed') {
                     $stok = Stok::where('produk_id', $item['produk_id'])
                         ->where('gudang_id', $item['gudang_id'])
@@ -119,11 +122,40 @@ class PenerimaanBarangController extends Controller
                 }
             }
 
+            // 4. Financial Transaction (Expense)
+            if ($status === 'completed' && $totalTransaksi > 0 && $request->sumber_id) {
+                $kategori = \App\Models\KategoriKeuangan::firstOrCreate(
+                    ['nama' => 'Pembelian Stok'],
+                    ['jenis' => 'pengeluaran', 'deskripsi' => 'Otomatis dari Penerimaan Barang']
+                );
+
+                // Auto Generate Finance Transaction No
+                $date = date('Ymd');
+                $count = \App\Models\Keuangan::whereDate('created_at', today())->count() + 1;
+                $noTrx = 'TRX-' . $date . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+
+                \App\Models\Keuangan::create([
+                    'no_transaksi'         => $noTrx,
+                    'jenis_transaksi'      => 'pengeluaran',
+                    'kategori_keuangan_id' => $kategori->id,
+                    'sumber_id'            => $request->sumber_id,
+                    'jumlah'               => $totalTransaksi,
+                    'tanggal_transaksi'    => $request->tanggal_penerimaan,
+                    'keterangan'           => 'Pembelian Stok Ref: ' . $penerimaan->no_penerimaan,
+                    'status'               => 'approved',
+                    'user_id'              => optional(Auth::user())->id,
+                ]);
+
+                // Deduct Balance
+                $akun = \App\Models\SumberKeuangan::findOrFail($request->sumber_id);
+                $akun->decrement('saldo', $totalTransaksi);
+            }
+
             DB::commit();
 
             $msg = ($status === 'completed')
-                ? 'Penerimaan barang berhasil diproses dan stok telah bertambah.'
-                : 'Penerimaan barang berhasil disimpan sebagai DRAFT (Stok belum bertambah).';
+                ? 'Penerimaan barang berhasil diproses, stok bertambah, dan transaksi keuangan tercatat.'
+                : 'Penerimaan barang berhasil disimpan sebagai DRAFT.';
 
             return redirect()->route('penerimaan-barang.index')->with('success', $msg);
         } catch (\Exception $e) {
