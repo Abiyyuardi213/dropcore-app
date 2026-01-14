@@ -23,6 +23,10 @@ class PenerimaanBarang extends Model
         'keterangan',
         'user_id',
         'status',
+        'subtotal',
+        'ppn_percentage',
+        'ppn_amount',
+        'total_amount',
     ];
 
     protected static function booted()

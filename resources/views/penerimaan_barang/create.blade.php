@@ -92,20 +92,15 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label>Sumber Pengirim <span class="text-danger">*</span></label>
-                                            <div class="d-flex align-items-center mt-2">
-                                                <div class="custom-control custom-radio mr-3">
-                                                    <input class="custom-control-input" type="radio"
-                                                        id="sourceSupplier" name="tipe_pengirim" value="supplier"
-                                                        checked>
-                                                    <label for="sourceSupplier"
-                                                        class="custom-control-label">Supplier</label>
-                                                </div>
-                                                <div class="custom-control custom-radio">
-                                                    <input class="custom-control-input" type="radio"
-                                                        id="sourceDistributor" name="tipe_pengirim" value="distributor">
-                                                    <label for="sourceDistributor"
-                                                        class="custom-control-label">Distributor</label>
-                                                </div>
+                                            <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                                                <label class="btn btn-outline-primary active">
+                                                    <input type="radio" name="tipe_pengirim" id="sourceSupplier"
+                                                        value="supplier" checked> Supplier
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="tipe_pengirim" id="sourceDistributor"
+                                                        value="distributor"> Distributor
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -116,6 +111,9 @@
                                                 <option value="">-- Pilih Supplier --</option>
                                                 @foreach ($suppliers as $s)
                                                     <option value="{{ $s->id }}"
+                                                        data-kode="{{ $s->kode_supplier }}"
+                                                        data-telp="{{ $s->no_telepon }}"
+                                                        data-alamat="{{ \Illuminate\Support\Str::limit($s->alamat, 30) }}"
                                                         {{ old('supplier_id') == $s->id ? 'selected' : '' }}>
                                                         {{ $s->nama_supplier }}
                                                     </option>
@@ -131,6 +129,8 @@
                                                 <option value="">-- Pilih Distributor --</option>
                                                 @foreach ($distributors as $d)
                                                     <option value="{{ $d->id }}"
+                                                        data-kode="{{ $d->kode_distributor ?? '-' }}"
+                                                        data-telp="{{ $d->nomor_telepon ?? '-' }}"
                                                         {{ old('distributor_id') == $d->id ? 'selected' : '' }}>
                                                         {{ $d->nama_distributor }}
                                                     </option>
@@ -141,13 +141,16 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label>Sumber Dana (Pembayaran) <span class="text-danger">*</span></label>
-                                            <select name="sumber_id" class="form-control select2" required>
+                                            <select name="sumber_id" class="form-control select2" id="sumberSelect"
+                                                required>
                                                 <option value="">-- Pilih Akun Pembayaran --</option>
                                                 @foreach ($sumberKeuangan as $sumber)
                                                     <option value="{{ $sumber->id }}"
+                                                        data-saldo="{{ number_format($sumber->saldo, 0, ',', '.') }}"
+                                                        data-jenis="{{ $sumber->jenis }}"
+                                                        data-norek="{{ $sumber->nomor_rekening }}"
                                                         {{ old('sumber_id') == $sumber->id ? 'selected' : '' }}>
                                                         {{ $sumber->nama_sumber }}
-                                                        ({{ number_format($sumber->saldo, 0, ',', '.') }})
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -201,8 +204,20 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="5" class="text-right text-bold">Total Estimasi Nilai:</td>
-                                            <td colspan="2"><span id="total-value" class="text-bold">Rp 0</span>
+                                            <td colspan="5" class="text-right text-bold">Subtotal:</td>
+                                            <td colspan="2"><span id="subtotal-value" class="text-bold">Rp
+                                                    0</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" class="text-right text-bold">PPN (10%):</td>
+                                            <td colspan="2"><span id="ppn-value" class="text-bold">Rp 0</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" class="text-right text-bold">Total Bayar:</td>
+                                            <td colspan="2"><span id="grand-total-value" class="text-bold">Rp
+                                                    0</span>
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -282,9 +297,76 @@
                 $('#form-penerimaan').submit();
             }
 
+            // Formatters
+            function formatSupplier(state) {
+                if (!state.id) return state.text;
+                var kode = $(state.element).data('kode');
+                var telp = $(state.element).data('telp');
+                var alamat = $(state.element).data('alamat');
+
+                // Detailed view for dropdown list
+                var $state = $(
+                    '<div class="d-flex flex-column py-1">' +
+                    '<span class="font-weight-bold">' + state.text + ' <small class="text-muted">(' + kode +
+                    ')</small></span>' +
+                    '<span class="text-muted small"><i class="fas fa-phone-alt mr-1"></i> ' + telp +
+                    ' &bull; <i class="fas fa-map-marker-alt mr-1"></i> ' + alamat + '</span>' +
+                    '</div>'
+                );
+                return $state;
+            }
+
+            function formatSupplierSelection(state) {
+                if (!state.id) return state.text;
+                var kode = $(state.element).data('kode');
+                return $('<span>' + state.text + ' (' + kode + ')</span>');
+            }
+
+            function formatSumber(state) {
+                if (!state.id) return state.text;
+                var saldo = $(state.element).data('saldo');
+                var jenis = $(state.element).data('jenis');
+                var norek = $(state.element).data('norek');
+
+                var icon = (String(jenis).toLowerCase().includes('bank')) ? 'fa-landmark' : 'fa-wallet';
+
+                var $state = $(
+                    '<div class="d-flex justify-content-between align-items-center w-100 py-1">' +
+                    '<div><i class="fas ' + icon + ' mr-2 text-secondary"></i><strong>' + state.text +
+                    '</strong><br><small class="text-muted pl-4">' + (norek ? norek : jenis) +
+                    '</small></div>' +
+                    '<div class="text-right"><span class="badge badge-light border">Rp ' + saldo +
+                    '</span></div>' +
+                    '</div>'
+                );
+                return $state;
+            }
+
+            function formatSumberSelection(state) {
+                if (!state.id) return state.text;
+                var saldo = $(state.element).data('saldo');
+                return $('<span>' + state.text + ' (Saldo: Rp ' + saldo + ')</span>');
+            }
+
+            // Init Generic Select2
             $('.select2').select2({
                 theme: 'bootstrap4',
                 width: '100%'
+            });
+
+            // Init Specific Select2 with Templates
+            $('#supplierSelect, #distributorSelect').select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                templateResult: formatSupplier,
+                templateSelection: formatSupplierSelection
+            });
+
+            $('#sumberSelect').select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                templateResult: formatSumber,
+                templateSelection: formatSumberSelection
             });
 
             let rowIndex = 0;
@@ -318,7 +400,7 @@
                     <td>
                         <div class="mb-1">
                              <select name="items[${rowIndex}][gudang_id]" class="form-control select2-sm gudang-select check-required" data-index="${rowIndex}" required>
-                                ${gudangOpts}
+                                 ${gudangOpts}
                             </select>
                         </div>
                         <div class="d-flex">
@@ -336,7 +418,7 @@
                     <td>
                         <div class="input-group">
                            <div class="input-group-prepend"><span class="input-group-text">Rp</span></div> 
-                           <input type="number" name="items[${rowIndex}][harga]" class="form-control price-input" min="0" placeholder="0">
+                           <input type="text" name="items[${rowIndex}][harga]" class="form-control price-input currency-input" placeholder="0">
                         </div>
                     </td>
                     <td>
@@ -419,11 +501,33 @@
                 }
             });
 
+            // Format Currency Input
+            $(document).on('keyup', '.currency-input', function() {
+                let value = $(this).val().replace(/[^,\d]/g, '').toString();
+                let split = value.split(',');
+                let sisa = split[0].length % 3;
+                let rupiah = split[0].substr(0, sisa);
+                let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+                if (ribuan) {
+                    let separator = sisa ? '.' : '';
+                    rupiah += separator + ribuan.join('.');
+                }
+
+                rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+                $(this).val(rupiah);
+            });
+
             // Calculations
             $(document).on('input', '.qty-input, .price-input', function() {
                 const row = $(this).closest('tr');
                 const qty = parseFloat(row.find('.qty-input').val()) || 0;
-                const price = parseFloat(row.find('.price-input').val()) || 0;
+
+                // Parse Price (Remove dots)
+                let priceStr = row.find('.price-input').val() || "0";
+                priceStr = priceStr.replace(/\./g, ''); // Remove dots
+                const price = parseFloat(priceStr) || 0;
+
                 const subtotal = qty * price;
 
                 row.find('.subtotal-display').val('Rp ' + subtotal.toLocaleString('id-ID'));
@@ -431,13 +535,23 @@
             });
 
             function calculateTotal() {
-                let total = 0;
+                let subtotal = 0;
                 $('#table-items tbody tr').each(function() {
                     const qty = parseFloat($(this).find('.qty-input').val()) || 0;
-                    const price = parseFloat($(this).find('.price-input').val()) || 0;
-                    total += (qty * price);
+
+                    let priceStr = $(this).find('.price-input').val() || "0";
+                    priceStr = priceStr.replace(/\./g, '');
+                    const price = parseFloat(priceStr) || 0;
+
+                    subtotal += (qty * price);
                 });
-                $('#total-value').text('Rp ' + total.toLocaleString('id-ID'));
+
+                const ppn = subtotal * 0.10;
+                const grandTotal = subtotal + ppn;
+
+                $('#subtotal-value').text('Rp ' + subtotal.toLocaleString('id-ID'));
+                $('#ppn-value').text('Rp ' + ppn.toLocaleString('id-ID'));
+                $('#grand-total-value').text('Rp ' + grandTotal.toLocaleString('id-ID'));
             }
 
             // Form Submit Validation

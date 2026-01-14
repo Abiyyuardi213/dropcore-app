@@ -236,8 +236,23 @@
     <table class="total-box">
         <tr>
             <td style="width: 70%;"></td>
-            <td class="total-label">TOTAL PENERIMAAN:</td>
-            <td class="total-value">Rp {{ number_format($total, 0, ',', '.') }}</td>
+            <td class="total-label">Subtotal:</td>
+            <td class="total-value" style="border-top: none;">Rp
+                {{ number_format($penerimaan->subtotal > 0 ? $penerimaan->subtotal : $total, 0, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td class="total-label">PPN
+                ({{ $penerimaan->ppn_percentage > 0 ? $penerimaan->ppn_percentage + 0 : 10 }}%):</td>
+            <td class="total-value" style="border-top: none;">Rp
+                {{ number_format($penerimaan->ppn_amount, 0, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td class="total-label">TOTAL BAYAR:</td>
+            <td class="total-value">Rp
+                {{ number_format($penerimaan->total_amount > 0 ? $penerimaan->total_amount : $total + $penerimaan->ppn_amount, 0, ',', '.') }}
+            </td>
         </tr>
     </table>
 

@@ -134,8 +134,22 @@
                                             <td>{{ $penerimaan->details->sum('qty') }} Item</td>
                                         </tr>
                                         <tr>
-                                            <th>Total Nilai:</th>
-                                            <td>Rp {{ number_format($total, 0, ',', '.') }}</td>
+                                            <th>Subtotal:</th>
+                                            <td>Rp
+                                                {{ number_format($penerimaan->subtotal > 0 ? $penerimaan->subtotal : $total, 0, ',', '.') }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>PPN
+                                                ({{ $penerimaan->ppn_percentage > 0 ? $penerimaan->ppn_percentage + 0 : 10 }}%):
+                                            </th>
+                                            <td>Rp {{ number_format($penerimaan->ppn_amount, 0, ',', '.') }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Bayar:</th>
+                                            <td>Rp
+                                                {{ number_format($penerimaan->total_amount > 0 ? $penerimaan->total_amount : $total + $penerimaan->ppn_amount, 0, ',', '.') }}
+                                            </td>
                                         </tr>
                                     </table>
                                 </div>
