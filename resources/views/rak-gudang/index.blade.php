@@ -112,7 +112,6 @@
                                                         <i class="fas fa-edit"></i> Edit
                                                     </a>
                                                     <button class="btn btn-danger btn-sm delete-rak-btn"
-                                                        data-toggle="modal" data-target="#deleteRakGudangModal"
                                                         data-rak-id="{{ $rak->id }}">
                                                         <i class="fas fa-trash"></i> Hapus
                                                     </button>
@@ -132,32 +131,7 @@
         @include('include.footerSistem')
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteRakGudangModal" tabindex="-1" aria-labelledby="deleteRakGudangModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteRakGudangModalLabel"><i class="fas fa-exclamation-triangle"></i>
-                        Konfirmasi Hapus</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus rak gudang ini? Tindakan ini tidak dapat dibatalkan.
-                </div>
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+
 
     @include('services.LogoutModal')
 
@@ -198,9 +172,9 @@
             @endif
 
             // Delete Confirmation
-            $('.delete-rak-btn').click(function() {
+            $(document).on('click', '.delete-rak-btn', function() {
                 let rakId = $(this).data('rak-id');
-                let deleteUrl = "{{ url('rak-gudang') }}/" + rakId;
+                let deleteUrl = "{{ route('rak-gudang.index') }}/" + rakId;
 
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
@@ -213,8 +187,15 @@
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $('#deleteForm').attr('action', deleteUrl);
-                        $('#deleteForm').submit();
+                        let form = document.createElement('form');
+                        form.action = deleteUrl;
+                        form.method = 'POST';
+                        form.innerHTML = `
+                            @csrf
+                            @method('DELETE')
+                        `;
+                        document.body.appendChild(form);
+                        form.submit();
                     }
                 });
             });
@@ -226,7 +207,7 @@
                 let originalState = !$(this).prop("checked");
                 let checkbox = $(this);
 
-                $.post("{{ url('rak-gudang') }}/" + rakId + "/toggle-status", {
+                $.post("{{ route('rak-gudang.index') }}/" + rakId + "/toggle-status", {
                     _token: '{{ csrf_token() }}',
                     rak_status: status
                 }, function(res) {

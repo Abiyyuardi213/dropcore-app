@@ -4,37 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use App\Models\RiwayatAktivitasLog;
 
 class Wilayah extends Model
 {
-    use SoftDeletes;
+    // use SoftDeletes; removed
 
     protected $table = 'wilayah';
     protected $keyType = 'string';
     public $incrementing = false;
 
     protected $fillable = [
-        'negara',
-        'deskripsi',
-        'status_wilayah',
+        'id',
+        'name',
     ];
 
     protected static function booted()
     {
-        static::creating(function ($wilayah) {
-            if (!$wilayah->id) {
-                $wilayah->id = (string) Str::uuid();
-            }
-        });
-
         static::created(function ($wilayah) {
             RiwayatAktivitasLog::add(
                 'wilayah',
                 'create',
-                "Menambah wilayah {$wilayah->negara}",
+                "Menambah wilayah {$wilayah->name}",
                 optional(Auth::user())->id
             );
         });

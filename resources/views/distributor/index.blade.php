@@ -208,7 +208,7 @@
             // Delete Confirmation
             $(document).on('click', '.delete-distributor-btn', function() {
                 let id = $(this).data('id');
-                let deleteUrl = "{{ url('distributor') }}/" + id;
+                let deleteUrl = "{{ route('distributor.index') }}/" + id;
 
                 Swal.fire({
                     title: 'Apakah Anda yakin?',

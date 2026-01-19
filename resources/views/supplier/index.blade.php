@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
         rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -99,7 +101,6 @@
                                                             <i class="fas fa-edit"></i>
                                                         </a>
                                                         <button class="btn btn-danger btn-sm delete-supplier-btn"
-                                                            data-toggle="modal" data-target="#deleteSupplierModal"
                                                             data-supplier-id="{{ $supplier->id }}" title="Hapus">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
@@ -120,32 +121,7 @@
         @include('include.footerSistem')
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteSupplierModal" tabindex="-1" aria-labelledby="deleteSupplierModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteSupplierModalLabel"><i class="fas fa-exclamation-triangle"></i>
-                        Konfirmasi Hapus</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus supplier ini? Tindakan ini tidak dapat dibatalkan.
-                </div>
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+
 
     @include('services.ToastModal')
     @include('services.LogoutModal')
@@ -167,22 +143,53 @@
                 "autoWidth": false,
                 "responsive": true
             });
-        });
 
-        $(document).ready(function() {
-            $('.delete-supplier-btn').click(function() {
+            // Delete Confirmation with SweetAlert
+            $(document).on('click', '.delete-supplier-btn', function() {
                 let supplierId = $(this).data('supplier-id');
-                let deleteUrl = "{{ url('supplier') }}/" + supplierId;
-                $('#deleteForm').attr('action', deleteUrl);
-            });
-        });
+                let deleteUrl = "{{ route('supplier.index') }}/" + supplierId;
 
-        $(document).ready(function() {
-            @if (session('success') || session('error'))
-                $('#toastNotification').toast({
-                    delay: 3000,
-                    autohide: true
-                }).toast('show');
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data supplier ini akan dihapus permanen!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let form = document.createElement('form');
+                        form.action = deleteUrl;
+                        form.method = 'POST';
+                        form.innerHTML = `
+                            @csrf
+                            @method('DELETE')
+                        `;
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+
+            // SweetAlert Flash Messages
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            @endif
+
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: '{{ session('error') }}',
+                });
             @endif
         });
     </script>

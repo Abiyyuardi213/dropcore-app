@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .toggle-status {
             width: 50px;
@@ -47,6 +51,7 @@
         }
     </style>
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         @include('include.navbarSistem')
@@ -68,7 +73,8 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title">Daftar Wilayah/Negara</h3>
-                            <a href="#" class="btn btn-primary btn-sm ml-auto" data-toggle="modal" data-target="#addWilayahModal">
+                            <a href="#" class="btn btn-primary btn-sm ml-auto" data-toggle="modal"
+                                data-target="#addWilayahModal">
                                 <i class="fas fa-plus"></i> Tambah Wilayah
                             </a>
                         </div>
@@ -85,7 +91,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($wilayahs as $index => $wilayah)
+                                        @foreach ($wilayahs as $index => $wilayah)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $wilayah->negara }}</td>
@@ -97,8 +103,7 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <button class="btn btn-warning btn-sm edit-wilayah-btn"
-                                                        data-toggle="modal"
-                                                        data-target="#editWilayahModal"
+                                                        data-toggle="modal" data-target="#editWilayahModal"
                                                         data-id="{{ $wilayah->id }}"
                                                         data-negara="{{ $wilayah->negara }}"
                                                         data-deskripsi="{{ $wilayah->deskripsi }}"
@@ -106,8 +111,6 @@
                                                         <i class="fas fa-edit"></i> Edit
                                                     </button>
                                                     <button class="btn btn-danger btn-sm delete-wilayah-btn"
-                                                        data-toggle="modal"
-                                                        data-target="#deleteWilayahModal"
                                                         data-wilayah-id="{{ $wilayah->id }}">
                                                         <i class="fas fa-trash"></i> Hapus
                                                     </button>
@@ -127,33 +130,11 @@
         @include('include.footerSistem')
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteWilayahModal" tabindex="-1" aria-labelledby="deleteWilayahModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteWilayahModalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus peran ini? Tindakan ini tidak dapat dibatalkan.
-                </div>
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Modal Tambah Wilayah -->
-    <div class="modal fade" id="addWilayahModal" tabindex="-1" role="dialog" aria-labelledby="addWilayahModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addWilayahModal" tabindex="-1" role="dialog" aria-labelledby="addWilayahModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <form action="{{ route('wilayah.store') }}" method="POST">
                 @csrf
@@ -176,9 +157,11 @@
                         <div class="form-group">
                             <label for="status_wilayah">Status Wilayah</label>
                             <select class="form-control @error('status_wilayah') is-invalid @enderror"
-                                    name="status_wilayah" required>
-                                <option value="1" {{ old('status_wilayah') == '1' ? 'selected' : '' }}>Aktif</option>
-                                <option value="0" {{ old('status_wilayah') == '0' ? 'selected' : '' }}>Nonaktif</option>
+                                name="status_wilayah" required>
+                                <option value="1" {{ old('status_wilayah') == '1' ? 'selected' : '' }}>Aktif
+                                </option>
+                                <option value="0" {{ old('status_wilayah') == '0' ? 'selected' : '' }}>Nonaktif
+                                </option>
                             </select>
                             @error('status_wilayah')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -195,7 +178,8 @@
     </div>
 
     <!-- Modal Edit Wilayah -->
-    <div class="modal fade" id="editWilayahModal" tabindex="-1" aria-labelledby="editWilayahLabel" aria-hidden="true">
+    <div class="modal fade" id="editWilayahModal" tabindex="-1" aria-labelledby="editWilayahLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <form id="editWilayahForm" method="POST">
                 @csrf
@@ -203,7 +187,8 @@
                 <div class="modal-content">
                     <div class="modal-header bg-warning text-white">
                         <h5 class="modal-title" id="editWilayahLabel"><i class="fas fa-edit"></i> Ubah Wilayah</h5>
-                        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+                        <button type="button" class="close text-white"
+                            data-dismiss="modal"><span>&times;</span></button>
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="wilayah_id" id="editWilayahId">
@@ -224,7 +209,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                        <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Simpan
+                            Perubahan</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                     </div>
                 </div>
@@ -242,7 +228,7 @@
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
     <script src="{{ asset('js/ToastScript.js') }}"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $("#wilayahTable").DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -254,31 +240,65 @@
             });
         });
 
-        $(document).ready(function () {
-            $('.delete-wilayah-btn').click(function () {
+        $(document).ready(function() {
+            $('.delete-wilayah-btn').click(function() {
                 let wilayahId = $(this).data('wilayah-id');
-                let deleteUrl = "{{ url('wilayah') }}/" + wilayahId;
-                $('#deleteForm').attr('action', deleteUrl);
-            });
-        });
+                let deleteUrl = "{{ route('wilayah.index') }}/" + wilayahId;
 
-        $(document).ready(function () {
-            $(".toggle-status").change(function () {
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data wilayah ini akan dihapus permanen!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let form = document.createElement('form');
+                        form.action = deleteUrl;
+                        form.method = 'POST';
+                        form.innerHTML = `
+                            @csrf
+                            @method('DELETE')
+                        `;
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+
+            $(".toggle-status").change(function() {
                 let wilayahId = $(this).data("wilayah-id");
                 let status = $(this).prop("checked") ? 1 : 0;
+                let checkbox = $(this);
+                let originalState = !status;
 
-                $.post("{{ url('wilayah') }}/" + wilayahId + "/toggle-status", {
+                $.post("{{ route('wilayah.index') }}/" + wilayahId + "/toggle-status", {
                     _token: '{{ csrf_token() }}',
                     status_wilayah: status
-                }, function (res) {
+                }, function(res) {
                     if (res.success) {
-                        $(".toast-body").text(res.message);
-                        $("#toastNotification").toast({ autohide: true, delay: 3000 }).toast("show");
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                        });
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: res.message
+                        });
                     } else {
-                        alert("Gagal memperbarui status.");
+                        Swal.fire('Gagal!', 'Gagal memperbarui status.', 'error');
+                        checkbox.prop("checked", originalState);
                     }
-                }).fail(function () {
-                    alert("Terjadi kesalahan dalam mengubah status.");
+                }).fail(function() {
+                    Swal.fire('Error!', 'Terjadi kesalahan dalam mengubah status.', 'error');
+                    checkbox.prop("checked", originalState);
                 });
             });
         });
@@ -290,13 +310,32 @@
                     autohide: true
                 }).toast('show');
             @endif
+
+            // SweetAlert Flash Messages
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            @endif
+
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: '{{ session('error') }}',
+                });
+            @endif
         });
 
-        $('#addWilayahModal').on('hidden.bs.modal', function () {
+        $('#addWilayahModal').on('hidden.bs.modal', function() {
             $(this).find('form')[0].reset();
         });
 
-        $(document).on('click', '.edit-wilayah-btn', function () {
+        $(document).on('click', '.edit-wilayah-btn', function() {
             let id = $(this).data('id');
             let negara = $(this).data('negara');
             let deskripsi = $(this).data('deskripsi');
@@ -307,9 +346,10 @@
             $('#editDeskripsi').val(deskripsi);
             $('#editStatusWilayah').val(status);
 
-            let actionUrl = "{{ url('wilayah') }}/" + id;
+            let actionUrl = "{{ route('wilayah.index') }}/" + id;
             $('#editWilayahForm').attr('action', actionUrl);
         });
     </script>
 </body>
+
 </html>

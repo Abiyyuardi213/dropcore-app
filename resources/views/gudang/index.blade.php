@@ -110,7 +110,6 @@
                                                         <i class="fas fa-edit"></i> Edit
                                                     </a>
                                                     <button class="btn btn-danger btn-sm delete-gudang-btn"
-                                                        data-toggle="modal" data-target="#deleteGudangModal"
                                                         data-gudang-id="{{ $gudang->id }}">
                                                         <i class="fas fa-trash"></i> Hapus
                                                     </button>
@@ -175,9 +174,9 @@
             @endif
 
             // Delete Confirmation
-            $('.delete-gudang-btn').click(function() {
+            $(document).on('click', '.delete-gudang-btn', function() {
                 let gudangId = $(this).data('gudang-id');
-                let deleteUrl = "{{ url('gudang') }}/" + gudangId;
+                let deleteUrl = "{{ route('gudang.index') }}/" + gudangId;
 
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
@@ -190,8 +189,15 @@
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $('#deleteForm').attr('action', deleteUrl);
-                        $('#deleteForm').submit();
+                        let form = document.createElement('form');
+                        form.action = deleteUrl;
+                        form.method = 'POST';
+                        form.innerHTML = `
+                            @csrf
+                            @method('DELETE')
+                        `;
+                        document.body.appendChild(form);
+                        form.submit();
                     }
                 });
             });
@@ -203,7 +209,7 @@
                 let originalState = !$(this).prop("checked");
                 let checkbox = $(this);
 
-                $.post("{{ url('gudang') }}/" + gudangId + "/toggle-status", {
+                $.post("{{ route('gudang.index') }}/" + gudangId + "/toggle-status", {
                     _token: '{{ csrf_token() }}',
                     gudang_status: status // Sesuaikan dengan controller
                 }, function(res) {

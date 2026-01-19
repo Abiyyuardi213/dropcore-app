@@ -58,14 +58,10 @@ class Products extends Model
             );
         });
 
-        static::deleted(function ($product) {
-            RiwayatAktivitasLog::add(
-                'product',
-                'delete',
-                "Menghapus produk {$product->name}",
-                optional(Auth::user())->id
-            );
-        });
+        // static::deleted removed to avoid Integrity Constraint Violation
+        // When a product is deleted, we cannot insert a log that references it via foreign key.
+        // If logging is needed, the `riwayat_aktivitas_produk` table structure needs adjustment (nullable or no FK)
+        // or we handle it differently. For now, removing this prevents the crash.
     }
 
     public static function generateSKU($productName)

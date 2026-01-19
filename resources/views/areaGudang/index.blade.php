@@ -114,7 +114,6 @@
                                                         <i class="fas fa-edit"></i> Edit
                                                     </a>
                                                     <button class="btn btn-danger btn-sm delete-area-btn"
-                                                        data-toggle="modal" data-target="#deleteAreaGudangModal"
                                                         data-area-id="{{ $area->id }}">
                                                         <i class="fas fa-trash"></i> Hapus
                                                     </button>
@@ -179,9 +178,9 @@
             @endif
 
             // Delete Confirmation
-            $('.delete-area-btn').click(function() {
+            $(document).on('click', '.delete-area-btn', function() {
                 let areaId = $(this).data('area-id');
-                let deleteUrl = "{{ url('areaGudang') }}/" + areaId;
+                let deleteUrl = "{{ route('areaGudang.index') }}/" + areaId;
 
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
@@ -194,8 +193,15 @@
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $('#deleteForm').attr('action', deleteUrl);
-                        $('#deleteForm').submit();
+                        let form = document.createElement('form');
+                        form.action = deleteUrl;
+                        form.method = 'POST';
+                        form.innerHTML = `
+                            @csrf
+                            @method('DELETE')
+                        `;
+                        document.body.appendChild(form);
+                        form.submit();
                     }
                 });
             });
@@ -207,7 +213,7 @@
                 let originalState = !$(this).prop("checked");
                 let checkbox = $(this);
 
-                $.post("{{ url('areaGudang') }}/" + areaId + "/toggle-status", {
+                $.post("{{ route('areaGudang.index') }}/" + areaId + "/toggle-status", {
                     _token: '{{ csrf_token() }}',
                     area_status: status
                 }, function(res) {

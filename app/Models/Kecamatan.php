@@ -5,36 +5,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes; removed
 use Illuminate\Support\Facades\Auth;
 use App\Models\RiwayatAktivitasLog;
 
 class Kecamatan extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    // SoftDeletes removed
 
     protected $table = 'kecamatan';
     protected $keyType = 'string';
     public $incrementing = false;
 
     protected $fillable = [
+        'id',
         'kota_id',
-        'kecamatan',
+        'name',
     ];
 
     protected static function booted()
     {
-        static::creating(function ($kecamatan) {
-            if (!$kecamatan->id) {
-                $kecamatan->id = (string) Str::uuid();
-            }
-        });
-
         static::created(function ($kecamatan) {
             RiwayatAktivitasLog::add(
                 'kecamatan',
                 'create',
-                "Menambah kecamatan {$kecamatan->kecamatan}",
+                "Menambah kecamatan {$kecamatan->name}",
                 optional(Auth::user())->id
             );
         });
@@ -43,7 +39,7 @@ class Kecamatan extends Model
             RiwayatAktivitasLog::add(
                 'kecamatan',
                 'update',
-                "Mengubah kecamatan {$kecamatan->kecamatan}",
+                "Mengubah kecamatan {$kecamatan->name}",
                 optional(Auth::user())->id
             );
         });
@@ -52,7 +48,7 @@ class Kecamatan extends Model
             RiwayatAktivitasLog::add(
                 'kecamatan',
                 'delete',
-                "Menghapus kecamatan {$kecamatan->kecamatan}",
+                "Menghapus kecamatan {$kecamatan->name}",
                 optional(Auth::user())->id
             );
         });
@@ -76,7 +72,7 @@ class Kecamatan extends Model
 
     public function kota()
     {
-        return $this->belongsTo(Kota::class, 'kota_id')->withTrashed();
+        return $this->belongsTo(Kota::class, 'kota_id');
     }
 
     public function getWilayahAttribute()

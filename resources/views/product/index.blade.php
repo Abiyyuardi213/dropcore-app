@@ -48,7 +48,7 @@
                                             <th>Nama Produk</th>
                                             <th>Kategori</th>
                                             <th>Harga</th>
-                                            <th>Min. Stok</th>
+
                                             <th style="width: 15%" class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
@@ -63,9 +63,9 @@
                                                     <strong>{{ $product->name }}</strong><br>
                                                     <small class="text-muted">{{ $product->merk ?? '-' }}</small>
                                                 </td>
-                                                <td>{{ $product->category->name ?? '-' }}</td>
+                                                <td>{{ $product->category->category_name ?? '-' }}</td>
                                                 <td>Rp {{ number_format($product->price, 0, ',', '.') }}</td>
-                                                <td>{{ $product->min_stock }}</td>
+
                                                 <td class="text-center">
                                                     <div class="btn-group">
                                                         <a href="{{ route('product.show', $product->id) }}"
@@ -146,7 +146,7 @@
             // Delete Confirmation with SweetAlert
             $('.delete-product-btn').click(function() {
                 let productId = $(this).data('product-id');
-                let deleteUrl = "{{ url('product') }}/" + productId;
+                let deleteUrl = "{{ route('product.index') }}/" + productId;
 
                 Swal.fire({
                     title: 'Apakah Anda yakin?',

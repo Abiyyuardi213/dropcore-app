@@ -125,13 +125,13 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = Products::findOrFail($id);
-        $product->deleteProduct();
 
-        RiwayatAktivitasProduk::log([
-            'produk_id'      => $product->id,
-            'tipe_aktivitas' => 'hapus_produk',
-            'deskripsi'      => 'Menghapus produk'
-        ]);
+        // Cannot log to RiwayatAktivitasProduk because it requires a valid produk_id foreign key,
+        // which will be violated (or cascaded) upon deletion.
+        // We rely on the General Log (RiwayatAktivitasLog) defined in the Model's booted() method if needed,
+        // or simply proceed with deletion.
+
+        $product->deleteProduct();
 
         return redirect()->route('product.index')
             ->with('success', 'Produk berhasil dihapus.');

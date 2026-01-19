@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,12 @@
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         @include('include.navbarSistem')
@@ -28,56 +32,118 @@
 
             <section class="content">
                 <div class="container-fluid">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card card-outline card-primary">
+                        <div class="card-header">
                             <h3 class="card-title">Daftar Kecamatan</h3>
-                            <a href="#" class="btn btn-primary btn-sm ml-auto" data-toggle="modal" data-target="#addKecamatanModal">
-                                <i class="fas fa-plus"></i> Tambah Kecamatan
-                            </a>
+
+                            <div class="card-tools">
+                                <form action="{{ route('kecamatan.index') }}" method="GET" class="form-inline">
+                                    {{-- Preserve filter params when searching --}}
+                                    @if (request('provinsi_id'))
+                                        <input type="hidden" name="provinsi_id" value="{{ request('provinsi_id') }}">
+                                    @endif
+                                    @if (request('kota_id'))
+                                        <input type="hidden" name="kota_id" value="{{ request('kota_id') }}">
+                                    @endif
+
+                                    <div class="input-group input-group-sm" style="width: 250px;">
+                                        <input type="text" name="q" class="form-control float-right"
+                                            placeholder="Cari Kecamatan..." value="{{ request('q') }}">
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-default">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                         <div class="card-body">
+                            {{-- Filters --}}
+                            <form action="{{ route('kecamatan.index') }}" method="GET" id="filterForm">
+                                <input type="hidden" name="q" value="{{ request('q') }}">
+                                <div class="row mb-4">
+                                    <div class="col-md-3">
+                                        <div class="form-group mb-0">
+                                            <label for="provinsi_id" class="sr-only">Provinsi</label>
+                                            <select name="provinsi_id" id="provinsi_id" class="form-control"
+                                                onchange="document.getElementById('kota_id').value=''; this.form.submit()">
+                                                <option value="">-- Filter Provinsi --</option>
+                                                @foreach ($provinsis as $p)
+                                                    <option value="{{ $p->id }}"
+                                                        {{ request('provinsi_id') == $p->id ? 'selected' : '' }}>
+                                                        {{ $p->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group mb-0">
+                                            <label for="kota_id" class="sr-only">Kota</label>
+                                            <select name="kota_id" id="kota_id" class="form-control"
+                                                onchange="this.form.submit()">
+                                                <option value="">-- Filter Kota --</option>
+                                                @foreach ($kotas as $k)
+                                                    <option value="{{ $k->id }}"
+                                                        {{ request('kota_id') == $k->id ? 'selected' : '' }}>
+                                                        {{ $k->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        @if (request('provinsi_id') || request('kota_id') || request('q'))
+                                            <a href="{{ route('kecamatan.index') }}"
+                                                class="btn btn-secondary btn-block">
+                                                <i class="fas fa-undo"></i> Reset
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </form>
+
                             <div class="table-responsive">
-                                <table id="kecamatanTable" class="table table-bordered table-striped">
-                                    <thead>
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead class="thead-light">
                                         <tr>
-                                            <th>No</th>
+                                            <th style="width: 10px">#</th>
                                             <th>Nama Kecamatan</th>
                                             <th>Nama Kota</th>
                                             <th>Provinsi</th>
                                             <th>Wilayah/Negara</th>
-                                            <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($kecamatans as $index => $kecamatan)
+                                        @forelse ($kecamatans as $index => $kecamatan)
                                             <tr>
-                                                <td>{{ $index + 1 }}</td>
-                                                <td>{{ $kecamatan->kecamatan }}</td>
-                                                <td>{{ $kecamatan->kota->kota }}</td>
-                                                <td>{{ $kecamatan->kota->provinsi->provinsi }}</td>
-                                                <td>{{ $kecamatan->kota->provinsi->wilayah->negara }}</td>
-                                                <td class="text-center">
-                                                    <button class="btn btn-warning btn-sm edit-kecamatan-btn"
-                                                        data-toggle="modal"
-                                                        data-target="#editKecamatanModal"
-                                                        data-id="{{ $kecamatan->id }}"
-                                                        data-kota-id="{{ $kecamatan->kota->id }}"
-                                                        data-kecamatan="{{ $kecamatan->kecamatan }}">
-                                                        <i class="fas fa-edit"></i> Edit
-                                                    </button>
-                                                    <button class="btn btn-danger btn-sm delete-kecamatan-btn"
-                                                        data-toggle="modal"
-                                                        data-target="#deletepKecamatanModal"
-                                                        data-kecamatan-id="{{ $kecamatan->id }}">
-                                                        <i class="fas fa-trash"></i> Hapus
-                                                    </button>
+                                                <td>{{ $kecamatans->firstItem() + $index }}</td>
+                                                <td>{{ $kecamatan->name }}</td>
+                                                <td>{{ $kecamatan->kota->name ?? '-' }}</td>
+                                                <td>{{ $kecamatan->kota->provinsi->name ?? '-' }}</td>
+                                                <td>{{ $kecamatan->kota->provinsi->wilayah->name ?? '-' }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted py-4">
+                                                    <i class="fas fa-search mb-2" style="font-size: 2rem;"></i>
+                                                    <p class="mb-0">Data tidak ditemukan</p>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="tablePagination"></div>
+                        </div>
+                        <div class="card-footer clearfix">
+                            <div class="float-right">
+                                {{ $kecamatans->links('pagination::bootstrap-4') }}
+                            </div>
+                            <div class="float-left text-muted">
+                                Menampilkan {{ $kecamatans->firstItem() ?? 0 }} sampai
+                                {{ $kecamatans->lastItem() ?? 0 }} dari {{ $kecamatans->total() }} data
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -87,163 +153,13 @@
         @include('include.footerSistem')
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteKecamatanModal" tabindex="-1" aria-labelledby="deleteKecamatanModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteKecamatanModalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus Kecamatan ini? Tindakan ini tidak dapat dibatalkan.
-                </div>
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Tambah Kecamatan -->
-    <div class="modal fade" id="addKecamatanModal" tabindex="-1" role="dialog" aria-labelledby="addKecamatanModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <form action="{{ route('kecamatan.store') }}" method="POST">
-                @csrf
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="addKecamatanModalLabel">Tambah Kecamatan Baru</h5>
-                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="kota_id">Kota</label>
-                            <select name="kota_id" id="kota_id" class="form-control @error('kota_id') is-invalid @enderror" required>
-                                <option value="">-- Pilih Kota --</option>
-                                @foreach($kotas as $kota)
-                                    <option value="{{ $kota->id }}" {{ old('kota_id') == $kota->id ? 'selected' : '' }}>
-                                        {{ $kota->kota }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('kota_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="kecamatan">Nama Kecamatan</label>
-                            <input type="text" name="kecamatan" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Edit Kecamatan -->
-    <div class="modal fade" id="editKecamatanModal" tabindex="-1" aria-labelledby="editKecamatanLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <form id="editKecamatanForm" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-content">
-                    <div class="modal-header bg-warning text-white">
-                        <h5 class="modal-title" id="editKecamatanLabel"><i class="fas fa-edit"></i> Ubah Kecamatan</h5>
-                        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="kota_id">Kota</label>
-                            <select name="kota_id" id="kota_id" class="form-control @error('kota_id') is-invalid @enderror" required>
-                                <option value="">-- Pilih Kota --</option>
-                                @foreach($kotas as $kota)
-                                    <option value="{{ $kota->id }}" {{ old('kota_id', $kecamatan->kota_id) == $kota->id ? 'selected' : '' }}>
-                                        {{ $kota->kota }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Nama Kecamatan</label>
-                            <input type="text" name="kecamatan" id="editKecamatan" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Simpan Perubahan</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
     @include('services.ToastModal')
     @include('services.LogoutModal')
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
     <script src="{{ asset('js/ToastScript.js') }}"></script>
-    <script>
-        $(document).ready(function () {
-            $("#kecamatanTable").DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": true,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true
-            });
-        });
-
-        $(document).ready(function () {
-            $('.delete-kecamatan-btn').click(function () {
-                let kecamatanId = $(this).data('kecamatan-id');
-                let deleteUrl = "{{ url('kecamatan') }}/" + kecamatanId;
-                $('#deleteForm').attr('action', deleteUrl);
-            });
-        });
-
-        $(document).ready(function() {
-            @if (session('success') || session('error'))
-                $('#toastNotification').toast({
-                    delay: 3000,
-                    autohide: true
-                }).toast('show');
-            @endif
-        });
-
-        $('#addWKecamatanModal').on('hidden.bs.modal', function () {
-            $(this).find('form')[0].reset();
-        });
-
-        $(document).on('click', '.edit-kecamatan-btn', function () {
-            let id = $(this).data('id');
-            let kotaId = $(this).data('kota_id');
-            let kecamatanId = $(this).data('kecamatan_id');
-            let kecamatan = $(this).data('kecamatan');
-
-            $('#editKecamatanId').val(id);
-            $('#edit_kota_id').val(kotaId);
-            $('#editKecamatan').val(kecamatan);
-
-            let actionUrl = "{{ url('kecamatan') }}/" + id;
-            $('#editKecamatanForm').attr('action', actionUrl);
-        });
-    </script>
 </body>
+
 </html>

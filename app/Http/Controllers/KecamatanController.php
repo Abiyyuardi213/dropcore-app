@@ -10,56 +10,37 @@ use App\Models\Wilayah;
 
 class KecamatanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $kotas = Kota::all();
-        $kecamatans = Kecamatan::with('kota.provinsi.wilayah')->orderBy('created_at')->get();
-        return view('kecamatan.index', compact('kecamatans', 'kotas'));
-    }
+        $query = Kecamatan::with(['kota.provinsi.wilayah']);
 
-    public function create()
-    {
-        $kotas = Kota::all();
-        return view('kecamatan.create', compact('kotas'));
-    }
+        // Search by name
+        if ($request->filled('q')) {
+            $query->where('name', 'like', '%' . $request->q . '%');
+        }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'kota_id' => 'required|exists:kota,id',
-            'kecamatan' => 'required|string|max:255|unique:kecamatan,kecamatan',
-        ]);
+        // Filter by Kota
+        if ($request->filled('kota_id')) {
+            $query->where('kota_id', $request->kota_id);
+        } elseif ($request->filled('provinsi_id')) {
+            // Filter by Provinsi only if Kota is not selected
+            $query->whereHas('kota', function ($q) use ($request) {
+                $q->where('provinsi_id', $request->provinsi_id);
+            });
+        }
 
-        Kecamatan::createKecamatan($request->all());
+        $kecamatans = $query->orderBy('name', 'asc')->paginate(10)->withQueryString();
 
-        return redirect()->route('kecamatan.index')->with('success', 'Kecamatan berhasil ditambahkan.');
-    }
+        $provinsis = Provinsi::orderBy('name')->get();
 
-    public function edit($id)
-    {
-        $kecamatan = Kecamatan::findOrFail($id);
-        $kotas = Kota::all();
-        return view('kecamatan.index', compact('kecamatan', 'kotas'));
-    }
+        // Fetch cities based on province if selected, otherwise fetch all cities
+        $kotas = $request->filled('provinsi_id')
+            ? Kota::where('provinsi_id', $request->provinsi_id)->orderBy('name')->get()
+            : Kota::orderBy('name')->get();
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'kota_id' => 'required|exists:kota,id',
-            'kecamatan' => 'required|string|max:255|unique:kecamatan,kecamatan,' . $id . ',id',
-        ]);
+        // If a city is selected but province wasn't (edge case or direct link), try to load relevant cities or just the one.
+        // But the UI will drive this. We'll stick to Dependent Dropdown logic.
 
-        $kecamatan = Kecamatan::findOrFail($id);
-        $kecamatan->updateKecamatan($request->all());
-
-        return redirect()->route('kecamatan.index')->with('success', 'Kecamatan berhasil diperbarui.');
-    }
-
-    public function destroy($id)
-    {
-        $kecamatan = Kecamatan::findOrFail($id);
-        $kecamatan->deleteKecamatan();
-
-        return redirect()->route('kecamatan.index')->with('success', 'Kecamatan berhasil dihapus.');
+        return view('kecamatan.index', compact('kecamatans', 'provinsis', 'kotas'));
     }
 }

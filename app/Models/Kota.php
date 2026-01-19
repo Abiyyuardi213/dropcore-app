@@ -5,36 +5,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes; removed
 use Illuminate\Support\Facades\Auth;
 use App\Models\RiwayatAktivitasLog;
 
 class Kota extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    // SoftDeletes removed
 
     protected $table = 'kota';
     protected $keyType = 'string';
     public $incrementing = false;
 
     protected $fillable = [
+        'id',
         'provinsi_id',
-        'kota',
+        'name',
     ];
 
     protected static function booted()
     {
-        static::creating(function ($kota) {
-            if (!$kota->id) {
-                $kota->id = (string) Str::uuid();
-            }
-        });
-
         static::created(function ($kota) {
             RiwayatAktivitasLog::add(
                 'kota',
                 'create',
-                "Menambah kota {$kota->kota}",
+                "Menambah kota {$kota->name}",
                 optional(Auth::user())->id
             );
         });
@@ -43,7 +39,7 @@ class Kota extends Model
             RiwayatAktivitasLog::add(
                 'kota',
                 'update',
-                "Mengubah kota {$kota->kota}",
+                "Mengubah kota {$kota->name}",
                 optional(Auth::user())->id
             );
         });
@@ -52,7 +48,7 @@ class Kota extends Model
             RiwayatAktivitasLog::add(
                 'kota',
                 'delete',
-                "Menghapus kota {$kota->kota}",
+                "Menghapus kota {$kota->name}",
                 optional(Auth::user())->id
             );
         });
@@ -76,7 +72,7 @@ class Kota extends Model
 
     public function provinsi()
     {
-        return $this->belongsTo(Provinsi::class, 'provinsi_id')->withTrashed();
+        return $this->belongsTo(Provinsi::class, 'provinsi_id');
     }
 
     public function wilayah()

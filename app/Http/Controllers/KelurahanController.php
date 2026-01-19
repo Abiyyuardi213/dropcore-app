@@ -8,56 +8,48 @@ use Illuminate\Http\Request;
 
 class KelurahanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $kecamatans = Kecamatan::all();
-        $kelurahans = Kelurahan::with('kecamatan.kota.provinsi.wilayah')->orderBy('created_at')->get();
-        return view('kelurahan.index', compact('kelurahans', 'kecamatans'));
-    }
+        $query = Kelurahan::with(['kecamatan.kota.provinsi.wilayah']);
 
-    public function create()
-    {
-        $kecamatans = Kecamatan::all();
-        return view('kelurahan.create', compact('kecamatan'));
-    }
+        // Search by name
+        if ($request->filled('q')) {
+            $query->where('name', 'like', '%' . $request->q . '%');
+        }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'kecamatan_id' => 'required|exists:kecamatan,id',
-            'kelurahan' => 'required|string|max:255|unique:kelurahan,kelurahan',
-        ]);
+        // Filter Priority: Kecamatan > Kota > Provinsi
+        if ($request->filled('kecamatan_id')) {
+            $query->where('kecamatan_id', $request->kecamatan_id);
+        } elseif ($request->filled('kota_id')) {
+            $query->whereHas('kecamatan', function ($q) use ($request) {
+                $q->where('kota_id', $request->kota_id);
+            });
+        } elseif ($request->filled('provinsi_id')) {
+            $query->whereHas('kecamatan.kota', function ($q) use ($request) {
+                $q->where('provinsi_id', $request->provinsi_id);
+            });
+        }
 
-        Kelurahan::createKelurahan($request->all());
+        $kelurahans = $query->orderBy('name', 'asc')->paginate(10)->withQueryString();
 
-        return redirect()->route('kelurahan.index')->with('success', 'Kelurahan berhasil ditambahkan.');
-    }
+        $provinsis = \App\Models\Provinsi::orderBy('name')->get();
 
-    public function edit($id)
-    {
-        $kelurahan = Kelurahan::findOrFail($id);
-        $kecamatans = Kecamatan::all();
-        return view('kelurahan.index', compact('kelurahan', 'kecamatans'));
-    }
+        // Fetch cities: All if no province selected, or filtered by province
+        $kotas = $request->filled('provinsi_id')
+            ? \App\Models\Kota::where('provinsi_id', $request->provinsi_id)->orderBy('name')->get()
+            : \App\Models\Kota::orderBy('name')->get();
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'kecamatan_id' => 'required|exists:kecamatan,id',
-            'kelurahan' => 'required|string|max:255|unique:kelurahan,kelurahan,' . $id . ',id',
-        ]);
+        // Fetch kecamatans: filtered by kota or province if selected, otherwise fetch all
+        if ($request->filled('kota_id')) {
+            $kecamatans = Kecamatan::where('kota_id', $request->kota_id)->orderBy('name')->get();
+        } elseif ($request->filled('provinsi_id')) {
+            $kecamatans = Kecamatan::whereHas('kota', function ($q) use ($request) {
+                $q->where('provinsi_id', $request->provinsi_id);
+            })->orderBy('name')->get();
+        } else {
+            $kecamatans = Kecamatan::orderBy('name')->get();
+        }
 
-        $kelurahan = Kelurahan::findOrFail($id);
-        $kelurahan->updateKelurahan($request->all());
-
-        return redirect()->route('kelurahan.index')->with('success', 'Kelurahan berhasil diperbarui.');
-    }
-
-    public function destroy($id)
-    {
-        $kelurahan = Kelurahan::findOrFail($id);
-        $kelurahan->deleteKelurahan();
-
-        return redirect()->route('kelurahan.index')->with('success', 'Kelurahan berhasil dihapus.');
+        return view('kelurahan.index', compact('kelurahans', 'provinsis', 'kotas', 'kecamatans'));
     }
 }

@@ -4,38 +4,31 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes; removed
 use Illuminate\Support\Facades\Auth;
 use App\Models\RiwayatAktivitasLog;
 
 class Provinsi extends Model
 {
-    use SoftDeletes;
+    // use SoftDeletes; removed
 
     protected $table = 'provinsi';
     protected $keyType = 'string';
     public $incrementing = false;
 
     protected $fillable = [
+        'id',
         'wilayah_id',
-        'provinsi',
-        'deskripsi',
-        'status_provinsi',
+        'name',
     ];
 
     protected static function booted()
     {
-        static::creating(function ($provinsi) {
-            if (!$provinsi->id) {
-                $provinsi->id = (string) Str::uuid();
-            }
-        });
-
         static::created(function ($provinsi) {
             RiwayatAktivitasLog::add(
                 'provinsi',
                 'create',
-                "Menambah provinsi {$provinsi->provinsi}",
+                "Menambah provinsi {$provinsi->name}",
                 optional(Auth::user())->id
             );
         });
@@ -44,7 +37,7 @@ class Provinsi extends Model
             RiwayatAktivitasLog::add(
                 'provinsi',
                 'update',
-                "Mengubah provinsi {$provinsi->provinsi}",
+                "Mengubah provinsi {$provinsi->name}",
                 optional(Auth::user())->id
             );
         });
@@ -53,7 +46,7 @@ class Provinsi extends Model
             RiwayatAktivitasLog::add(
                 'provinsi',
                 'delete',
-                "Menghapus provinsi {$provinsi->provinsi}",
+                "Menghapus provinsi {$provinsi->name}",
                 optional(Auth::user())->id
             );
         });
@@ -99,7 +92,7 @@ class Provinsi extends Model
 
     public function wilayah()
     {
-        return $this->belongsTo(Wilayah::class, 'wilayah_id')->withTrashed();
+        return $this->belongsTo(Wilayah::class, 'wilayah_id');
     }
 
     public function suppliers()

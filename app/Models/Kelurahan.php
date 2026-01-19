@@ -5,36 +5,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes; removed
 use Illuminate\Support\Facades\Auth;
 use App\Models\RiwayatAktivitasLog;
 
 class Kelurahan extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    // SoftDeletes removed
 
     protected $table = 'kelurahan';
     protected $keyType = 'string';
     public $incrementing = false;
 
     protected $fillable = [
+        'id',
         'kecamatan_id',
-        'kelurahan',
+        'name',
     ];
 
     protected static function booted()
     {
-        static::creating(function ($kelurahan) {
-            if (!$kelurahan->id) {
-                $kelurahan->id = (string) Str::uuid();
-            }
-        });
-
         static::created(function ($kelurahan) {
             RiwayatAktivitasLog::add(
                 'kelurahan',
                 'create',
-                "Menambah kelurahan {$kelurahan->kelurahan}",
+                "Menambah kelurahan {$kelurahan->name}",
                 optional(Auth::user())->id
             );
         });
@@ -43,7 +39,7 @@ class Kelurahan extends Model
             RiwayatAktivitasLog::add(
                 'kelurahan',
                 'update',
-                "Mengubah kelurahan {$kelurahan->kelurahan}",
+                "Mengubah kelurahan {$kelurahan->name}",
                 optional(Auth::user())->id
             );
         });
@@ -52,7 +48,7 @@ class Kelurahan extends Model
             RiwayatAktivitasLog::add(
                 'kelurahan',
                 'delete',
-                "Menghapus kelurahan {$kelurahan->kelurahan}",
+                "Menghapus kelurahan {$kelurahan->name}",
                 optional(Auth::user())->id
             );
         });
@@ -76,7 +72,7 @@ class Kelurahan extends Model
 
     public function kecamatan()
     {
-        return $this->belongsTo(Kecamatan::class, 'kecamatan_id')->withTrashed();
+        return $this->belongsTo(Kecamatan::class, 'kecamatan_id');
     }
 
     public function getAllWilayahAttribute()
