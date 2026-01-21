@@ -110,4 +110,48 @@ class AuthController extends Controller
 
         return redirect('/login')->with('success', 'Logout berhasil! Sampai jumpa lagi.');
     }
+
+    public function showRegisterForm()
+    {
+        return view('auth.register-customer');
+    }
+
+    public function registerCustomer(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'no_telepon' => 'nullable|string|max:20',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // Cari role customer
+        $customerRole = \App\Models\Role::where('role_name', 'customer')->first();
+
+        if (!$customerRole) {
+            return back()->withErrors(['error' => 'Sistem belum siap. Role customer tidak ditemukan.']);
+        }
+
+        // Generate username dari email
+        $username = explode('@', $request->email)[0];
+
+        // Cek jika username sudah ada, tambahkan angka random
+        if (User::where('username', $username)->exists()) {
+            $username = $username . rand(10, 99);
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'username' => $username,
+            'no_telepon' => $request->no_telepon,
+            'password' => Hash::make($request->password),
+            'role_id' => $customerRole->id,
+            'status_kepegawaian' => 'aktif',
+        ]);
+
+        Auth::login($user);
+
+        return redirect('/homepage')->with('success', 'Pendaftaran berhasil! Selamat datang di Garuda Fiber.');
+    }
 }

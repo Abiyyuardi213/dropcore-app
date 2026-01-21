@@ -39,6 +39,7 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\JabatanController;
+use App\Http\Controllers\CartController;
 use Whoops\Run;
 
 Route::get('/', function () {
@@ -46,6 +47,8 @@ Route::get('/', function () {
 });
 
 Route::get('homepage', [HomepageController::class, 'index'])->name('homepage');
+Route::get('produk', [HomepageController::class, 'products'])->name('customer.products');
+
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
@@ -57,6 +60,12 @@ Route::get('/login-customer', function () {
 
 Route::post('/login-customer', [AuthController::class, 'loginCustomer'])
     ->name('login.customer');
+
+Route::get('/register-customer', [AuthController::class, 'showRegisterForm'])
+    ->name('register.customer.form')->middleware('guest');
+
+Route::post('/register-customer', [AuthController::class, 'registerCustomer'])
+    ->name('register.customer');
 
 Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
@@ -210,4 +219,10 @@ Route::middleware(['role:customer'])->group(function () {
 
     Route::post('profil-customer', [UserController::class, 'updateProfilCustomer'])
         ->name('customer.profil.update');
+
+    // Cart Routes
+    Route::get('keranjang', [CartController::class, 'index'])->name('customer.cart');
+    Route::post('keranjang/tambah', [CartController::class, 'add'])->name('customer.cart.add');
+    Route::patch('keranjang/update/{id}', [CartController::class, 'update'])->name('customer.cart.update');
+    Route::delete('keranjang/hapus/{id}', [CartController::class, 'remove'])->name('customer.cart.remove');
 });

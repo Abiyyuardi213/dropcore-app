@@ -1,285 +1,233 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil Saya</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Pengaturan Profil - Garuda Fiber</title>
+
+    <!-- Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles & Scripts -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <style>
-        body {
-            background: #f1f4f9;
-            font-family: 'Inter', sans-serif;
-        }
-        .profile-header {
-            background: linear-gradient(135deg, #0d47a1, #1565c0);
-            padding: 60px 0 120px 0; /* Padding lebih besar */
-            text-align: center;
-            color: white;
-            border-radius: 0 0 30px 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
-        .profile-wrapper {
-            margin-top: -80px; /* Tarik ke atas header */
-        }
-        .profile-container {
-            background: white;
-            padding: 40px 35px;
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0,0,0,.08);
-        }
-        .avatar-card {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,.05);
-            text-align: center;
-        }
-        .profile-picture {
-            width: 180px; /* Ukuran lebih besar */
-            height: 180px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 6px solid #e9ecef; /* Border lebih soft */
-            box-shadow: 0 4px 15px rgba(0,0,0,.15);
-            background: #e5e7eb;
-            margin-bottom: 20px;
-        }
-        label {
-            font-weight: 600;
-            color: #374151;
-        }
-        .form-control {
-            padding: 12px;
-            border-radius: 12px;
-            border: 1.4px solid #d7dbe2;
-        }
-        .form-control:focus {
-            border-color: #1565c0;
-            box-shadow: 0 0 0 .2rem rgba(21,101,192,.25);
-        }
-        .btn-primary {
-            background: #1565c0;
-            border-radius: 12px;
-            padding: 12px 35px;
-            font-weight: 600;
-            border: none;
-        }
-        .btn-primary:hover {
-            background: #0d47a1;
-        }
-        .btn-secondary-outline {
-            color: #6c757d;
-            border: 1.5px solid #d7dbe2;
-            background-color: white;
-            border-radius: 10px;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-        .btn-secondary-outline:hover {
-            background-color: #f1f4f9;
-        }
-        .section-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 25px;
-            color: #1f2937;
-            border-bottom: 3px solid #f1f4f9;
-            padding-bottom: 10px;
-        }
-        .modal-xl-custom {
-            --bs-modal-width: 380px;
-        }
-    </style>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
-@include('include.navbar-client')
 
-<div class="profile-header">
-    <h1 class="fw-bold">Pengaturan Profil</h1>
-    <p class="mt-2 opacity-75">Kelola informasi dan foto profil akun Anda</p>
-</div>
+<body class="bg-background font-sans text-foreground antialiased min-h-screen flex flex-col">
+    @include('include.navbar-client')
 
-<div class="container mb-5">
-    <div class="row g-4 profile-wrapper">
-        <div class="col-lg-4">
-            <div class="avatar-card h-100">
-                <h5 class="fw-bold mb-4">Foto Profil Saat Ini</h5>
-                @if($user->profile_picture)
-                    <img id="profilePreview" src="{{ asset('uploads/profile/' . $user->profile_picture) }}"
-                         class="profile-picture" alt="Foto Profil">
-                @else
-                    <img id="profilePreview" src="{{ asset('images/default.png') }}"
-                         class="profile-picture" alt="Default">
-                @endif
-
-                <p class="text-muted mt-3 mb-4 small">Gambar harus dalam format JPG, PNG, atau GIF dan berukuran kurang dari 5MB.</p>
-
-                <button type="button" class="btn btn-secondary-outline w-100 mb-2" data-bs-toggle="modal"
-                        data-bs-target="#viewPhotoModal">
-                    <i class="bi bi-eye me-2"></i>Lihat Foto Penuh
-                </button>
-                <button type="button" class="btn btn-primary w-100" onclick="document.getElementById('profileInputFile').click()">
-                    <i class="bi bi-cloud-arrow-up me-2"></i>Ganti Foto Profil
-                </button>
-                <input type="file" id="profileInputFile" name="profile_picture_hidden" style="display: none;" accept="image/*">
+    <main class="flex-1">
+        <!-- Header -->
+        <div class="border-b bg-muted/30">
+            <div class="container mx-auto px-4 py-12 md:py-16">
+                <h1 class="text-3xl font-bold tracking-tight">Pengaturan Profil</h1>
+                <p class="text-muted-foreground mt-2">Kelola informasi pribadi dan keamanan akun Anda.</p>
             </div>
         </div>
 
-        <div class="col-lg-8">
-            <div class="profile-container h-100">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <!-- Left Sidebar: Profile Picture -->
+                <div class="lg:col-span-4">
+                    <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+                        <div class="p-6 text-center space-y-6">
+                            <h3 class="font-semibold text-lg">Foto Profil</h3>
 
-                @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
+                            <div class="relative inline-block group">
+                                <div
+                                    class="h-40 w-40 rounded-full border-4 border-muted overflow-hidden bg-muted group-hover:opacity-90 transition-opacity">
+                                    @if ($user->profile_picture)
+                                        <img id="profilePreview"
+                                            src="{{ asset('uploads/profile/' . $user->profile_picture) }}"
+                                            class="h-full w-full object-cover" alt="Foto Profil">
+                                    @else
+                                        <div
+                                            class="h-full w-full flex items-center justify-center text-muted-foreground">
+                                            <i class="bi bi-person text-6xl"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                                <button type="button" onclick="document.getElementById('profileInputFile').click()"
+                                    class="absolute bottom-0 right-0 h-10 w-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg border-2 border-background hover:scale-110 transition-transform">
+                                    <i class="bi bi-camera-fill"></i>
+                                </button>
+                            </div>
 
-                <h4 class="section-title"><i class="bi bi-person-circle me-2"></i>Informasi Akun</h4>
-                <form action="{{ route('customer.profil.update') }}" method="POST">
-                    @csrf
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label class="form-label">Nama Lengkap</label>
-                            <input type="text" name="name" class="form-control"
-                                   value="{{ old('name', $user->name) }}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Username</label>
-                            <input type="text" name="username" class="form-control"
-                                   value="{{ old('username', $user->username) }}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Email (opsional)</label>
-                            <input type="email" name="email" class="form-control"
-                                   value="{{ old('email', $user->email) }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">No. Telepon</label>
-                            <input type="text" name="no_telepon" class="form-control"
-                                   value="{{ old('no_telepon', $user->no_telepon) }}">
-                        </div>
-                        <div class="col-12">
-                            <h4 class="section-title mt-4"><i class="bi bi-key me-2"></i>Ganti Password</h4>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Password Baru (opsional)</label>
-                            <input type="password" name="password" class="form-control"
-                                   placeholder="Isi jika ingin mengganti password">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Konfirmasi Password Baru</label>
-                            <input type="password" name="password_confirmation" class="form-control"
-                                   placeholder="Ulangi password baru">
+                            <div class="space-y-2">
+                                <p class="text-xs text-muted-foreground leading-relaxed px-4">
+                                    Format JPG atau PNG. Maksimum 5MB.
+                                </p>
+                            </div>
+
+                            <input type="file" id="profileInputFile" name="profile_picture_hidden"
+                                style="display: none;" accept="image/*">
                         </div>
                     </div>
-                    <input type="hidden" name="cropped_image" id="croppedImage">
-                    <div class="text-end mt-5">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-save me-2"></i>Simpan Perubahan
-                        </button>
+                </div>
+
+                <!-- Right Side: Account Info Form -->
+                <div class="lg:col-span-8">
+                    <div class="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
+                        <div class="border-b p-6">
+                            <h3 class="font-semibold text-xl">Informasi Akun</h3>
+                            <p class="text-sm text-muted-foreground">Detail profil Anda akan muncul di seluruh platform.
+                            </p>
+                        </div>
+                        <div class="p-6">
+                            @if (session('success'))
+                                <div
+                                    class="mb-6 rounded-lg border border-green-500/50 bg-green-500/10 p-4 text-sm text-green-600 flex items-center gap-3">
+                                    <i class="bi bi-check-circle text-base"></i>
+                                    <p>{{ session('success') }}</p>
+                                </div>
+                            @endif
+
+                            <form action="{{ route('customer.profil.update') }}" method="POST" class="space-y-8">
+                                @csrf
+                                <input type="hidden" name="cropped_image" id="croppedImage">
+
+                                <!-- Basic Info -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium leading-none" for="name">Nama
+                                            Lengkap</label>
+                                        <input type="text" name="name" id="name"
+                                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                            value="{{ old('name', $user->name) }}" required>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium leading-none" for="username">Username</label>
+                                        <input type="text" name="username" id="username"
+                                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                            value="{{ old('username', $user->username) }}" required>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium leading-none" for="email">Alamat
+                                            Email</label>
+                                        <input type="email" name="email" id="email"
+                                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                            value="{{ old('email', $user->email) }}">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium leading-none" for="no_telepon">No.
+                                            Telepon</label>
+                                        <input type="text" name="no_telepon" id="no_telepon"
+                                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                            value="{{ old('no_telepon', $user->no_telepon) }}">
+                                    </div>
+                                </div>
+
+                                <div class="border-t pt-8">
+                                    <h3 class="font-semibold text-lg mb-6">Keamanan Akun</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div class="space-y-2">
+                                            <label class="text-sm font-medium leading-none" for="password">Password
+                                                Baru</label>
+                                            <input type="password" name="password" id="password"
+                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                                placeholder="Biarkan kosong jika tetap">
+                                        </div>
+                                        <div class="space-y-2">
+                                            <label class="text-sm font-medium leading-none"
+                                                for="password_confirmation">Konfirmasi Password</label>
+                                            <input type="password" name="password_confirmation"
+                                                id="password_confirmation"
+                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-end pt-4">
+                                    <button type="submit"
+                                        class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-8">
+                                        Simpan Perubahan
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="cropModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-xl-custom">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title fw-semibold">Crop Foto Profil</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                <div class="text-center">
-                    <img id="cropImage" style="max-width: 100%;">
-                </div>
-                <div class="mt-3">
-                    <p class="text-muted small mb-0">Sesuaikan area crop untuk mendapatkan foto profil terbaik (rasio 1:1).</p>
                 </div>
             </div>
+        </div>
+    </main>
 
-            <div class="modal-footer">
-                <button class="btn btn-secondary-outline" data-bs-dismiss="modal">Batal</button>
-                <button id="cropBtn" class="btn btn-primary">Crop & Simpan</button>
+    <!-- Crop Modal Styled as Drawer/Centered Shadcn Modal -->
+    <div id="cropDialog"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+        <div
+            class="bg-card w-full max-w-sm rounded-xl border shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div class="p-4 border-b">
+                <h3 class="font-semibold">Sesuaikan Foto</h3>
+                <p class="text-xs text-muted-foreground">Atur posisi foto profil Anda.</p>
             </div>
-
+            <div class="p-4">
+                <div class="aspect-square bg-muted rounded-md overflow-hidden flex items-center justify-center">
+                    <img id="cropImage" class="max-w-full block">
+                </div>
+            </div>
+            <div class="p-4 flex gap-2 justify-end border-t bg-muted/30">
+                <button type="button" onclick="closeCrop()"
+                    class="h-9 px-4 rounded-md border border-input bg-background text-sm font-medium hover:bg-accent hover:text-accent-foreground">Batal</button>
+                <button type="button" id="cropBtn"
+                    class="h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90">Simpan
+                    Foto</button>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="modal fade" id="viewPhotoModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-semibold">Foto Profil Lengkap</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="fullProfileView" src="{{ $user->profile_picture ? asset('uploads/profile/' . $user->profile_picture) : asset('images/default.png') }}"
-                     style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,.1);" alt="Foto Profil Penuh">
-            </div>
-        </div>
-    </div>
-</div>
+    @include('include.footer-client')
 
+    <script>
+        let cropper;
+        const cropDialog = document.getElementById('cropDialog');
 
-@include('include.footer-client')
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-let cropper;
-
-document.getElementById('profileInputFile').addEventListener('change', function (event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-        document.getElementById('cropImage').src = e.target.result;
-
-        const cropModal = new bootstrap.Modal(document.getElementById('cropModal'));
-        cropModal.show();
-
-        document.getElementById('cropModal').addEventListener('shown.bs.modal', function () {
+        function closeCrop() {
             if (cropper) cropper.destroy();
+            cropDialog.classList.add('hidden');
+            cropDialog.classList.remove('flex');
+        }
 
-            cropper = new Cropper(document.getElementById('cropImage'), {
-                aspectRatio: 1,
-                viewMode: 1,
-                movable: true,
-                zoomable: true,
-                responsive: true
+        document.getElementById('profileInputFile').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('cropImage').src = e.target.result;
+                cropDialog.classList.remove('hidden');
+                cropDialog.classList.add('flex');
+
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(document.getElementById('cropImage'), {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    movable: true,
+                    zoomable: true,
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('cropBtn').addEventListener('click', function() {
+            if (!cropper) return;
+            const canvas = cropper.getCroppedCanvas({
+                width: 400,
+                height: 400
             });
-        }, { once: true });
-    };
+            const dataUrl = canvas.toDataURL();
 
-    reader.readAsDataURL(file);
-});
+            document.getElementById('profilePreview').src = dataUrl;
+            document.getElementById('croppedImage').value = dataUrl;
 
-document.getElementById('cropBtn').addEventListener('click', function () {
-    if (!cropper) return;
-
-    const canvas = cropper.getCroppedCanvas({ width: 450, height: 450 });
-    document.getElementById('profilePreview').src = canvas.toDataURL();
-    document.getElementById('fullProfileView').src = canvas.toDataURL();
-    document.getElementById('croppedImage').value = canvas.toDataURL();
-    document.getElementById('profileInputFile').value = '';
-
-    bootstrap.Modal.getInstance(document.getElementById('cropModal')).hide();
-});
-
-document.getElementById('viewPhotoModal').addEventListener('show.bs.modal', function () {
-    const previewSrc = document.getElementById('profilePreview').src;
-    document.getElementById('fullProfileView').src = previewSrc;
-});
-</script>
+            closeCrop();
+        });
+    </script>
 </body>
+
 </html>
