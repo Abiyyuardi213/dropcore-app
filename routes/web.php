@@ -48,6 +48,9 @@ Route::get('/', function () {
 
 Route::get('homepage', [HomepageController::class, 'index'])->name('homepage');
 Route::get('produk', [HomepageController::class, 'products'])->name('customer.products');
+Route::get('produk/{id}', [HomepageController::class, 'productDetail'])->name('customer.products.detail');
+Route::get('tentang', [HomepageController::class, 'about'])->name('customer.about');
+Route::get('berita', [HomepageController::class, 'news'])->name('customer.news');
 
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');

@@ -24,13 +24,13 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url('/tentang') }}"
+                        <a href="{{ route('customer.about') }}"
                             class="flex items-center gap-2 hover:text-white transition-colors">
                             <i class="bi bi-info-circle"></i> Tentang Kami
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url('/berita') }}"
+                        <a href="{{ route('customer.news') }}"
                             class="flex items-center gap-2 hover:text-white transition-colors">
                             <i class="bi bi-newspaper"></i> Berita
                         </a>

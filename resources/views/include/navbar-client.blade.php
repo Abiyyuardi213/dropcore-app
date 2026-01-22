@@ -9,27 +9,81 @@
         <div class="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
             <a href="{{ url('/homepage') }}" class="transition-colors hover:text-primary">Beranda</a>
             <a href="{{ route('customer.products') }}" class="transition-colors hover:text-primary">Produk</a>
-            <a href="{{ url('/tentang') }}" class="transition-colors hover:text-primary">Tentang Kami</a>
-            <a href="{{ url('/berita') }}" class="transition-colors hover:text-primary">Berita</a>
+            <a href="{{ route('customer.about') }}" class="transition-colors hover:text-primary">Tentang Kami</a>
+            <a href="{{ route('customer.news') }}" class="transition-colors hover:text-primary">Berita</a>
         </div>
 
 
         <!-- Right Side (Auth & Cart) -->
         <div class="flex items-center gap-4">
             @auth
-                <a href="{{ route('customer.cart') }}" id="cart-icon-wrapper"
-                    class="relative mr-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <i class="bi bi-cart3 text-xl"></i>
-                    @php
-                        $cartCount = \App\Models\Cart::where('user_id', Auth::id())->count();
-                    @endphp
-                    @if ($cartCount > 0)
-                        <span id="cart-count-badge"
-                            class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                            {{ $cartCount }}
-                        </span>
-                    @endif
-                </a>
+                <div class="relative group">
+                    <a href="{{ route('customer.cart') }}" id="cart-icon-wrapper"
+                        class="relative flex items-center justify-center text-muted-foreground hover:text-foreground transition-all duration-300 p-2 rounded-full hover:bg-accent">
+                        <i class="bi bi-cart3 text-xl"></i>
+                        @php
+                            $cartItems = \App\Models\Cart::where('user_id', Auth::id())
+                                ->with('product')
+                                ->latest()
+                                ->take(5)
+                                ->get();
+                            $cartCount = \App\Models\Cart::where('user_id', Auth::id())->count();
+                        @endphp
+                        @if ($cartCount > 0)
+                            <span id="cart-count-badge"
+                                class="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground border-2 border-background">
+                                {{ $cartCount }}
+                            </span>
+                        @endif
+                    </a>
+
+                    <!-- Mini Cart Dropdown -->
+                    <div
+                        class="absolute right-0 top-full mt-2 w-80 rounded-xl border border-border bg-popover/95 backdrop-blur-sm text-popover-foreground shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform translate-y-2 group-hover:translate-y-0">
+                        <div class="p-4 border-b">
+                            <h3 class="font-bold text-sm">Keranjang Belanja</h3>
+                        </div>
+                        <div class="max-h-[300px] overflow-y-auto p-4 space-y-4" id="mini-cart-items">
+                            @forelse($cartItems as $item)
+                                <div class="flex items-center gap-3 group/item">
+                                    <div class="h-12 w-12 rounded-lg bg-muted flex-shrink-0 overflow-hidden border">
+                                        @if ($item->product->image)
+                                            <img src="{{ asset('uploads/product/' . $item->product->image) }}"
+                                                class="h-full w-full object-contain p-1">
+                                        @else
+                                            <div
+                                                class="h-full w-full flex items-center justify-center bg-muted text-muted-foreground">
+                                                <i class="bi bi-image text-xs"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-semibold truncate">{{ $item->product->name }}</p>
+                                        <p class="text-[10px] text-muted-foreground">{{ $item->quantity }} x Rp
+                                            {{ number_format($item->product->price, 0, ',', '.') }}</p>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="py-4 text-center">
+                                    <i class="bi bi-cart-x text-2xl text-muted-foreground/30 mb-2 block"></i>
+                                    <p class="text-xs text-muted-foreground">Keranjang Anda kosong</p>
+                                </div>
+                            @endforelse
+                        </div>
+                        @if ($cartCount > 5)
+                            <div class="px-4 py-2 bg-muted/30 text-center border-t">
+                                <p class="text-[10px] text-muted-foreground font-medium">+ {{ $cartCount - 5 }} produk
+                                    lainnya</p>
+                            </div>
+                        @endif
+                        <div class="p-4 border-t bg-muted/20">
+                            <a href="{{ route('customer.cart') }}"
+                                class="flex items-center justify-center w-full rounded-md bg-primary h-9 px-4 text-xs font-bold text-primary-foreground shadow transition-all hover:bg-primary/90">
+                                Lihat Semua Keranjang
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="relative group">
                     <button class="flex items-center gap-2 text-sm font-medium focus:outline-none">

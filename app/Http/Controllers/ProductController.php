@@ -42,14 +42,15 @@ class ProductController extends Controller
             'max_stock'     => 'nullable|integer|min:0',
             'category_id'   => 'required|exists:product_category,id',
             'uom_id'        => 'required|exists:uoms,id',
-            'image'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $data = $request->all();
 
         if ($request->hasFile('image')) {
             $file      = $request->file('image');
-            $filename  = uniqid() . '.' . $file->getClientOriginalExtension();
+            $extension = strtolower($file->getClientOriginalExtension());
+            $filename  = uniqid() . '.' . $extension;
             $file->move(public_path('uploads/product'), $filename);
             $data['image'] = $filename;
         }
@@ -91,14 +92,15 @@ class ProductController extends Controller
             'max_stock'     => 'nullable|integer|min:0',
             'category_id'   => 'required|exists:product_category,id',
             'uom_id'        => 'required|exists:uoms,id',
-            'image'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $data = $request->all();
 
         if ($request->hasFile('image')) {
             $file      = $request->file('image');
-            $filename  = uniqid() . '.' . $file->getClientOriginalExtension();
+            $extension = strtolower($file->getClientOriginalExtension());
+            $filename  = uniqid() . '.' . $extension;
             $file->move(public_path('uploads/product'), $filename);
             $data['image'] = $filename;
         }

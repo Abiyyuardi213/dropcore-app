@@ -155,7 +155,8 @@
                                         </div>
                                     </div>
 
-                                    <a href="#" class="absolute inset-0 z-0">
+                                    <a href="{{ route('customer.products.detail', $product->id) }}"
+                                        class="absolute inset-0 z-0">
                                         <span class="sr-only">Detail: {{ $product->name }}</span>
                                     </a>
                                 </div>

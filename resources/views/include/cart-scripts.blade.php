@@ -1,12 +1,16 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function addToCart(productId, event) {
+    function addToCart(productId, event, quantity = 1) {
         if (event) {
             event.preventDefault();
             event.stopPropagation();
         }
         // Find the product image for the animation
         let productCard = event ? event.target.closest('.group') : null;
+        if (!productCard && event && event.target) {
+            // Fallback for detail page where the structure might be different
+            productCard = event.target.closest('section') || document.body;
+        }
         let productImage = productCard ? productCard.querySelector('img') : null;
 
         fetch("{{ route('customer.cart.add') }}", {
@@ -17,7 +21,7 @@
                 },
                 body: JSON.stringify({
                     product_id: productId,
-                    quantity: 1
+                    quantity: quantity
                 })
             })
             .then(response => {
