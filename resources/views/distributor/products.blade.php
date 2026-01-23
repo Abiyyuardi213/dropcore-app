@@ -31,7 +31,7 @@
                             Anda.</p>
                     </div>
 
-                    <form action="{{ route('customer.products') }}" method="GET" class="flex items-center gap-2">
+                    <form action="{{ route('distributor.products') }}" method="GET" class="flex items-center gap-2">
                         <div class="relative group">
                             <input type="text" name="search" value="{{ request('search') }}"
                                 placeholder="Cari produk..."
@@ -55,13 +55,13 @@
                             Filter Kategori
                         </h3>
                         <nav class="flex flex-col space-y-1">
-                            <a href="{{ route('customer.products') }}"
+                            <a href="{{ route('distributor.products') }}"
                                 class="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium {{ !request('category') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground' }} transition-colors">
                                 <span>Semua Produk</span>
                                 <i class="bi bi-chevron-right text-[10px]"></i>
                             </a>
                             @foreach ($categories as $category)
-                                <a href="{{ route('customer.products', ['category' => $category->id, 'search' => request('search')]) }}"
+                                <a href="{{ route('distributor.products', ['category' => $category->id, 'search' => request('search')]) }}"
                                     class="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium {{ request('category') == $category->id ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground' }} transition-colors">
                                     <span>{{ $category->category_name }}</span>
                                     <i class="bi bi-chevron-right text-[10px]"></i>
@@ -93,7 +93,7 @@
                             <h3 class="text-lg font-medium">Produk tidak ditemukan</h3>
                             <p class="text-sm text-muted-foreground max-w-xs mt-1">Kami tidak dapat menemukan produk
                                 yang sesuai dengan filter atau pencarian Anda.</p>
-                            <a href="{{ route('customer.products') }}"
+                            <a href="{{ route('distributor.products') }}"
                                 class="mt-6 text-sm font-semibold text-primary hover:underline">Hapus semua filter</a>
                         </div>
                     @else
@@ -120,6 +120,15 @@
                                                 </span>
                                             </div>
                                         @endif
+
+                                        @if ($product->stok_sum_quantity <= 0)
+                                            <div class="absolute top-3 right-3">
+                                                <span
+                                                    class="inline-flex items-center rounded-md bg-destructive/10 border border-destructive/20 px-2 py-1 text-[10px] font-bold text-destructive uppercase tracking-wide">
+                                                    Habis
+                                                </span>
+                                            </div>
+                                        @endif
                                     </div>
 
                                     <!-- Content -->
@@ -143,10 +152,17 @@
                                                     {{ $product->uom->name ?? 'Unit' }}</span>
                                             </div>
                                             <div class="flex items-center gap-2 relative z-10">
-                                                <button onclick="addToCart('{{ $product->id }}', event)"
-                                                    class="flex-1 inline-flex items-center justify-center rounded-md bg-primary h-9 px-4 text-xs font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
-                                                    <i class="bi bi-cart-plus me-2"></i> Tambah
-                                                </button>
+                                                @if ($product->stok_sum_quantity > 0)
+                                                    <button onclick="addToCart('{{ $product->id }}', event)"
+                                                        class="flex-1 inline-flex items-center justify-center rounded-md bg-primary h-9 px-4 text-xs font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
+                                                        <i class="bi bi-cart-plus me-2"></i> Tambah
+                                                    </button>
+                                                @else
+                                                    <button disabled
+                                                        class="flex-1 inline-flex items-center justify-center rounded-md bg-muted h-9 px-4 text-xs font-medium text-muted-foreground shadow-sm cursor-not-allowed">
+                                                        <i class="bi bi-x-circle me-2"></i> Stok Habis
+                                                    </button>
+                                                @endif
                                                 <button
                                                     class="h-9 w-9 inline-flex items-center justify-center rounded-md border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors">
                                                     <i class="bi bi-heart"></i>
@@ -155,7 +171,7 @@
                                         </div>
                                     </div>
 
-                                    <a href="{{ route('customer.products.detail', $product->id) }}"
+                                    <a href="{{ route('distributor.products.detail', $product->id) }}"
                                         class="absolute inset-0 z-0">
                                         <span class="sr-only">Detail: {{ $product->name }}</span>
                                     </a>

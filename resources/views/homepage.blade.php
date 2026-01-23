@@ -43,7 +43,7 @@
                         infrastruktur IT dengan kualitas premium dan layanan efisien.
                     </p>
                     <div class="flex flex-wrap gap-4 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-                        <a href="{{ route('customer.products') }}"
+                        <a href="{{ route('distributor.products') }}"
                             class="inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
                             Mulai Belanja
                         </a>
@@ -91,12 +91,12 @@
                             Kategori Produk
                         </h3>
                         <nav class="flex flex-col space-y-1">
-                            <a href="{{ route('customer.products') }}"
+                            <a href="{{ route('distributor.products') }}"
                                 class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium bg-accent text-accent-foreground transition-colors">
                                 <i class="bi bi-grid text-xs"></i> Semua Produk
                             </a>
                             @forelse($categories as $category)
-                                <a href="{{ route('customer.products', ['category' => $category->id]) }}"
+                                <a href="{{ route('distributor.products', ['category' => $category->id]) }}"
                                     class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
                                     <i class="bi bi-chevron-right text-[10px]"></i> {{ $category->category_name }}
                                 </a>
@@ -135,7 +135,7 @@
                                     terbaik kami.</p>
                             </div>
                             <div class="flex items-center gap-2">
-                                <a href="{{ route('customer.products') }}"
+                                <a href="{{ route('distributor.products') }}"
                                     class="text-sm font-semibold text-primary hover:underline">Lihat Semua Katalog <i
                                         class="bi bi-arrow-right"></i></a>
                             </div>
@@ -212,7 +212,7 @@
                                         </div>
 
                                         <!-- Hidden overlay link -->
-                                        <a href="{{ route('customer.products.detail', $product->id) }}"
+                                        <a href="{{ route('distributor.products.detail', $product->id) }}"
                                             class="absolute inset-0 z-0">
                                             <span class="sr-only">Detail: {{ $product->name }}</span>
                                         </a>

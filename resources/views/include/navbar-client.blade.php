@@ -8,9 +8,9 @@
         <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
             <a href="{{ url('/homepage') }}" class="transition-colors hover:text-primary">Beranda</a>
-            <a href="{{ route('customer.products') }}" class="transition-colors hover:text-primary">Produk</a>
-            <a href="{{ route('customer.about') }}" class="transition-colors hover:text-primary">Tentang Kami</a>
-            <a href="{{ route('customer.news') }}" class="transition-colors hover:text-primary">Berita</a>
+            <a href="{{ route('distributor.products') }}" class="transition-colors hover:text-primary">Produk</a>
+            <a href="{{ route('distributor.about') }}" class="transition-colors hover:text-primary">Tentang Kami</a>
+            <a href="{{ route('distributor.news') }}" class="transition-colors hover:text-primary">Berita</a>
         </div>
 
 
@@ -18,7 +18,7 @@
         <div class="flex items-center gap-4">
             @auth
                 <div class="relative group">
-                    <a href="{{ route('customer.cart') }}" id="cart-icon-wrapper"
+                    <a href="{{ route('distributor.cart') }}" id="cart-icon-wrapper"
                         class="relative flex items-center justify-center text-muted-foreground hover:text-foreground transition-all duration-300 p-2 rounded-full hover:bg-accent">
                         <i class="bi bi-cart3 text-xl"></i>
                         @php
@@ -44,31 +44,7 @@
                             <h3 class="font-bold text-sm">Keranjang Belanja</h3>
                         </div>
                         <div class="max-h-[300px] overflow-y-auto p-4 space-y-4" id="mini-cart-items">
-                            @forelse($cartItems as $item)
-                                <div class="flex items-center gap-3 group/item">
-                                    <div class="h-12 w-12 rounded-lg bg-muted flex-shrink-0 overflow-hidden border">
-                                        @if ($item->product->image)
-                                            <img src="{{ asset('uploads/product/' . $item->product->image) }}"
-                                                class="h-full w-full object-contain p-1">
-                                        @else
-                                            <div
-                                                class="h-full w-full flex items-center justify-center bg-muted text-muted-foreground">
-                                                <i class="bi bi-image text-xs"></i>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-xs font-semibold truncate">{{ $item->product->name }}</p>
-                                        <p class="text-[10px] text-muted-foreground">{{ $item->quantity }} x Rp
-                                            {{ number_format($item->product->price, 0, ',', '.') }}</p>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="py-4 text-center">
-                                    <i class="bi bi-cart-x text-2xl text-muted-foreground/30 mb-2 block"></i>
-                                    <p class="text-xs text-muted-foreground">Keranjang Anda kosong</p>
-                                </div>
-                            @endforelse
+                            @include('include.mini-cart-list')
                         </div>
                         @if ($cartCount > 5)
                             <div class="px-4 py-2 bg-muted/30 text-center border-t">
@@ -77,7 +53,7 @@
                             </div>
                         @endif
                         <div class="p-4 border-t bg-muted/20">
-                            <a href="{{ route('customer.cart') }}"
+                            <a href="{{ route('distributor.cart') }}"
                                 class="flex items-center justify-center w-full rounded-md bg-primary h-9 px-4 text-xs font-bold text-primary-foreground shadow transition-all hover:bg-primary/90">
                                 Lihat Semua Keranjang
                             </a>
@@ -105,12 +81,12 @@
                     <div
                         class="absolute right-0 top-full mt-2 w-56 rounded-md border border-border bg-popover text-popover-foreground shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                         <div class="p-1">
-                            <a href="{{ route('customer.profil') }}"
+                            <a href="{{ route('distributor.profil') }}"
                                 class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground">
                                 <i class="bi bi-person mr-2 h-4 w-4"></i>
                                 <span>Profil</span>
                             </a>
-                            <a href="{{ url('/order') }}"
+                            <a href="{{ route('distributor.order.index') }}"
                                 class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground">
                                 <i class="bi bi-bag mr-2 h-4 w-4"></i>
                                 <span>Order</span>
@@ -125,7 +101,7 @@
                     </div>
                 </div>
             @else
-                <a href="{{ route('login.customer') }}"
+                <a href="{{ route('login.distributor') }}"
                     class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2">
                     Masuk
                 </a>

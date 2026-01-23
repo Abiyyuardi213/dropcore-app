@@ -184,11 +184,11 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="berat">Berat (Kg)</label>
+                                                    <label for="weight">Berat (Kg)</label>
                                                     <input type="number" step="0.01"
-                                                        class="form-control @error('berat') is-invalid @enderror"
-                                                        name="berat" value="{{ old('berat', $product->berat) }}">
-                                                    @error('berat')
+                                                        class="form-control @error('weight') is-invalid @enderror"
+                                                        name="weight" value="{{ old('weight', $product->weight) }}">
+                                                    @error('weight')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>

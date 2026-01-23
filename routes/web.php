@@ -47,28 +47,28 @@ Route::get('/', function () {
 });
 
 Route::get('homepage', [HomepageController::class, 'index'])->name('homepage');
-Route::get('produk', [HomepageController::class, 'products'])->name('customer.products');
-Route::get('produk/{id}', [HomepageController::class, 'productDetail'])->name('customer.products.detail');
-Route::get('tentang', [HomepageController::class, 'about'])->name('customer.about');
-Route::get('berita', [HomepageController::class, 'news'])->name('customer.news');
+Route::get('produk', [HomepageController::class, 'products'])->name('distributor.products');
+Route::get('produk/{id}', [HomepageController::class, 'productDetail'])->name('distributor.products.detail');
+Route::get('tentang', [HomepageController::class, 'about'])->name('distributor.about');
+Route::get('berita', [HomepageController::class, 'news'])->name('distributor.news');
 
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-Route::get('/login-customer', function () {
-    return view('auth.login-customer');
-})->name('login.customer.form')->middleware('guest');
+Route::get('/login-distributor', function () {
+    return view('auth.login-distributor');
+})->name('login.distributor.form')->middleware('guest');
 
-Route::post('/login-customer', [AuthController::class, 'loginCustomer'])
-    ->name('login.customer');
+Route::post('/login-distributor', [AuthController::class, 'loginDistributor'])
+    ->name('login.distributor');
 
-Route::get('/register-customer', [AuthController::class, 'showRegisterForm'])
-    ->name('register.customer.form')->middleware('guest');
+Route::get('/register-distributor', [AuthController::class, 'showRegisterForm'])
+    ->name('register.distributor.form')->middleware('guest');
 
-Route::post('/register-customer', [AuthController::class, 'registerCustomer'])
-    ->name('register.customer');
+Route::post('/register-distributor', [AuthController::class, 'registerDistributor'])
+    ->name('register.distributor');
 
 Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
@@ -213,19 +213,39 @@ Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
     Route::resource('laporan', LaporanController::class);
     Route::resource('stock-opname', StockOpnameController::class);
     Route::resource('divisi', DivisiController::class);
+    Route::resource('divisi', DivisiController::class);
     Route::resource('jabatan', JabatanController::class);
+
+    // Admin Order Management
+    Route::get('orders', [\App\Http\Controllers\AdminOrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('orders/{id}', [\App\Http\Controllers\AdminOrderController::class, 'show'])->name('admin.orders.show');
+    Route::get('orders/{id}/invoice', [\App\Http\Controllers\AdminOrderController::class, 'invoice'])->name('admin.orders.invoice');
+    Route::patch('orders/{id}/status', [\App\Http\Controllers\AdminOrderController::class, 'updateStatus'])->name('admin.orders.update-status');
+
+    // Jasa Pengiriman & Metode Pembayaran management
+    Route::post('jasa-pengiriman/{id}/toggle-status', [\App\Http\Controllers\JasaPengirimanController::class, 'toggleStatus'])->name('jasa-pengiriman.toggleStatus');
+    Route::resource('jasa-pengiriman', \App\Http\Controllers\JasaPengirimanController::class);
+
+    Route::post('metode-pembayaran/{id}/toggle-status', [\App\Http\Controllers\MetodePembayaranController::class, 'toggleStatus'])->name('metode-pembayaran.toggleStatus');
+    Route::resource('metode-pembayaran', \App\Http\Controllers\MetodePembayaranController::class);
 });
 
-Route::middleware(['role:customer'])->group(function () {
-    Route::get('profil-customer', [UserController::class, 'profilCustomer'])
-        ->name('customer.profil');
+Route::middleware(['role:distributor'])->group(function () {
+    Route::get('profil-distributor', [UserController::class, 'profilDistributor'])
+        ->name('distributor.profil');
 
-    Route::post('profil-customer', [UserController::class, 'updateProfilCustomer'])
-        ->name('customer.profil.update');
+    Route::post('profil-distributor', [UserController::class, 'updateProfilDistributor'])
+        ->name('distributor.profil.update');
 
     // Cart Routes
-    Route::get('keranjang', [CartController::class, 'index'])->name('customer.cart');
-    Route::post('keranjang/tambah', [CartController::class, 'add'])->name('customer.cart.add');
-    Route::patch('keranjang/update/{id}', [CartController::class, 'update'])->name('customer.cart.update');
-    Route::delete('keranjang/hapus/{id}', [CartController::class, 'remove'])->name('customer.cart.remove');
+    Route::get('keranjang', [CartController::class, 'index'])->name('distributor.cart');
+    Route::post('keranjang/tambah', [CartController::class, 'add'])->name('distributor.cart.add');
+    Route::patch('keranjang/update/{id}', [CartController::class, 'update'])->name('distributor.cart.update');
+    Route::delete('keranjang/hapus/{id}', [CartController::class, 'remove'])->name('distributor.cart.remove');
+
+    // Order Routes
+    Route::post('checkout', [\App\Http\Controllers\OrderController::class, 'checkout'])->name('distributor.checkout');
+    Route::get('pesanan', [\App\Http\Controllers\OrderController::class, 'index'])->name('distributor.order.index');
+    Route::get('pesanan/{id}', [\App\Http\Controllers\OrderController::class, 'show'])->name('distributor.order.show');
+    Route::get('pesanan/sukses/{id}', [\App\Http\Controllers\OrderController::class, 'success'])->name('distributor.order.success');
 });

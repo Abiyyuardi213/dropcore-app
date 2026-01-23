@@ -36,7 +36,7 @@
                             <h3 class="text-lg font-medium">Keranjang Anda kosong</h3>
                             <p class="text-sm text-muted-foreground max-w-xs mt-1">Sepertinya Anda belum menambahkan
                                 produk apapun ke keranjang.</p>
-                            <a href="{{ route('customer.products') }}"
+                            <a href="{{ route('distributor.products') }}"
                                 class="mt-6 inline-flex items-center justify-center rounded-md bg-primary h-10 px-6 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
                                 Mulai Belanja
                             </a>
@@ -81,7 +81,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-4">
-                                                    <form action="{{ route('customer.cart.update', $item->id) }}"
+                                                    <form action="{{ route('distributor.cart.update', $item->id) }}"
                                                         method="POST" class="flex items-center justify-center gap-2">
                                                         @csrf
                                                         @method('PATCH')
@@ -102,7 +102,7 @@
                                                         {{ $item->product->uom->name ?? 'unit' }}</div>
                                                 </td>
                                                 <td class="px-6 py-4 text-center">
-                                                    <form action="{{ route('customer.cart.remove', $item->id) }}"
+                                                    <form action="{{ route('distributor.cart.remove', $item->id) }}"
                                                         method="POST">
                                                         @csrf
                                                         @method('DELETE')
@@ -145,12 +145,29 @@
                                 <span class="text-primary">Rp {{ number_format($subtotal * 1.11, 0, ',', '.') }}</span>
                             </div>
 
-                            <button
-                                class="w-full inline-flex items-center justify-center rounded-md bg-primary h-11 px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 mt-6 {{ $cartItems->isEmpty() ? 'opacity-50 cursor-not-allowed' : '' }}"
-                                {{ $cartItems->isEmpty() ? 'disabled' : '' }}>
-                                Lanjut ke Checkout
-                            </button>
-                            <a href="{{ route('customer.products') }}"
+                            <form action="{{ route('distributor.checkout') }}" method="POST">
+                                @csrf
+                                <div class="mb-4">
+                                    <label for="shipping_address" class="block text-sm font-medium mb-1">Alamat
+                                        Pengiriman</label>
+                                    <textarea name="shipping_address" id="shipping_address" rows="3"
+                                        class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                                        placeholder="Masukkan alamat lengkap..." required>{{ Auth::user()->alamat }}</textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="notes" class="block text-sm font-medium mb-1">Catatan Tambahan
+                                        (Opsional)</label>
+                                    <textarea name="notes" id="notes" rows="2"
+                                        class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                                        placeholder="Informasi khusus untuk pengiriman..."></textarea>
+                                </div>
+                                <button type="submit"
+                                    class="w-full inline-flex items-center justify-center rounded-md bg-primary h-11 px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 mt-2 {{ $cartItems->isEmpty() ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                    {{ $cartItems->isEmpty() ? 'disabled' : '' }}>
+                                    Lanjut ke Checkout
+                                </button>
+                            </form>
+                            <a href="{{ route('distributor.products') }}"
                                 class="w-full inline-flex items-center justify-center rounded-md border border-input bg-background h-10 px-8 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
                                 Kembali Belanja
                             </a>
@@ -162,6 +179,17 @@
     </main>
 
     @include('include.footer-client')
+    @include('include.cart-scripts')
+
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof showToast === 'function') {
+                    showToast('{{ session('success') }}', 'success');
+                }
+            });
+        </script>
+    @endif
 </body>
 
 </html>

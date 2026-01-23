@@ -27,7 +27,8 @@
                 <nav class="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                     <a href="{{ route('homepage') }}" class="hover:text-primary transition-colors">Beranda</a>
                     <i class="bi bi-chevron-right text-[10px]"></i>
-                    <a href="{{ route('customer.products') }}" class="hover:text-primary transition-colors">Katalog</a>
+                    <a href="{{ route('distributor.products') }}"
+                        class="hover:text-primary transition-colors">Katalog</a>
                     <i class="bi bi-chevron-right text-[10px]"></i>
                     <span class="text-foreground truncate">{{ $product->name }}</span>
                 </nav>
@@ -75,15 +76,37 @@
                                 <span class="text-sm text-muted-foreground">/
                                     {{ $product->uom->name ?? 'Unit' }}</span>
                             </div>
+
+                            <div class="mt-2">
+                                @if ($product->stok_sum_quantity > 5)
+                                    <p class="text-sm font-medium text-emerald-600 flex items-center gap-2">
+                                        <i class="bi bi-check-circle-fill"></i> Stok Tersedia
+                                        <span
+                                            class="text-xs text-muted-foreground">({{ $product->stok_sum_quantity }})</span>
+                                    </p>
+                                @elseif($product->stok_sum_quantity > 0)
+                                    <p class="text-sm font-medium text-amber-600 flex items-center gap-2">
+                                        <i class="bi bi-exclamation-circle-fill"></i> Stok Terbatas
+                                        <span
+                                            class="text-xs text-muted-foreground">({{ $product->stok_sum_quantity }})</span>
+                                    </p>
+                                @else
+                                    <p class="text-sm font-medium text-destructive flex items-center gap-2">
+                                        <i class="bi bi-x-circle-fill"></i> Stok Habis
+                                    </p>
+                                @endif
+                            </div>
                         </div>
 
                         <div class="space-y-4 pt-6 border-t">
                             <div class="flex items-center gap-4">
                                 <label for="quantity" class="text-sm font-medium">Jumlah:</label>
-                                <div class="flex items-center border rounded-md">
+                                <div
+                                    class="flex items-center border rounded-md {{ $product->stok_sum_quantity <= 0 ? 'opacity-50 pointer-events-none' : '' }}">
                                     <button type="button" class="px-3 py-1 hover:bg-accent transition-colors border-r"
                                         id="btn-minus">-</button>
                                     <input type="number" id="quantity" value="1" min="1"
+                                        max="{{ $product->stok_sum_quantity }}"
                                         class="w-12 text-center bg-transparent focus:outline-none text-sm font-medium">
                                     <button type="button" class="px-3 py-1 hover:bg-accent transition-colors border-l"
                                         id="btn-plus">+</button>
@@ -91,10 +114,17 @@
                             </div>
 
                             <div class="flex flex-col sm:flex-row gap-4">
-                                <button onclick="addToCartDetailed('{{ $product->id }}')"
-                                    class="flex-1 inline-flex items-center justify-center rounded-md bg-primary h-12 px-8 text-sm font-semibold text-primary-foreground shadow transition-colors hover:bg-primary/90">
-                                    <i class="bi bi-cart-plus me-2 text-lg"></i> Tambah ke Keranjang
-                                </button>
+                                @if ($product->stok_sum_quantity > 0)
+                                    <button onclick="addToCartDetailed('{{ $product->id }}')"
+                                        class="flex-1 inline-flex items-center justify-center rounded-md bg-primary h-12 px-8 text-sm font-semibold text-primary-foreground shadow transition-colors hover:bg-primary/90">
+                                        <i class="bi bi-cart-plus me-2 text-lg"></i> Tambah ke Keranjang
+                                    </button>
+                                @else
+                                    <button disabled
+                                        class="flex-1 inline-flex items-center justify-center rounded-md bg-muted h-12 px-8 text-sm font-semibold text-muted-foreground shadow-sm cursor-not-allowed">
+                                        <i class="bi bi-x-circle me-2 text-lg"></i> Stok Habis
+                                    </button>
+                                @endif
                                 <button
                                     class="h-12 w-12 inline-flex items-center justify-center rounded-md border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors group">
                                     <i class="bi bi-heart group-hover:scale-110 transition-transform"></i>
@@ -170,7 +200,7 @@
                                     {{ $rel->name }}</h4>
                                 <p class="text-sm font-bold text-primary">Rp
                                     {{ number_format($rel->price, 0, ',', '.') }}</p>
-                                <a href="{{ route('customer.products.detail', $rel->id) }}"
+                                <a href="{{ route('distributor.products.detail', $rel->id) }}"
                                     class="absolute inset-0 z-0">
                                     <span class="sr-only">Lihat {{ $rel->name }}</span>
                                 </a>

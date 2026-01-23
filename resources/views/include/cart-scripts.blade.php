@@ -13,7 +13,7 @@
         }
         let productImage = productCard ? productCard.querySelector('img') : null;
 
-        fetch("{{ route('customer.cart.add') }}", {
+        fetch("{{ route('distributor.cart.add') }}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -26,7 +26,7 @@
             })
             .then(response => {
                 if (response.status === 401) {
-                    window.location.href = "{{ route('login.customer') }}";
+                    window.location.href = "{{ route('login.distributor') }}";
                     return;
                 }
                 return response.json();
@@ -35,9 +35,11 @@
                 if (data && data.success) {
                     if (productImage) {
                         animateToCart(productImage, data.cart_count);
+                        if (data.mini_cart_html) updateMiniCart(data.mini_cart_html);
                     } else {
                         showSuccessToast(data.success);
                         updateCartCount(data.cart_count);
+                        if (data.mini_cart_html) updateMiniCart(data.mini_cart_html);
                     }
                 }
             })
@@ -106,11 +108,22 @@
         }
     }
 
+    function updateMiniCart(htmlContent) {
+        const miniCartContainer = document.getElementById('mini-cart-items');
+        if (miniCartContainer) {
+            miniCartContainer.innerHTML = htmlContent;
+        }
+    }
+
     function showSuccessToast(message) {
+        showToast(message, 'success');
+    }
+
+    function showToast(message, type = 'success') {
         Swal.fire({
-            title: 'Berhasil!',
+            title: type === 'success' ? 'Berhasil!' : (type === 'error' ? 'Gagal!' : 'Info'),
             text: message,
-            icon: 'success',
+            icon: type,
             toast: true,
             position: 'top-end',
             showConfirmButton: false,

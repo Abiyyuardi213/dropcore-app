@@ -22,6 +22,7 @@ class User extends Authenticatable
         'nip',
         'name',
         'nik',
+        'npwp',
         'username',
         'email',
         'no_telepon',

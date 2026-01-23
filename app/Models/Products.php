@@ -26,6 +26,7 @@ class Products extends Model
         'category_id',
         'uom_id',
         'image',
+        'weight', // Added weight column
     ];
 
     protected static function booted()
@@ -101,7 +102,8 @@ class Products extends Model
             'merk'        => $data['merk'] ?? null,
             'description' => $data['description'] ?? null,
             'dimensi'     => $data['dimensi'] ?? null,
-            'berat'       => $data['berat'] ?? null,
+            'berat'       => $data['weight'] ?? null, // Sync both for now or legacy
+            'weight'      => $data['weight'] ?? null,
             'price'       => str_replace(',', '', $data['price']),
             'min_stock'   => $data['min_stock'] ?? 0,
             'max_stock'   => $data['max_stock'] ?? null,
@@ -124,7 +126,8 @@ class Products extends Model
             'merk'        => $data['merk']       ?? $this->merk,
             'description' => $data['description'] ?? $this->description,
             'dimensi'     => $data['dimensi']    ?? $this->dimensi,
-            'berat'       => $data['berat']      ?? $this->berat,
+            'berat'       => $data['weight']     ?? $this->berat,
+            'weight'      => $data['weight']     ?? $this->weight,
             'price'       => isset($data['price']) ? str_replace(',', '', $data['price']) : $this->price,
             'min_stock'   => $data['min_stock']  ?? $this->min_stock,
             'max_stock'   => $data['max_stock']  ?? $this->max_stock,
@@ -147,5 +150,15 @@ class Products extends Model
     public function uom()
     {
         return $this->belongsTo(Uom::class, 'uom_id');
+    }
+
+    public function stok()
+    {
+        return $this->hasMany(Stok::class, 'produk_id');
+    }
+
+    public function getTotalStockAttribute()
+    {
+        return $this->stok()->sum('quantity');
     }
 }

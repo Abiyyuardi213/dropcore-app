@@ -173,6 +173,21 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a href="{{ route('jasa-pengiriman.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/jasa-pengiriman*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-shipping-fast"></i>
+                                <p>Jasa Pengiriman</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('metode-pembayaran.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/metode-pembayaran*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-money-check-alt"></i>
+                                <p>Metode Pembayaran</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
 
@@ -329,6 +344,14 @@
                         </li>
 
                     </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('admin.orders.index') }}"
+                        class="nav-link {{ Request::is('admin/orders*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-shopping-cart"></i>
+                        <p>Pesanan Distributor</p>
+                    </a>
                 </li>
 
                 <li class="nav-item">

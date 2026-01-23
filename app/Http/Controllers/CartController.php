@@ -15,7 +15,7 @@ class CartController extends Controller
             ->with(['product.category', 'product.uom'])
             ->get();
 
-        return view('customer.cart', compact('cartItems'));
+        return view('distributor.cart', compact('cartItems'));
     }
 
     public function add(Request $request)
@@ -48,9 +48,18 @@ class CartController extends Controller
             ]);
         }
 
+        $cartItems = Cart::where('user_id', $user->id)
+            ->with('product')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $miniCartHtml = view('include.mini-cart-list', compact('cartItems'))->render();
+
         return response()->json([
             'success' => 'Produk berhasil ditambahkan ke keranjang.',
-            'cart_count' => Cart::where('user_id', $user->id)->count()
+            'cart_count' => Cart::where('user_id', $user->id)->count(),
+            'mini_cart_html' => $miniCartHtml
         ]);
     }
 

@@ -69,8 +69,8 @@
                     </div>
                     <div class="relative">
                         <div class="aspect-video rounded-2xl bg-muted overflow-hidden border shadow-xl">
-                            <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=1200&auto=format&fit=crop"
-                                alt="Server Room" class="object-cover w-full h-full">
+                            <img src="{{ asset('image/server-room.jpg') }}" alt="Server Room"
+                                class="object-cover w-full h-full">
                         </div>
                         <div
                             class="absolute -bottom-6 -left-6 bg-primary text-primary-foreground p-8 rounded-2xl shadow-2xl hidden md:block">
@@ -141,7 +141,7 @@
                             unggulan kami.
                         </p>
                         <div class="flex flex-wrap justify-center gap-4">
-                            <a href="{{ route('customer.products') }}"
+                            <a href="{{ route('distributor.products') }}"
                                 class="bg-primary text-primary-foreground px-8 py-3 rounded-full font-bold hover:bg-primary/90 transition-colors">Lihat
                                 Produk</a>
                             <a href="#"

@@ -23,8 +23,8 @@ class RoleSeeder extends Seeder
             ],
             [
                 'id' => (string) Str::uuid(),
-                'role_name' => 'customer',
-                'role_description' => 'konsumen',
+                'role_name' => 'distributor',
+                'role_description' => 'distributor',
                 'role_status' => 1,
             ],
         ]);

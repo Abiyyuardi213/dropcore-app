@@ -231,22 +231,22 @@ class UserController extends Controller
         return redirect()->route('user.profil')->with('success', 'Profil berhasil diperbarui');
     }
 
-    public function profilCustomer()
+    public function profilDistributor()
     {
         $user = auth()->user();
 
-        if ($user->role->role_name !== 'customer') {
+        if ($user->role->role_name !== 'distributor') {
             abort(403, 'Anda tidak memiliki akses.');
         }
 
-        return view('customer.profil-client', compact('user'));
+        return view('distributor.profil-client', compact('user'));
     }
 
-    public function updateProfilCustomer(Request $request)
+    public function updateProfilDistributor(Request $request)
     {
         $user = auth()->user();
 
-        if ($user->role->role_name !== 'customer') {
+        if ($user->role->role_name !== 'distributor') {
             abort(403, 'Anda tidak memiliki akses.');
         }
 
@@ -255,11 +255,14 @@ class UserController extends Controller
             'username' => ['required', 'string', Rule::unique('users', 'username')->ignore($user->id)],
             'email' => ['nullable', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'no_telepon' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
+            'nik' => ['nullable', 'string', 'max:50', Rule::unique('users', 'nik')->ignore($user->id)],
+            'npwp' => 'nullable|string|max:50',
             'password' => 'nullable|min:6',
             'cropped_image' => 'nullable|string',
         ]);
 
-        $data = $request->only('name', 'username', 'email', 'no_telepon');
+        $data = $request->only('name', 'username', 'email', 'no_telepon', 'alamat', 'nik', 'npwp');
 
         if (!empty($request->password)) {
             $data['password'] = Hash::make($request->password);
@@ -290,6 +293,6 @@ class UserController extends Controller
         }
 
         $user->update($data);
-        return redirect()->route('customer.profil')->with('success', 'Profil berhasil diperbarui');
+        return redirect()->route('distributor.profil')->with('success', 'Profil berhasil diperbarui');
     }
 }

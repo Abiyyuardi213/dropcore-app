@@ -25,7 +25,7 @@ class HomepageController extends Controller
 
     public function products(Request $request)
     {
-        $query = \App\Models\Products::with(['category', 'uom'])->latest();
+        $query = \App\Models\Products::with(['category', 'uom'])->withSum('stok', 'quantity')->latest();
 
         if ($request->has('category') && $request->category != '') {
             $query->where('category_id', $request->category);
@@ -38,23 +38,23 @@ class HomepageController extends Controller
         $products = $query->paginate(12);
         $categories = \App\Models\Category::all();
 
-        return view('customer.products', compact('products', 'categories'));
+        return view('distributor.products', compact('products', 'categories'));
     }
 
     public function productDetail($id)
     {
-        $product = \App\Models\Products::with(['category', 'uom'])->findOrFail($id);
+        $product = \App\Models\Products::with(['category', 'uom'])->withSum('stok', 'quantity')->findOrFail($id);
         $relatedProducts = \App\Models\Products::where('category_id', $product->category_id)
             ->where('id', '!=', $id)
             ->take(4)
             ->get();
 
-        return view('customer.product-detail', compact('product', 'relatedProducts'));
+        return view('distributor.product-detail', compact('product', 'relatedProducts'));
     }
 
     public function about()
     {
-        return view('customer.about');
+        return view('distributor.about');
     }
 
     public function news()
@@ -83,6 +83,6 @@ class HomepageController extends Controller
                 'image' => 'https://images.unsplash.com/photo-1601597111158-2fca2974d393?q=80&w=800&auto=format&fit=crop'
             ]
         ];
-        return view('customer.news', compact('newsItems'));
+        return view('distributor.news', compact('newsItems'));
     }
 }

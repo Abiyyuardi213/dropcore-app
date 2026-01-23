@@ -88,7 +88,7 @@
                                 </div>
                             @endif
 
-                            <form action="{{ route('customer.profil.update') }}" method="POST" class="space-y-8">
+                            <form action="{{ route('distributor.profil.update') }}" method="POST" class="space-y-8">
                                 @csrf
                                 <input type="hidden" name="cropped_image" id="croppedImage">
 
@@ -120,6 +120,33 @@
                                         <input type="text" name="no_telepon" id="no_telepon"
                                             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                             value="{{ old('no_telepon', $user->no_telepon) }}">
+                                    </div>
+
+                                    <div class="space-y-2 md:col-span-2">
+                                        <label class="text-sm font-medium leading-none" for="alamat">Alamat
+                                            Lengkap</label>
+                                        <textarea name="alamat" id="alamat" rows="3"
+                                            class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">{{ old('alamat', $user->alamat) }}</textarea>
+                                        <p class="text-[0.8rem] text-muted-foreground">Alamat ini akan digunakan sebagai
+                                            alamat pengiriman default.</p>
+                                    </div>
+
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium leading-none" for="nik">NIK / No.
+                                            KTP</label>
+                                        <input type="text" name="nik" id="nik"
+                                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                            value="{{ old('nik', $user->nik) }}"
+                                            placeholder="Nomor Induk Kependudukan">
+                                    </div>
+
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium leading-none" for="npwp">NPWP
+                                            (Opsional)</label>
+                                        <input type="text" name="npwp" id="npwp"
+                                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                            value="{{ old('npwp', $user->npwp) }}"
+                                            placeholder="Nomor Pokok Wajib Pajak">
                                     </div>
                                 </div>
 

@@ -47,7 +47,7 @@ class AuthController extends Controller
                 return redirect()->intended('/admin/dashboard')->with('success', 'Login berhasil! Selamat datang kembali.');
             }
 
-            if ($user->role->role_name === 'customer') {
+            if ($user->role->role_name === 'distributor') {
                 return redirect()->intended('/homepage')->with('success', 'Login berhasil! Selamat datang kembali.');
             }
 
@@ -59,7 +59,7 @@ class AuthController extends Controller
         ])->withInput();
     }
 
-    public function loginCustomer(Request $request)
+    public function loginDistributor(Request $request)
     {
         $request->validate([
             'login' => 'required|string',
@@ -71,10 +71,10 @@ class AuthController extends Controller
 
         if ($user && Hash::check($request->password, $user->password)) {
 
-            // Cek jika bukan customer
-            if ($user->role->role_name !== 'customer') {
+            // Cek jika bukan distributor
+            if ($user->role->role_name !== 'distributor') {
                 return back()->withErrors([
-                    'login' => 'Akun ini bukan akun customer. Gunakan halaman login admin.',
+                    'login' => 'Akun ini bukan akun distributor. Gunakan halaman login admin.',
                 ]);
             }
 
@@ -92,7 +92,7 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'login-customer' => 'Kredensial salah atau tidak ditemukan.',
+            'login-distributor' => 'Kredensial salah atau tidak ditemukan.',
         ])->withInput();
     }
 
@@ -104,8 +104,8 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        if ($roleName === 'customer') {
-            return redirect('/login-customer')->with('success', 'Logout berhasil! Sampai jumpa lagi.');
+        if ($roleName === 'distributor') {
+            return redirect('/login-distributor')->with('success', 'Logout berhasil! Sampai jumpa lagi.');
         }
 
         return redirect('/login')->with('success', 'Logout berhasil! Sampai jumpa lagi.');
@@ -113,10 +113,10 @@ class AuthController extends Controller
 
     public function showRegisterForm()
     {
-        return view('auth.register-customer');
+        return view('auth.register-distributor');
     }
 
-    public function registerCustomer(Request $request)
+    public function registerDistributor(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -125,11 +125,11 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // Cari role customer
-        $customerRole = \App\Models\Role::where('role_name', 'customer')->first();
+        // Cari role distributor
+        $distributorRole = \App\Models\Role::where('role_name', 'distributor')->first();
 
-        if (!$customerRole) {
-            return back()->withErrors(['error' => 'Sistem belum siap. Role customer tidak ditemukan.']);
+        if (!$distributorRole) {
+            return back()->withErrors(['error' => 'Sistem belum siap. Role distributor tidak ditemukan.']);
         }
 
         // Generate username dari email
@@ -146,7 +146,7 @@ class AuthController extends Controller
             'username' => $username,
             'no_telepon' => $request->no_telepon,
             'password' => Hash::make($request->password),
-            'role_id' => $customerRole->id,
+            'role_id' => $distributorRole->id,
             'status_kepegawaian' => 'aktif',
         ]);
 
