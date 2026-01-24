@@ -220,6 +220,12 @@ Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
     Route::get('orders', [\App\Http\Controllers\AdminOrderController::class, 'index'])->name('admin.orders.index');
     Route::get('orders/{id}', [\App\Http\Controllers\AdminOrderController::class, 'show'])->name('admin.orders.show');
     Route::get('orders/{id}/invoice', [\App\Http\Controllers\AdminOrderController::class, 'invoice'])->name('admin.orders.invoice');
+
+    // Fallback for accidental GET requests to status update URL
+    Route::get('orders/{id}/status', function ($id) {
+        return redirect()->route('admin.orders.show', $id);
+    });
+
     Route::patch('orders/{id}/status', [\App\Http\Controllers\AdminOrderController::class, 'updateStatus'])->name('admin.orders.update-status');
 
     // Jasa Pengiriman & Metode Pembayaran management
@@ -244,8 +250,12 @@ Route::middleware(['role:distributor'])->group(function () {
     Route::delete('keranjang/hapus/{id}', [CartController::class, 'remove'])->name('distributor.cart.remove');
 
     // Order Routes
+    Route::get('konfirmasi-pesanan', [\App\Http\Controllers\OrderController::class, 'confirmationPage'])->name('distributor.confirmation');
     Route::post('checkout', [\App\Http\Controllers\OrderController::class, 'checkout'])->name('distributor.checkout');
     Route::get('pesanan', [\App\Http\Controllers\OrderController::class, 'index'])->name('distributor.order.index');
+    Route::get('pesanan/pembayaran/{id}', [\App\Http\Controllers\OrderController::class, 'paymentPage'])->name('distributor.order.payment');
+    Route::post('pesanan/pembayaran/{id}', [\App\Http\Controllers\OrderController::class, 'processPayment'])->name('distributor.order.process-payment');
     Route::get('pesanan/{id}', [\App\Http\Controllers\OrderController::class, 'show'])->name('distributor.order.show');
+    Route::patch('pesanan/{id}/cancel', [\App\Http\Controllers\OrderController::class, 'requestCancel'])->name('distributor.order.cancel');
     Route::get('pesanan/sukses/{id}', [\App\Http\Controllers\OrderController::class, 'success'])->name('distributor.order.success');
 });

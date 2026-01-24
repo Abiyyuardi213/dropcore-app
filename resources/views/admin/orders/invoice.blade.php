@@ -207,6 +207,12 @@
                     // Fallback calculation for legacy orders
                     $dpp = $order->tax_base > 0 ? $order->tax_base : $order->total_price / 1.11;
                     $ppn = $order->tax_amount > 0 ? $order->tax_amount : $dpp * 0.11;
+
+                    // Calculate shipping cost (Total - DPP - PPN)
+                    $shipping_cost = $order->total_price - $dpp - $ppn;
+                    if ($shipping_cost < 0) {
+                        $shipping_cost = 0;
+                    } // Prevent negative due to rounding
                 @endphp
                 <tr>
                     <td colspan="2" class="text-right"><strong>Harga Jual / Penggantian</strong></td>
@@ -228,6 +234,12 @@
                     <td colspan="2" class="text-right"><strong>PPN (11%)</strong></td>
                     <td class="text-right">{{ number_format($ppn, 0, ',', '.') }}</td>
                 </tr>
+                @if ($shipping_cost > 0)
+                    <tr>
+                        <td colspan="2" class="text-right"><strong>Biaya Pengiriman (Ongkir)</strong></td>
+                        <td class="text-right">{{ number_format($shipping_cost, 0, ',', '.') }}</td>
+                    </tr>
+                @endif
                 <tr style="background-color: #eee;">
                     <td colspan="2" class="text-right"><strong>Total Bayar</strong></td>
                     <td class="text-right"><strong>{{ number_format($order->total_price, 0, ',', '.') }}</strong></td>

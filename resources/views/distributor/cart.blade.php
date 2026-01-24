@@ -145,28 +145,12 @@
                                 <span class="text-primary">Rp {{ number_format($subtotal * 1.11, 0, ',', '.') }}</span>
                             </div>
 
-                            <form action="{{ route('distributor.checkout') }}" method="POST">
-                                @csrf
-                                <div class="mb-4">
-                                    <label for="shipping_address" class="block text-sm font-medium mb-1">Alamat
-                                        Pengiriman</label>
-                                    <textarea name="shipping_address" id="shipping_address" rows="3"
-                                        class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                                        placeholder="Masukkan alamat lengkap..." required>{{ Auth::user()->alamat }}</textarea>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="notes" class="block text-sm font-medium mb-1">Catatan Tambahan
-                                        (Opsional)</label>
-                                    <textarea name="notes" id="notes" rows="2"
-                                        class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                                        placeholder="Informasi khusus untuk pengiriman..."></textarea>
-                                </div>
-                                <button type="submit"
-                                    class="w-full inline-flex items-center justify-center rounded-md bg-primary h-11 px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 mt-2 {{ $cartItems->isEmpty() ? 'opacity-50 cursor-not-allowed' : '' }}"
-                                    {{ $cartItems->isEmpty() ? 'disabled' : '' }}>
-                                    Lanjut ke Checkout
-                                </button>
-                            </form>
+                            <div class="mt-6">
+                                <a href="{{ route('distributor.confirmation') }}"
+                                    class="w-full inline-flex items-center justify-center rounded-md bg-primary h-11 px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 {{ $cartItems->isEmpty() ? 'pointer-events-none opacity-50' : '' }}">
+                                    Lanjut ke Konfirmasi Pesanan
+                                </a>
+                            </div>
                             <a href="{{ route('distributor.products') }}"
                                 class="w-full inline-flex items-center justify-center rounded-md border border-input bg-background h-10 px-8 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
                                 Kembali Belanja

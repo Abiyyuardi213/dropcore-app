@@ -31,8 +31,22 @@
                                             <td>Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                                             <td>
                                                 <span
-                                                    class="badge badge-{{ $order->status == 'completed' ? 'success' : ($order->status == 'pending' ? 'warning' : ($order->status == 'cancelled' ? 'danger' : 'info')) }}">
-                                                    {{ ucfirst($order->status) }}
+                                                    class="badge badge-{{ $order->status == 'completed'
+                                                        ? 'success'
+                                                        : ($order->status == 'processing'
+                                                            ? 'primary'
+                                                            : ($order->status == 'shipped'
+                                                                ? 'info'
+                                                                : ($order->status == 'cancelled'
+                                                                    ? 'danger'
+                                                                    : ($order->status == 'waiting_confirmation'
+                                                                        ? 'warning'
+                                                                        : ($order->status == 'waiting_payment'
+                                                                            ? 'secondary'
+                                                                            : ($order->status == 'cancel_requested'
+                                                                                ? 'orange'
+                                                                                : 'dark')))))) }}">
+                                                    {{ ucwords(str_replace('_', ' ', $order->status)) }}
                                                 </span>
                                             </td>
                                             <td>{{ $order->created_at->format('d M Y H:i') }}</td>

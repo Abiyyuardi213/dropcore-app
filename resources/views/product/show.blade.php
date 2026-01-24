@@ -99,7 +99,9 @@
 
                                                     <strong><i class="fas fa-weight-hanging mr-1"></i> Berat</strong>
                                                     <p class="text-muted">
-                                                        {{ $product->berat ? $product->berat . ' Kg' : '-' }}</p>
+                                                        @php $displayWeight = $product->weight > 0 ? $product->weight : $product->berat; @endphp
+                                                        {{ $displayWeight ? $displayWeight . ' Kg' : '-' }}
+                                                    </p>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <strong><i class="fas fa-exclamation-triangle mr-1"></i> Min. Stock

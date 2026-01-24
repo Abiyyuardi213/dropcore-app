@@ -113,6 +113,10 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <!-- Pagination Links -->
+                            <div class="d-flex justify-content-center mt-3">
+                                {{ $logs->links('pagination::bootstrap-4') }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -130,11 +134,11 @@
     <script>
         $(document).ready(function() {
             $('#logTable').DataTable({
-                paging: true,
+                paging: false,
                 lengthChange: false,
-                searching: true,
+                searching: false,
                 ordering: true,
-                info: true,
+                info: false,
                 autoWidth: false,
                 responsive: true
             });

@@ -55,6 +55,8 @@
                         request()->is('admin/supplier*') ||
                         request()->is('admin/kondisi-barang*') ||
                         request()->is('admin/divisi*') ||
+                        request()->is('admin/jasa-pengiriman*') ||
+                        request()->is('admin/metode-pembayaran*') ||
                         request()->is('admin/jabatan*');
                 @endphp
 

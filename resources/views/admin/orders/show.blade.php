@@ -1,6 +1,9 @@
 @extends('layouts.dashboard-master')
 
 @section('content')
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
@@ -88,10 +91,19 @@
 
                         <div class="card card-default">
                             <div class="card-header">
-                                <h3 class="card-title">Informasi Distributor</h3>
+                                <h3 class="card-title">Informasi Distributor & Pembayaran</h3>
                             </div>
                             <div class="card-body">
                                 <dl class="row mb-0">
+                                    <dt class="col-sm-4">Metode Pembayaran</dt>
+                                    <dd class="col-sm-8"><span
+                                            class="badge badge-success">{{ $order->payment_method ?? 'Tidak ditemukan' }}</span>
+                                    </dd>
+
+                                    <div class="col-12 mt-2 mb-2">
+                                        <hr>
+                                    </div>
+
                                     <dt class="col-sm-4">Nama Distributor</dt>
                                     <dd class="col-sm-8">{{ $order->user->name }}</dd>
 
@@ -132,15 +144,73 @@
                                         class="text-center p-3 rounded 
                                         {{ $order->status == 'completed'
                                             ? 'bg-success'
-                                            : ($order->status == 'pending'
-                                                ? 'bg-warning'
-                                                : ($order->status == 'cancelled'
-                                                    ? 'bg-danger'
-                                                    : 'bg-info')) }}">
-                                        <h4 class="m-0 text-white text-uppercase font-weight-bold">{{ $order->status }}
+                                            : ($order->status == 'processing'
+                                                ? 'bg-primary'
+                                                : ($order->status == 'shipped'
+                                                    ? 'bg-info'
+                                                    : ($order->status == 'cancelled'
+                                                        ? 'bg-danger'
+                                                        : ($order->status == 'waiting_confirmation'
+                                                            ? 'bg-warning'
+                                                            : ($order->status == 'waiting_payment'
+                                                                ? 'bg-secondary'
+                                                                : 'bg-dark'))))) }}">
+                                        <h4 class="m-0 text-white text-uppercase font-weight-bold">
+                                            {{ str_replace('_', ' ', $order->status == 'cancel_requested' ? 'Permintaan Batal' : $order->status) }}
                                         </h4>
                                     </div>
                                 </div>
+
+                                @if ($order->proof_of_payment)
+                                    <div class="card card-info">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Bukti Pembayaran (Dari Distributor)</h3>
+                                        </div>
+                                        <div class="card-body text-center">
+                                            <img src="{{ asset('uploads/payment_proofs/' . $order->proof_of_payment) }}"
+                                                alt="Bukti Pembayaran" class="img-fluid rounded mb-2"
+                                                style="max-height: 300px;">
+                                            <a href="{{ asset('uploads/payment_proofs/' . $order->proof_of_payment) }}"
+                                                target="_blank" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-search-plus"></i> Perbesar
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if ($order->status == 'cancel_requested')
+                                    <div class="alert alert-warning">
+                                        <h5><i class="icon fas fa-exclamation-triangle"></i> Permintaan Pembatalan</h5>
+                                        <p><strong>Alasan:</strong> {{ $order->cancellation_reason }}</p>
+                                        @if ($order->cancellation_note)
+                                            <p><strong>Catatan:</strong> {{ $order->cancellation_note }}</p>
+                                        @endif
+                                        <hr>
+                                        <p class="mb-2">Tindakan:</p>
+                                        <div class="d-flex" style="gap: 10px;">
+                                            <form id="formApproveCancel"
+                                                action="{{ route('admin.orders.update-status', $order->id) }}"
+                                                method="POST" style="flex:1;">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="cancelled">
+                                                <button type="button" class="btn btn-danger btn-block"
+                                                    onclick="confirmCancel()">
+                                                    Setujui Batal
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('admin.orders.update-status', $order->id) }}"
+                                                method="POST" style="flex:1;">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="processing">
+                                                <button type="submit" class="btn btn-outline-primary btn-block">
+                                                    Tolak (Proses)
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endif
 
                                 @if ($order->shipping_provider)
                                     <div class="callout callout-info">
@@ -162,8 +232,12 @@
                                             <label>Pilih Status Baru</label>
                                             <select name="status" id="statusSelect" class="form-control"
                                                 onchange="toggleShippingFields()">
-                                                <option value="pending"
-                                                    {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                                <option value="waiting_payment"
+                                                    {{ $order->status == 'waiting_payment' ? 'selected' : '' }}>Waiting
+                                                    Payment</option>
+                                                <option value="waiting_confirmation"
+                                                    {{ $order->status == 'waiting_confirmation' ? 'selected' : '' }}>
+                                                    Waiting Confirmation</option>
                                                 <option value="processing"
                                                     {{ $order->status == 'processing' ? 'selected' : '' }}>Processing
                                                 </option>
@@ -175,6 +249,10 @@
                                                 </option>
                                                 <option value="cancelled"
                                                     {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled
+                                                </option>
+                                                <option value="cancel_requested"
+                                                    {{ $order->status == 'cancel_requested' ? 'selected' : '' }}>
+                                                    Cancellation Requested
                                                 </option>
                                             </select>
                                         </div>
@@ -220,6 +298,23 @@
     </div>
 
     <script>
+        function confirmCancel() {
+            Swal.fire({
+                title: 'Konfirmasi Pembatalan',
+                text: "Apakah Anda yakin ingin menyetujui pembatalan pesanan ini? Stok akan dikembalikan.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Setujui Batal!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('formApproveCancel').submit();
+                }
+            })
+        }
+
         function toggleShippingFields() {
             var status = document.getElementById('statusSelect').value;
             var shippingFields = document.getElementById('shippingFields');

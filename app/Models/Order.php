@@ -25,6 +25,9 @@ class Order extends Model
         'shipped_at',
         'payment_status',
         'payment_method',
+        'proof_of_payment',
+        'cancellation_reason',
+        'cancellation_note',
         'notes'
     ];
 

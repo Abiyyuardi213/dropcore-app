@@ -9,7 +9,7 @@ class RiwayatAktivitasLogController extends Controller
 {
     public function index()
     {
-        $logs = RiwayatAktivitasLog::with('user')->latest()->get();
+        $logs = RiwayatAktivitasLog::with('user')->latest()->paginate(50);
         return view('riwayat-log.index', compact('logs'));
     }
 
@@ -22,6 +22,6 @@ class RiwayatAktivitasLogController extends Controller
     public function destroyAll()
     {
         RiwayatAktivitasLog::truncate();
-        return back()->with('success','Seluruh riwayat log berhasil dihapus.');
+        return back()->with('success', 'Seluruh riwayat log berhasil dihapus.');
     }
 }

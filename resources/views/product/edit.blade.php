@@ -187,7 +187,8 @@
                                                     <label for="weight">Berat (Kg)</label>
                                                     <input type="number" step="0.01"
                                                         class="form-control @error('weight') is-invalid @enderror"
-                                                        name="weight" value="{{ old('weight', $product->weight) }}">
+                                                        name="weight"
+                                                        value="{{ old('weight', $product->weight > 0 ? $product->weight : $product->berat) }}">
                                                     @error('weight')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
