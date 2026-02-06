@@ -424,11 +424,32 @@
     </div>
 </aside>
 
-<style>
-    /* Styling khusus untuk sub-menu aktif agar berwarna kuning */
-    .nav-sidebar .nav-treeview>.nav-item>.nav-link.active {
-        background-color: #f39c12 !important;
-        color: #1f2d3d !important;
-        font-weight: bold;
-    }
+/* Styling khusus untuk sub-menu aktif agar berwarna kuning */
+.nav-sidebar .nav-treeview>.nav-item>.nav-link.active {
+background-color: #f39c12 !important;
+color: #1f2d3d !important;
+font-weight: bold;
+}
 </style>
+
+<script>
+    /**
+     * Script untuk menjaga posisi scroll sidebar agar tidak reset ke atas saat reload/navigasi
+     */
+    document.addEventListener("DOMContentLoaded", function() {
+        var sidebar = document.querySelector('.sidebar');
+
+        if (sidebar) {
+            // Check if there's a saved scroll position
+            var scrollPos = localStorage.getItem('sidebarScrollPos');
+            if (scrollPos) {
+                sidebar.scrollTop = scrollPos;
+            }
+
+            // Save scroll position before unloading the page
+            window.addEventListener('beforeunload', function() {
+                localStorage.setItem('sidebarScrollPos', sidebar.scrollTop);
+            });
+        }
+    });
+</script>
