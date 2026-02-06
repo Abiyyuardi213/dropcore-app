@@ -424,12 +424,13 @@
     </div>
 </aside>
 
-/* Styling khusus untuk sub-menu aktif agar berwarna kuning */
-.nav-sidebar .nav-treeview>.nav-item>.nav-link.active {
-background-color: #f39c12 !important;
-color: #1f2d3d !important;
-font-weight: bold;
-}
+<style>
+    /* Styling khusus untuk sub-menu aktif agar berwarna kuning */
+    .nav-sidebar .nav-treeview>.nav-item>.nav-link.active {
+        background-color: #f39c12 !important;
+        color: #1f2d3d !important;
+        font-weight: bold;
+    }
 </style>
 
 <script>
