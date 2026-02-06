@@ -19,7 +19,7 @@ class IndoRegionService
         // 1. Ensure "Indonesia" Wilayah exists
         $wilayah = Wilayah::firstOrCreate(
             ['id' => '62'],
-            ['negara' => 'Indonesia', 'name' => 'Indonesia', 'status_wilayah' => 1] // Ensure 'name' is present
+            ['name' => 'Indonesia', 'status_wilayah' => 1] // Only using 'name' as 'negara' column is missing
         );
         return $wilayah;
     }

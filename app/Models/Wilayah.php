@@ -18,10 +18,16 @@ class Wilayah extends Model
     protected $fillable = [
         'id',
         'name',
-        'negara',
+        // 'negara', // Removed as column doesn't exist on VPS
         'deskripsi',
         'status_wilayah',
     ];
+
+    // Accessor for backward compatibility
+    public function getNegaraAttribute()
+    {
+        return $this->name;
+    }
 
     protected static function booted()
     {
@@ -38,7 +44,7 @@ class Wilayah extends Model
             RiwayatAktivitasLog::add(
                 'wilayah',
                 'update',
-                "Mengubah wilayah {$wilayah->negara}",
+                "Mengubah wilayah {$wilayah->name}",
                 optional(Auth::user())->id
             );
         });
@@ -47,7 +53,7 @@ class Wilayah extends Model
             RiwayatAktivitasLog::add(
                 'wilayah',
                 'delete',
-                "Menghapus wilayah {$wilayah->negara}",
+                "Menghapus wilayah {$wilayah->name}",
                 optional(Auth::user())->id
             );
         });
@@ -56,9 +62,8 @@ class Wilayah extends Model
     public static function createWilayah($data)
     {
         return self::create([
-            'id'             => $data['id'] ?? (string) Str::uuid(), // Ensure ID is handled if needed
-            'name'           => $data['negara'], // Map negara to name to satisfy DB constraint
-            'negara'         => $data['negara'],
+            'id'             => $data['id'] ?? (string) Str::uuid(),
+            'name'           => $data['negara'], // Map input 'negara' to column 'name'
             'deskripsi'      => $data['deskripsi'] ?? null,
             'status_wilayah' => $data['status_wilayah'] ?? true,
         ]);
@@ -67,8 +72,7 @@ class Wilayah extends Model
     public function updateWilayah($data)
     {
         $this->update([
-            'name'           => $data['negara'], // Keep name synced
-            'negara'         => $data['negara'],
+            'name'           => $data['negara'],
             'deskripsi'      => $data['deskripsi'] ?? $this->deskripsi,
             'status_wilayah' => $data['status_wilayah'] ?? $this->status_wilayah,
         ]);
