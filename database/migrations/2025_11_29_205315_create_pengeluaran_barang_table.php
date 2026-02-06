@@ -30,7 +30,7 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
 
-            $table->foareign('distributor_id')
+            $table->foreign('distributor_id')
                 ->references('id')->on('distributor')
                 ->onDelete('set null')
                 ->onUpdate('cascade');
