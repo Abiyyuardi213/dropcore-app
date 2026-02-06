@@ -65,8 +65,7 @@
                             <h3 class="card-title">Daftar Kota (Sinkronisasi API)</h3>
                             <form action="{{ route('kota.sync') }}" method="POST" class="ml-auto">
                                 @csrf
-                                <button type="submit" class="btn btn-success btn-sm"
-                                    onclick="return confirm('Apakah anda yakin ingin sinkronisasi data kota? Proses ini mungkin sedikit lama.')">
+                                <button type="button" class="btn btn-success btn-sm sync-btn-kota">
                                     <i class="fas fa-sync"></i> Sinkronasi API
                                 </button>
                             </form>
