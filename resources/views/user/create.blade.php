@@ -358,6 +358,22 @@
                     cropper.destroy();
                 }
 
+                const updateCroppedImage = () => {
+                    const canvas = cropper.getCroppedCanvas({
+                        width: 300,
+                        height: 300
+                    });
+                    if (canvas) {
+                        canvas.toBlob((blob) => {
+                            const reader = new FileReader();
+                            reader.onloadend = function() {
+                                document.getElementById('cropped_image').value = reader.result;
+                            }
+                            reader.readAsDataURL(blob);
+                        });
+                    }
+                };
+
                 cropper = new Cropper(image, {
                     aspectRatio: 1,
                     viewMode: 1,
@@ -368,37 +384,12 @@
                     ready() {
                         // Auto crop on load
                         this.cropper.crop();
+                        updateCroppedImage();
                     },
                     cropend() {
-                        const canvas = cropper.getCroppedCanvas({
-                            width: 300,
-                            height: 300
-                        });
-                        canvas.toBlob((blob) => {
-                            const reader = new FileReader();
-                            reader.onloadend = function() {
-                                document.getElementById('cropped_image').value = reader
-                                    .result;
-                            }
-                            reader.readAsDataURL(blob);
-                        });
+                        updateCroppedImage();
                     }
                 });
-
-                // Trigger initial crop
-                const canvas = cropper.getCroppedCanvas({
-                    width: 300,
-                    height: 300
-                });
-                if (canvas) {
-                    canvas.toBlob((blob) => {
-                        const reader = new FileReader();
-                        reader.onloadend = function() {
-                            document.getElementById('cropped_image').value = reader.result;
-                        }
-                        reader.readAsDataURL(blob);
-                    });
-                }
             };
             reader.readAsDataURL(file);
         });

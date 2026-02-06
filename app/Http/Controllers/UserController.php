@@ -48,12 +48,37 @@ class UserController extends Controller
             'jenis_kelamin'     => ['nullable', Rule::in(['L', 'P'])],
             'status_kepegawaian' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
             'profile_picture'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'cropped_image'     => 'nullable|string',
         ]);
 
         $data = $request->all();
         $data['password'] = Hash::make($request->password);
 
-        if ($request->hasFile('profile_picture')) {
+        // Handle Cropped Image First
+        if ($request->filled('cropped_image')) {
+            $croppedImage = $request->input('cropped_image');
+
+            // Parse Data URI
+            if (strpos($croppedImage, ';base64,') !== false) {
+                list($type, $croppedImage) = explode(';', $croppedImage);
+                list(, $croppedImage) = explode(',', $croppedImage);
+                $croppedImage = base64_decode($croppedImage);
+
+                $filename = uniqid() . '.png';
+                $path = public_path('uploads/profile') . '/' . $filename;
+
+                // Ensure directory exists
+                if (!file_exists(public_path('uploads/profile'))) {
+                    @mkdir(public_path('uploads/profile'), 0777, true);
+                }
+
+                if (file_put_contents($path, $croppedImage)) {
+                    $data['profile_picture'] = $filename;
+                }
+            }
+        }
+        // Fallback to normal file upload if no cropped image
+        elseif ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
             $filename = uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/profile'), $filename);
@@ -136,6 +161,7 @@ class UserController extends Controller
             'jenis_kelamin'     => ['nullable', Rule::in(['L', 'P'])],
             'status_kepegawaian' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
             'profile_picture'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'cropped_image'     => 'nullable|string',
         ]);
 
         $data = $request->only([
@@ -156,7 +182,36 @@ class UserController extends Controller
             $data['password'] = Hash::make($request->password);
         }
 
-        if ($request->hasFile('profile_picture')) {
+        // Handle Cropped Image First
+        if ($request->filled('cropped_image')) {
+            $croppedImage = $request->input('cropped_image');
+
+            // Parse Data URI
+            if (strpos($croppedImage, ';base64,') !== false) {
+                // Delete old image
+                if ($user->profile_picture && file_exists(public_path('uploads/profile/' . $user->profile_picture))) {
+                    @unlink(public_path('uploads/profile/' . $user->profile_picture));
+                }
+
+                list($type, $croppedImage) = explode(';', $croppedImage);
+                list(, $croppedImage) = explode(',', $croppedImage);
+                $croppedImage = base64_decode($croppedImage);
+
+                $filename = uniqid() . '.png';
+                $path = public_path('uploads/profile') . '/' . $filename;
+
+                // Ensure directory exists
+                if (!file_exists(public_path('uploads/profile'))) {
+                    @mkdir(public_path('uploads/profile'), 0777, true);
+                }
+
+                if (file_put_contents($path, $croppedImage)) {
+                    $data['profile_picture'] = $filename;
+                }
+            }
+        }
+        // Fallback to normal file upload
+        elseif ($request->hasFile('profile_picture')) {
             if ($user->profile_picture && file_exists(public_path('uploads/profile/' . $user->profile_picture))) {
                 unlink(public_path('uploads/profile/' . $user->profile_picture));
             }
