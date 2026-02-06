@@ -36,7 +36,13 @@
                         <div class="card-header">
                             <h3 class="card-title">Daftar Kelurahan</h3>
 
-                            <div class="card-tools">
+                            <div class="card-tools d-flex align-items-center">
+                                <form action="{{ route('kelurahan.sync') }}" method="POST" class="mr-2">
+                                    @csrf
+                                    <button type="button" class="btn btn-success btn-sm sync-btn-kelurahan">
+                                        <i class="fas fa-sync"></i> Sync API
+                                    </button>
+                                </form>
                                 <form action="{{ route('kelurahan.index') }}" method="GET" class="form-inline">
                                     {{-- Preserve filter params when searching --}}
                                     @foreach (['provinsi_id', 'kota_id', 'kecamatan_id'] as $param)
@@ -175,6 +181,38 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="{{ asset('js/ToastScript.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('.sync-btn-kelurahan').click(function(e) {
+                e.preventDefault();
+                let form = $(this).closest('form');
+
+                Swal.fire({
+                    title: 'CRITICAL WARNING',
+                    text: "Proses ini SANGAT SANGAT LAMA (bisa >10 menit) karena puluhan ribu data. Browser mungkin akan hang sementara. Yakin?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Saya Paham!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Sedang Memproses...',
+                            html: 'Mohon tunggu, sinkronisasi data kelurahan sedang berjalan.<br><strong>JANGAN REFRESH ATAU TUTUP HALAMAN INI.</strong>',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

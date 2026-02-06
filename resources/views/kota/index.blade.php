@@ -63,7 +63,13 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title">Daftar Kota (Sinkronisasi API)</h3>
-                            {{-- No CRUD buttons --}}
+                            <form action="{{ route('kota.sync') }}" method="POST" class="ml-auto">
+                                @csrf
+                                <button type="submit" class="btn btn-success btn-sm"
+                                    onclick="return confirm('Apakah anda yakin ingin sinkronisasi data kota? Proses ini mungkin sedikit lama.')">
+                                    <i class="fas fa-sync"></i> Sinkronasi API
+                                </button>
+                            </form>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -116,6 +122,35 @@
                 "info": true,
                 "autoWidth": false,
                 "responsive": true
+            });
+
+            $('.sync-btn-kota').click(function(e) {
+                e.preventDefault();
+                let form = $(this).closest('form');
+
+                Swal.fire({
+                    title: 'Konfirmasi Sinkronisasi',
+                    text: "Apakah anda yakin ingin sinkronisasi data Kota? Proses ini akan memperbarui data dari API dan mungkin memakan waktu beberapa saat.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Sinkronisasi!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Sedang Memproses...',
+                            html: 'Mohon tunggu, sinkronisasi data sedang berjalan.<br>Jangan tutup halaman ini.',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        form.submit();
+                    }
+                });
             });
 
             // Filter Logic

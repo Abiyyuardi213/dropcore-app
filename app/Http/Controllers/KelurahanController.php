@@ -12,12 +12,10 @@ class KelurahanController extends Controller
     {
         $query = Kelurahan::with(['kecamatan.kota.provinsi.wilayah']);
 
-        // Search by name
         if ($request->filled('q')) {
             $query->where('name', 'like', '%' . $request->q . '%');
         }
 
-        // Filter Priority: Kecamatan > Kota > Provinsi
         if ($request->filled('kecamatan_id')) {
             $query->where('kecamatan_id', $request->kecamatan_id);
         } elseif ($request->filled('kota_id')) {
@@ -34,12 +32,10 @@ class KelurahanController extends Controller
 
         $provinsis = \App\Models\Provinsi::orderBy('name')->get();
 
-        // Fetch cities: All if no province selected, or filtered by province
         $kotas = $request->filled('provinsi_id')
             ? \App\Models\Kota::where('provinsi_id', $request->provinsi_id)->orderBy('name')->get()
             : \App\Models\Kota::orderBy('name')->get();
 
-        // Fetch kecamatans: filtered by kota or province if selected, otherwise fetch all
         if ($request->filled('kota_id')) {
             $kecamatans = Kecamatan::where('kota_id', $request->kota_id)->orderBy('name')->get();
         } elseif ($request->filled('provinsi_id')) {
@@ -51,5 +47,16 @@ class KelurahanController extends Controller
         }
 
         return view('kelurahan.index', compact('kelurahans', 'provinsis', 'kotas', 'kecamatans'));
+    }
+
+    public function sync(\App\Services\IndoRegionService $regionService)
+    {
+        try {
+            // This is extremely heavy. 
+            $count = $regionService->syncVillages();
+            return redirect()->route('kelurahan.index')->with('success', "Sinkronisasi Berhasil. {$count} Kelurahan diperbarui.");
+        } catch (\Exception $e) {
+            return redirect()->route('kelurahan.index')->with('error', 'Gagal sinkronisasi: ' . $e->getMessage());
+        }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Services\IndoRegionService;
 
 class SyncIndoRegionCommand extends Command
 {
@@ -23,7 +24,7 @@ class SyncIndoRegionCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(IndoRegionService $regionService)
     {
         $this->info('Starting Regional Data Sync...');
         $depth = $this->option('depth');
@@ -32,99 +33,29 @@ class SyncIndoRegionCommand extends Command
         $targetLevel = $levels[$depth] ?? 2;
 
         try {
-            // 1. Ensure "Indonesia" Wilayah exists
-            // We use '62' as ID for Indonesia based on ISO or just hardcode
-            $wilayah = \App\Models\Wilayah::firstOrCreate(
-                ['id' => '62'],
-                ['name' => 'Indonesia']
-            );
-            $this->info("Wilayah: {$wilayah->name} (Checked)");
+            // 1. Wilayah & Provinces (Level 1)
+            $this->info("Syncing Wilayah & Provinces...");
+            $regionService->syncProvinces();
 
-            // 2. Fetch Provinces
-            $this->info("Fetching Provinces...");
-            $provinces = \Illuminate\Support\Facades\Http::withoutVerifying()
-                ->timeout(60)
-                ->retry(3, 100)
-                ->get('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json')
-                ->json();
-
-            $bar = $this->output->createProgressBar(count($provinces));
-            $bar->start();
-
-            foreach ($provinces as $provData) {
-                // Use API ID as our ID
-                $provinsi = \App\Models\Provinsi::firstOrCreate(
-                    ['id' => $provData['id']],
-                    ['name' => $provData['name'], 'wilayah_id' => $wilayah->id]
-                );
-
-                if ($targetLevel >= 2) {
-                    $this->syncCities($provinsi, $provData['id'], $targetLevel);
-                }
-
-                $bar->advance();
+            if ($targetLevel >= 2) {
+                $this->info("Syncing Cities...");
+                $regionService->syncCities();
             }
-            $bar->finish();
+
+            if ($targetLevel >= 3) {
+                $this->info("Syncing Districts (This may take a while)...");
+                $regionService->syncDistricts();
+            }
+
+            if ($targetLevel >= 4) {
+                $this->info("Syncing Villages (This will take a long time)...");
+                $regionService->syncVillages();
+            }
+
             $this->newLine();
             $this->info("Sync Completed Successfully!");
         } catch (\Exception $e) {
             $this->error("Error: " . $e->getMessage());
-        }
-    }
-
-    private function syncCities($provinsi, $apiProvId, $targetLevel)
-    {
-        $cities = \Illuminate\Support\Facades\Http::withoutVerifying()
-            ->timeout(60)
-            ->retry(3, 100)
-            ->get("https://www.emsifa.com/api-wilayah-indonesia/api/regencies/{$apiProvId}.json")
-            ->json();
-
-        foreach ($cities as $cityData) {
-            $kota = \App\Models\Kota::firstOrCreate(
-                ['id' => $cityData['id']],
-                ['name' => $cityData['name'], 'provinsi_id' => $provinsi->id]
-            );
-
-            if ($targetLevel >= 3) {
-                $this->syncDistricts($kota, $cityData['id'], $targetLevel);
-            }
-        }
-    }
-
-    private function syncDistricts($kota, $apiCityId, $targetLevel)
-    {
-        $districts = \Illuminate\Support\Facades\Http::withoutVerifying()
-            ->timeout(60)
-            ->retry(3, 100)
-            ->get("https://www.emsifa.com/api-wilayah-indonesia/api/districts/{$apiCityId}.json")
-            ->json();
-
-        foreach ($districts as $distData) {
-            $kecamatan = \App\Models\Kecamatan::firstOrCreate(
-                ['id' => $distData['id']],
-                ['name' => $distData['name'], 'kota_id' => $kota->id]
-            );
-
-            if ($targetLevel >= 4) {
-                $this->syncVillages($kecamatan, $distData['id']);
-            }
-        }
-    }
-
-    private function syncVillages($kecamatan, $apiDistId)
-    {
-        $villages = \Illuminate\Support\Facades\Http::withoutVerifying()
-            ->timeout(60)
-            ->retry(3, 100)
-            ->get("https://www.emsifa.com/api-wilayah-indonesia/api/villages/{$apiDistId}.json")
-            ->json();
-
-        foreach ($villages as $villageData) {
-            \App\Models\Kelurahan::firstOrCreate(
-                ['id' => $villageData['id']],
-                ['name' => $villageData['name'], 'kecamatan_id' => $kecamatan->id]
-            );
         }
     }
 }

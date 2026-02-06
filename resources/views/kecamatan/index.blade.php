@@ -36,7 +36,13 @@
                         <div class="card-header">
                             <h3 class="card-title">Daftar Kecamatan</h3>
 
-                            <div class="card-tools">
+                            <div class="card-tools d-flex align-items-center">
+                                <form action="{{ route('kecamatan.sync') }}" method="POST" class="mr-2">
+                                    @csrf
+                                    <button type="button" class="btn btn-success btn-sm sync-btn-kecamatan">
+                                        <i class="fas fa-sync"></i> Sync API
+                                    </button>
+                                </form>
                                 <form action="{{ route('kecamatan.index') }}" method="GET" class="form-inline">
                                     {{-- Preserve filter params when searching --}}
                                     @if (request('provinsi_id'))
@@ -160,6 +166,38 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="{{ asset('js/ToastScript.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('.sync-btn-kecamatan').click(function(e) {
+                e.preventDefault();
+                let form = $(this).closest('form');
+
+                Swal.fire({
+                    title: 'Peringatan Sync Data',
+                    text: "Proses ini SANGAT LAMA karena banyaknya data kecamatan di Indonesia. Apakah Anda yakin ingin melanjutkan?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Lanjutkan!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Sedang Memproses...',
+                            html: 'Mohon tunggu, sinkronisasi data sedang berjalan.<br>Jangan tutup halaman ini.<br>Proses ini bisa memakan waktu beberapa menit.',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

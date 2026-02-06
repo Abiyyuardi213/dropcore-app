@@ -140,16 +140,23 @@ Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
     Route::resource('mutasi-stok', MutasiStokController::class);
 
     Route::post('wilayah/{id}/toggle-status', [WilayahController::class, 'toggleStatus'])->name('wilayah.toggleStatus');
+    Route::post('wilayah/sync', [WilayahController::class, 'sync'])->name('wilayah.sync');
     Route::resource('wilayah', WilayahController::class);
 
     Route::post('provinsi/{id}/toggle-status', [ProvinsiController::class, 'toggleStatus'])->name('provinsi.toggleStatus');
+    Route::post('provinsi/sync', [ProvinsiController::class, 'sync'])->name('provinsi.sync');
     Route::resource('provinsi', ProvinsiController::class);
 
+    Route::post('kota/sync', [KotaController::class, 'sync'])->name('kota.sync');
     Route::resource('kota', KotaController::class);
 
+    Route::post('kecamatan/sync', [KecamatanController::class, 'sync'])->name('kecamatan.sync');
     Route::resource('kecamatan', KecamatanController::class);
 
+    Route::post('kelurahan/sync', [KelurahanController::class, 'sync'])->name('kelurahan.sync');
     Route::resource('kelurahan', KelurahanController::class);
+
+
 
     Route::post('supplier/{id}/toggle-status', [SupplierController::class, 'toggleStatus'])->name('role.toggleStatus');
     Route::resource('supplier', SupplierController::class);

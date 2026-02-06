@@ -73,10 +73,18 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title">Daftar Wilayah/Negara</h3>
-                            <a href="#" class="btn btn-primary btn-sm ml-auto" data-toggle="modal"
-                                data-target="#addWilayahModal">
-                                <i class="fas fa-plus"></i> Tambah Wilayah
-                            </a>
+                            <div class="ml-auto">
+                                <form action="{{ route('wilayah.sync') }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="button" class="btn btn-success btn-sm mr-2 sync-btn-wilayah">
+                                        <i class="fas fa-sync"></i> Sinkronasi API
+                                    </button>
+                                </form>
+                                <a href="#" class="btn btn-primary btn-sm" data-toggle="modal"
+                                    data-target="#addWilayahModal">
+                                    <i class="fas fa-plus"></i> Tambah Wilayah
+                                </a>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -237,6 +245,36 @@
                 "info": true,
                 "autoWidth": false,
                 "responsive": true
+            });
+
+            // Sync Confirmation & Loading
+            $('.sync-btn-wilayah').click(function(e) {
+                e.preventDefault();
+                let form = $(this).closest('form');
+
+                Swal.fire({
+                    title: 'Konfirmasi Sinkronisasi',
+                    text: "Apakah anda yakin ingin sinkronisasi data wilayah? Proses ini akan memperbarui data dari API.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Sinkronisasi!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Sedang Memproses...',
+                            html: 'Mohon tunggu, sinkronisasi data sedang berjalan.<br>Jangan tutup halaman ini.',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        form.submit();
+                    }
+                });
             });
         });
 

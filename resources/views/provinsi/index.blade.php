@@ -73,7 +73,12 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title">Daftar Provinsi (Sinkronisasi API)</h3>
-                            {{-- Action buttons removed as data is synced --}}
+                            <form action="{{ route('provinsi.sync') }}" method="POST" class="ml-auto">
+                                @csrf
+                                <button type="button" class="btn btn-success btn-sm sync-btn-provinsi">
+                                    <i class="fas fa-sync"></i> Sinkronasi API
+                                </button>
+                            </form>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -129,6 +134,35 @@
                 "info": true,
                 "autoWidth": false,
                 "responsive": true
+            });
+
+            $('.sync-btn-provinsi').click(function(e) {
+                e.preventDefault();
+                let form = $(this).closest('form');
+
+                Swal.fire({
+                    title: 'Konfirmasi Sinkronisasi',
+                    text: "Apakah anda yakin ingin sinkronisasi data Provinsi? Proses ini akan memperbarui data dari API.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Sinkronisasi!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Sedang Memproses...',
+                            html: 'Mohon tunggu, sinkronisasi data sedang berjalan.<br>Jangan tutup halaman ini.',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        form.submit();
+                    }
+                });
             });
         });
     </script>

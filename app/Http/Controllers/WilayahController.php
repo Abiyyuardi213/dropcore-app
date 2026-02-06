@@ -76,4 +76,14 @@ class WilayahController extends Controller
             ], 500);
         }
     }
+
+    public function sync(\App\Services\IndoRegionService $regionService)
+    {
+        try {
+            $regionService->syncWilayah();
+            return redirect()->route('wilayah.index')->with('success', 'Sinkronisasi Wilayah Berhasil.');
+        } catch (\Exception $e) {
+            return redirect()->route('wilayah.index')->with('error', 'Gagal sinkronisasi: ' . $e->getMessage());
+        }
+    }
 }
