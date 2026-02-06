@@ -78,22 +78,24 @@ return new class extends Migration
         // We will just alter the columns.
 
         Schema::table('suppliers', function (Blueprint $table) {
-            // Drop old FKs first - names might vary, relying on automatic naming convention or brute force?
-            // Laravel default: table_column_foreign
+            // Drop old FKs first
             $table->dropForeign(['wilayah_id']);
             $table->dropForeign(['provinsi_id']);
             $table->dropForeign(['kota_id']);
             $table->dropForeign(['kecamatan_id']);
             $table->dropForeign(['kelurahan_id']);
+
+            // Drop old columns to avoid data truncation errors (since old UUIDs won't fit in char(2/4/etc))
+            $table->dropColumn(['wilayah_id', 'provinsi_id', 'kota_id', 'kecamatan_id', 'kelurahan_id']);
         });
 
         Schema::table('suppliers', function (Blueprint $table) {
-            // Modify columns to be compatible with new Char IDs
-            $table->char('wilayah_id', 2)->change();
-            $table->char('provinsi_id', 2)->change();
-            $table->char('kota_id', 4)->change();
-            $table->char('kecamatan_id', 7)->change();
-            $table->char('kelurahan_id', 10)->change();
+            // Create new columns as nullable to prevent constraint errors on empty regional tables
+            $table->char('wilayah_id', 2)->nullable();
+            $table->char('provinsi_id', 2)->nullable();
+            $table->char('kota_id', 4)->nullable();
+            $table->char('kecamatan_id', 7)->nullable();
+            $table->char('kelurahan_id', 10)->nullable();
 
             // Re-add FKs
             $table->foreign('wilayah_id')->references('id')->on('wilayah')->onDelete('cascade');
