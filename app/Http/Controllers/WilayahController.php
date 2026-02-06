@@ -23,7 +23,7 @@ class WilayahController extends Controller
         $request->validate([
             'negara' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
-            'status_wilayah' => 'required|boolean',
+            // 'status_wilayah' => 'required|boolean', // Removed validation
         ]);
 
         Wilayah::createWilayah($request->all());
@@ -42,7 +42,7 @@ class WilayahController extends Controller
         $request->validate([
             'negara' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
-            'status_wilayah' => 'required|boolean',
+            // 'status_wilayah' => 'required|boolean', // Removed validation
         ]);
 
         $wilayah = Wilayah::findOrFail($id);
@@ -61,6 +61,13 @@ class WilayahController extends Controller
 
     public function toggleStatus($id)
     {
+        // Feature disabled as column does not exist on VPS
+        return response()->json([
+            'success' => true,
+            'message' => 'Status update disabled due to DB schema mismatch.'
+        ]);
+
+        /*
         try {
             $wilayah = Wilayah::findOrFail($id);
             $wilayah->toggleStatus();
@@ -75,6 +82,7 @@ class WilayahController extends Controller
                 'message' => 'Gagal memperbarui status.'
             ], 500);
         }
+        */
     }
 
     public function sync(\App\Services\IndoRegionService $regionService)

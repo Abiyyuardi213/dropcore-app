@@ -20,7 +20,7 @@ class Wilayah extends Model
         'name',
         // 'negara', // Removed as column doesn't exist on VPS
         'deskripsi',
-        'status_wilayah',
+        // 'status_wilayah', // Removed as column doesn't exist on VPS
     ];
 
     // Accessor for backward compatibility
@@ -65,7 +65,6 @@ class Wilayah extends Model
             'id'             => $data['id'] ?? (string) Str::uuid(),
             'name'           => $data['negara'], // Map input 'negara' to column 'name'
             'deskripsi'      => $data['deskripsi'] ?? null,
-            'status_wilayah' => $data['status_wilayah'] ?? true,
         ]);
     }
 
@@ -74,7 +73,6 @@ class Wilayah extends Model
         $this->update([
             'name'           => $data['negara'],
             'deskripsi'      => $data['deskripsi'] ?? $this->deskripsi,
-            'status_wilayah' => $data['status_wilayah'] ?? $this->status_wilayah,
         ]);
     }
 
@@ -83,18 +81,18 @@ class Wilayah extends Model
         return $this->delete();
     }
 
-    public function toggleStatus()
-    {
-        $this->status_wilayah = !$this->status_wilayah;
-        $this->save();
-
-        RiwayatAktivitasLog::add(
-            'wilayah',
-            'toggle_status',
-            "Mengubah status wilayah {$this->negara}",
-            optional(Auth::user())->id
-        );
-    }
+    // public function toggleStatus()
+    // {
+    //     $this->status_wilayah = !$this->status_wilayah;
+    //     $this->save();
+    //
+    //     RiwayatAktivitasLog::add(
+    //         'wilayah',
+    //         'toggle_status',
+    //         "Mengubah status wilayah {$this->negara}",
+    //         optional(Auth::user())->id
+    //     );
+    // }
 
     public function suppliers()
     {

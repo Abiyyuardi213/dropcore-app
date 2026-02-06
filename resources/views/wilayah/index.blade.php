@@ -94,7 +94,7 @@
                                             <th>No</th>
                                             <th>Nama Wilayah</th>
                                             <th>Deskripsi</th>
-                                            <th>Status Wilayah</th>
+                                            {{-- <th>Status Wilayah</th> --}}
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -104,18 +104,18 @@
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $wilayah->negara }}</td>
                                                 <td>{{ $wilayah->deskripsi }}</td>
-                                                <td class="text-center">
+                                                {{-- <td class="text-center">
                                                     <input type="checkbox" class="toggle-status"
                                                         data-wilayah-id="{{ $wilayah->id }}"
                                                         {{ $wilayah->status_wilayah ? 'checked' : '' }}>
-                                                </td>
+                                                </td> --}}
                                                 <td class="text-center">
                                                     <button class="btn btn-warning btn-sm edit-wilayah-btn"
                                                         data-toggle="modal" data-target="#editWilayahModal"
                                                         data-id="{{ $wilayah->id }}"
                                                         data-negara="{{ $wilayah->negara }}"
                                                         data-deskripsi="{{ $wilayah->deskripsi }}"
-                                                        data-status="{{ $wilayah->status_wilayah }}">
+                                                        {{-- data-status="{{ $wilayah->status_wilayah }}" --}}>
                                                         <i class="fas fa-edit"></i> Edit
                                                     </button>
                                                     <button class="btn btn-danger btn-sm delete-wilayah-btn"
@@ -162,7 +162,7 @@
                             <label for="deskripsi">Deskripsi</label>
                             <textarea name="deskripsi" class="form-control" rows="3"></textarea>
                         </div>
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="status_wilayah">Status Wilayah</label>
                             <select class="form-control @error('status_wilayah') is-invalid @enderror"
                                 name="status_wilayah" required>
@@ -174,7 +174,7 @@
                             @error('status_wilayah')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
@@ -186,8 +186,7 @@
     </div>
 
     <!-- Modal Edit Wilayah -->
-    <div class="modal fade" id="editWilayahModal" tabindex="-1" aria-labelledby="editWilayahLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="editWilayahModal" tabindex="-1" aria-labelledby="editWilayahLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <form id="editWilayahForm" method="POST">
                 @csrf
@@ -208,13 +207,13 @@
                             <label>Deskripsi</label>
                             <textarea name="deskripsi" id="editDeskripsi" class="form-control"></textarea>
                         </div>
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label>Status Wilayah</label>
                             <select name="status_wilayah" id="editStatusWilayah" class="form-control" required>
                                 <option value="1">Aktif</option>
                                 <option value="0">Nonaktif</option>
                             </select>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Simpan
