@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
 class UserSeeder extends Seeder
@@ -24,7 +25,7 @@ class UserSeeder extends Seeder
                 'no_telepon'      => '081234567890',
                 'password'        => Hash::make('password'),
                 'profile_picture' => null,
-                'role_id'         => '4880aba1-4450-465e-b938-5694588ab2e5',
+                'role_id'         => DB::table('role')->where('role_name', 'admin')->value('id'),
             ],
         ]);
     }
