@@ -158,7 +158,7 @@ Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
 
 
 
-    Route::post('supplier/{id}/toggle-status', [SupplierController::class, 'toggleStatus'])->name('role.toggleStatus');
+    Route::post('supplier/{id}/toggle-status', [SupplierController::class, 'toggleStatus'])->name('supplier.toggleStatus');
     Route::resource('supplier', SupplierController::class);
 
     Route::get('dashboard-master', [DashboardMasterController::class, 'index'])->name('dashboard-master');
