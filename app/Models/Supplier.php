@@ -18,7 +18,6 @@ class Supplier extends Model
         'nama_supplier',
         'penanggung_jawab',
         'email',
-        'website',
         'no_telepon',
         'alamat',
         'keterangan',
@@ -27,8 +26,6 @@ class Supplier extends Model
         'wilayah_id',
         'provinsi_id',
         'kota_id',
-        'kecamatan_id',
-        'kelurahan_id',
         'status',
     ];
 
@@ -78,7 +75,6 @@ class Supplier extends Model
             'nama_supplier' => $data['nama_supplier'],
             'penanggung_jawab' => $data['penanggung_jawab'] ?? null,
             'email'        => $data['email'],
-            'website'      => $data['website'] ?? null,
             'no_telepon'   => $data['no_telepon'],
             'alamat'       => $data['alamat'],
             'keterangan'   => $data['keterangan'] ?? null,
@@ -87,8 +83,6 @@ class Supplier extends Model
             'wilayah_id'   => $data['wilayah_id'],
             'provinsi_id'  => $data['provinsi_id'],
             'kota_id'      => $data['kota_id'],
-            'kecamatan_id' => $data['kecamatan_id'],
-            'kelurahan_id' => $data['kelurahan_id'],
             'status'       => $data['status'] ?? true,
         ]);
     }
@@ -100,7 +94,6 @@ class Supplier extends Model
             'nama_supplier' => $data['nama_supplier'],
             'penanggung_jawab' => $data['penanggung_jawab'] ?? $this->penanggung_jawab,
             'email'        => $data['email']        ?? $this->email,
-            'website'      => $data['website']      ?? $this->website,
             'no_telepon'   => $data['no_telepon']    ?? $this->no_telepon,
             'alamat'       => $data['alamat']       ?? $this->alamat,
             'keterangan'   => $data['keterangan']   ?? $this->keterangan,
@@ -109,8 +102,6 @@ class Supplier extends Model
             'wilayah_id'   => $data['wilayah_id']   ?? $this->wilayah_id,
             'provinsi_id'  => $data['provinsi_id']  ?? $this->provinsi_id,
             'kota_id'      => $data['kota_id']      ?? $this->kota_id,
-            'kecamatan_id' => $data['kecamatan_id'] ?? $this->kecamatan_id,
-            'kelurahan_id' => $data['kelurahan_id'] ?? $this->kelurahan_id,
             'status'       => $data['status']       ?? $this->status,
         ]);
     }
@@ -133,16 +124,6 @@ class Supplier extends Model
     public function kota()
     {
         return $this->belongsTo(Kota::class, 'kota_id');
-    }
-
-    public function kecamatan()
-    {
-        return $this->belongsTo(Kecamatan::class, 'kecamatan_id');
-    }
-
-    public function kelurahan()
-    {
-        return $this->belongsTo(Kelurahan::class, 'kelurahan_id');
     }
 
     public function toggleStatus()

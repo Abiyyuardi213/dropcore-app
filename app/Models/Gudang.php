@@ -14,6 +14,7 @@ class Gudang extends Model
     public $incrementing = false;
 
     protected $fillable = [
+        'kode_gudang',
         'nama_gudang',
         'jenis_gudang',
         'lokasi',
@@ -30,13 +31,25 @@ class Gudang extends Model
             if (!$gudang->id) {
                 $gudang->id = (string) Str::uuid();
             }
+
+            if (empty($gudang->kode_gudang)) {
+                $latest = self::orderBy('created_at', 'desc')->first();
+                $number = 1;
+                if ($latest && $latest->kode_gudang) {
+                    // Extract number from WH-XXXXXX
+                    if (preg_match('/WH-(\d+)/', $latest->kode_gudang, $matches)) {
+                        $number = (int) $matches[1] + 1;
+                    }
+                }
+                $gudang->kode_gudang = 'WH-' . str_pad($number, 6, '0', STR_PAD_LEFT);
+            }
         });
 
         static::created(function ($gudang) {
             RiwayatAktivitasLog::add(
                 'gudang',
                 'create',
-                "Menambah gudang {$gudang->nama_gudang}",
+                "Menambah gudang {$gudang->nama_gudang} ({$gudang->kode_gudang})",
                 optional(Auth::user())->id
             );
         });
@@ -63,6 +76,7 @@ class Gudang extends Model
     public static function createGudang($data)
     {
         return self::create([
+            'kode_gudang'    => $data['kode_gudang'] ?? null,
             'nama_gudang'    => $data['nama_gudang'],
             'jenis_gudang'   => $data['jenis_gudang'] ?? 'Utama',
             'lokasi'         => $data['lokasi'],
@@ -109,5 +123,9 @@ class Gudang extends Model
             "Mengubah status gudang {$this->nama_gudang}",
             optional(Auth::user())->id
         );
+    }
+    public function stok()
+    {
+        return $this->hasMany(Stok::class, 'gudang_id');
     }
 }

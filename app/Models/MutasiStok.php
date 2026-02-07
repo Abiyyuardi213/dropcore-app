@@ -35,6 +35,24 @@ class MutasiStok extends Model
             if (!$mutasi->id) {
                 $mutasi->id = (string) Str::uuid();
             }
+
+            if (empty($mutasi->referensi)) {
+                $prefix = 'MUT-' . date('ymd') . '-';
+
+                // Find last mutasi created today to increment sequence
+                $lastMutasi = self::where('referensi', 'like', $prefix . '%')
+                    ->orderBy('referensi', 'desc')
+                    ->first();
+
+                $number = 1;
+                if ($lastMutasi) {
+                    // Extract the number part
+                    $lastNumber = (int) substr($lastMutasi->referensi, strlen($prefix));
+                    $number = $lastNumber + 1;
+                }
+
+                $mutasi->referensi = $prefix . str_pad($number, 4, '0', STR_PAD_LEFT);
+            }
         });
     }
 

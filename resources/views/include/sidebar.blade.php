@@ -143,21 +143,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('kecamatan.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/kecamatan*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-map"></i>
-                                <p>Master Kecamatan</p>
-                            </a>
-                        </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('kelurahan.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/kelurahan*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-map"></i>
-                                <p>Master Kelurahan</p>
-                            </a>
-                        </li>
 
                         <li class="nav-item">
                             <a href="{{ route('supplier.index') }}"

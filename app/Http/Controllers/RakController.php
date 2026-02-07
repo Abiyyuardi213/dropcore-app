@@ -27,7 +27,7 @@ class RakController extends Controller
         $request->validate([
             'gudang_id'     => 'required|exists:gudang,id',
             'area_id'       => 'required|exists:area_gudang,id',
-            'kode_rak'      => 'required|string|max:255|unique:rak_gudang,kode_rak',
+            'kode_rak'      => 'nullable|string|max:255|unique:rak_gudang,kode_rak',
             'jenis_rak'     => 'nullable|string|max:100',
             'posisi'        => 'nullable|string|max:255',
             'kapasitas_max' => 'nullable|string|max:100',
@@ -61,7 +61,7 @@ class RakController extends Controller
         $request->validate([
             'gudang_id'     => 'required|exists:gudang,id',
             'area_id'       => 'required|exists:area_gudang,id',
-            'kode_rak'      => 'required|string|max:255|unique:rak_gudang,kode_rak,' . $id,
+            'kode_rak'      => 'nullable|string|max:255|unique:rak_gudang,kode_rak,' . $id,
             'jenis_rak'     => 'nullable|string|max:100',
             'posisi'        => 'nullable|string|max:255',
             'kapasitas_max' => 'nullable|string|max:100',

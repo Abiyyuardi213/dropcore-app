@@ -11,6 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -88,20 +91,14 @@
                                                         name="tipe_supplier" value="{{ old('tipe_supplier') }}"
                                                         placeholder="Contoh: Distributor, Principal">
                                                 </div>
-                                                <div class="form-group">
-                                                    <label for="website">Website</label>
-                                                    <input type="url"
-                                                        class="form-control @error('website') is-invalid @enderror"
-                                                        name="website" value="{{ old('website') }}"
-                                                        placeholder="https://example.com">
-                                                </div>
+
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="logo">Logo Supplier</label>
                                                     <div class="custom-file">
-                                                        <input type="file" class="custom-file-input"
-                                                            id="logo" name="logo" accept="image/*">
+                                                        <input type="file" class="custom-file-input" id="logo"
+                                                            name="logo" accept="image/*">
                                                         <label class="custom-file-label" for="logo">Pilih
                                                             file</label>
                                                     </div>
@@ -185,44 +182,20 @@
                                                 <div class="form-group">
                                                     <label for="kota_id">Kota</label>
                                                     <select name="kota_id" id="kota_id"
-                                                        class="form-control @error('kota_id') is-invalid @enderror">
+                                                        class="form-control select2 @error('kota_id') is-invalid @enderror">
                                                         <option value="">-- Pilih Kota --</option>
                                                         @foreach ($kotas as $kota)
                                                             <option value="{{ $kota->id }}"
                                                                 {{ old('kota_id') == $kota->id ? 'selected' : '' }}>
-                                                                {{ $kota->kota }}</option>
+                                                                {{ $kota->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="kecamatan_id">Kecamatan</label>
-                                                    <select name="kecamatan_id" id="kecamatan_id"
-                                                        class="form-control @error('kecamatan_id') is-invalid @enderror">
-                                                        <option value="">-- Pilih Kecamatan --</option>
-                                                        @foreach ($kecamatans as $kecamatan)
-                                                            <option value="{{ $kecamatan->id }}"
-                                                                {{ old('kecamatan_id') == $kecamatan->id ? 'selected' : '' }}>
-                                                                {{ $kecamatan->kecamatan }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="kelurahan_id">Kelurahan</label>
-                                                    <select name="kelurahan_id" id="kelurahan_id"
-                                                        class="form-control @error('kelurahan_id') is-invalid @enderror">
-                                                        <option value="">-- Pilih Kelurahan --</option>
-                                                        @foreach ($kelurahans as $kelurahan)
-                                                            <option value="{{ $kelurahan->id }}"
-                                                                {{ old('kelurahan_id') == $kelurahan->id ? 'selected' : '' }}>
-                                                                {{ $kelurahan->kelurahan }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
                                                     <label for="alamat">Alamat Lengkap</label>
-                                                    <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" rows="3">{{ old('alamat') }}</textarea>
+                                                    <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" rows="5">{{ old('alamat') }}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -253,10 +226,53 @@
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bs-custom-file-input/1.3.4/bs-custom-file-input.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
             bsCustomFileInput.init();
             $('[data-widget="treeview"]').Treeview('init');
+
+            // Initialize Select2 on the Kota dropdown
+            $('#kota_id').select2({
+                theme: 'bootstrap4',
+                placeholder: '-- Pilih Kota --',
+                allowClear: true,
+                width: '100%'
+            });
+
+            // SweetAlert for Success Message
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                });
+            @endif
+
+            // SweetAlert for Error Message
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: '{{ session('error') }}',
+                });
+            @endif
+
+            // SweetAlert for Validation Errors
+            @if ($errors->any())
+                var errorMessages = '<ul>';
+                @foreach ($errors->all() as $error)
+                    errorMessages += '<li>{{ $error }}</li>';
+                @endforeach
+                errorMessages += '</ul>';
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Validasi',
+                    html: errorMessages,
+                });
+            @endif
         });
     </script>
 </body>

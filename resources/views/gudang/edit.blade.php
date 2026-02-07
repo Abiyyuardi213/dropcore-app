@@ -58,17 +58,34 @@
                                     <!-- General Tab -->
                                     <div class="tab-pane fade show active" id="general" role="tabpanel"
                                         aria-labelledby="general-tab">
-                                        <div class="form-group">
-                                            <label for="nama_gudang">Nama Gudang <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="text"
-                                                class="form-control @error('nama_gudang') is-invalid @enderror"
-                                                name="nama_gudang"
-                                                value="{{ old('nama_gudang', $gudang->nama_gudang) }}" required
-                                                placeholder="Contoh: Gudang Utama Jakarta" autocomplete="off">
-                                            @error('nama_gudang')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="kode_gudang">Kode Gudang</label>
+                                                    <input type="text"
+                                                        class="form-control @error('kode_gudang') is-invalid @enderror"
+                                                        name="kode_gudang"
+                                                        value="{{ old('kode_gudang', $gudang->kode_gudang) }}"
+                                                        placeholder="Contoh: WH-000001" autocomplete="off">
+                                                    @error('kode_gudang')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="nama_gudang">Nama Gudang <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                        class="form-control @error('nama_gudang') is-invalid @enderror"
+                                                        name="nama_gudang"
+                                                        value="{{ old('nama_gudang', $gudang->nama_gudang) }}" required
+                                                        placeholder="Contoh: Gudang Utama Jakarta" autocomplete="off">
+                                                    @error('nama_gudang')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div class="row">

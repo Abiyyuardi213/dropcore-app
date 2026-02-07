@@ -4,31 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Mutasi Stok</title>
-    <link rel="icon" type="image/png" href="{{ asset('image/itats-1080.jpg') }}">
+    <title>Input Mutasi Stok</title>
+    <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
         rel="stylesheet">
-
-    <style>
-        /* Styling agar dropdown Select2 tampil rapi */
-        .select2-container--default .select2-selection--single {
-            height: 38px;
-            padding: 6px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 24px;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 36px;
-        }
-    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -42,7 +26,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Tambah Mutasi Stok</h1>
+                            <h1 class="m-0">Input Mutasi Stok</h1>
                         </div>
                     </div>
                 </div>
@@ -50,240 +34,222 @@
 
             <section class="content">
                 <div class="container-fluid">
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-exchange-alt"></i> Form Mutasi Stok</h3>
-                        </div>
-                        <div class="card-body">
-                            @if (session('error'))
-                                <div class="alert alert-danger">{{ session('error') }}</div>
-                            @endif
+                    <form action="{{ route('mutasi-stok.store') }}" method="POST">
+                        @csrf
 
-                            <form action="{{ route('mutasi-stok.store') }}" method="POST">
-                                @csrf
-
-                                <div class="row mb-3">
-                                    <div class="col-md-12">
-                                        <div class="callout callout-info">
-                                            <h5><i class="fas fa-info"></i> Info Mutasi</h5>
-                                            <p>Pilih <strong>Jenis Mutasi</strong> terlebih dahulu untuk menyesuaikan
-                                                form input.</p>
-                                        </div>
+                        {{-- Top Section: Basic Info & Product --}}
+                        <div class="card card-primary card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-edit mr-1"></i> Data Mutasi</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="jenis_mutasi">Jenis Mutasi <span
-                                                    class="text-danger">*</span></label>
-                                            <select name="jenis_mutasi" id="jenis_mutasi" class="form-control select2"
-                                                style="width: 100%;" required>
+                                            <label>Jenis Mutasi <span class="text-danger">*</span></label>
+                                            <select name="jenis_mutasi" id="jenis_mutasi"
+                                                class="form-control select2bs4">
                                                 <option value="pindah" selected>Pindah Lokasi (Transfer)</option>
-                                                <option value="masuk">Barang Masuk (Inbound / Supplier)</option>
-                                                <option value="keluar">Barang Keluar (Outbound / Usage)</option>
+                                                <option value="masuk">Barang Masuk (Inbound)</option>
+                                                <option value="keluar">Barang Keluar (Outbound)</option>
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Tanggal <span class="text-danger">*</span></label>
+                                            <input type="date" name="tanggal_mutasi" class="form-control"
+                                                value="{{ date('Y-m-d') }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Referensi (Opsional)</label>
+                                            <input type="text" name="referensi" class="form-control"
+                                                placeholder="Auto-Generate jika kosong">
+                                        </div>
+                                    </div>
                                 </div>
 
+                                <div class="dropdown-divider"></div>
+
+                                {{-- Dynamic Product Section --}}
                                 <div class="row">
-                                    {{-- Kolom Kiri: Info Barang --}}
-                                    <div class="col-md-6">
-                                        <div class="card card-secondary card-outline">
-                                            <div class="card-header">
-                                                <h3 class="card-title">Informasi Barang</h3>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label for="produk_id">Produk <span
-                                                            class="text-danger">*</span></label>
-                                                    <select id="produk_id" name="produk_id" class="form-control select2"
-                                                        data-placeholder="-- Pilih Produk --" style="width: 100%;"
-                                                        required>
-                                                        <option value=""></option>
-                                                        @foreach ($products as $produk)
-                                                            <option value="{{ $produk->id }}"
-                                                                {{ old('produk_id') == $produk->id ? 'selected' : '' }}>
-                                                                {{ $produk->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                    @error('produk_id')
-                                                        <div class="text-danger small">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
+                                    <div class="col-md-9">
+                                        {{-- 1. Stock Selector (For Transfer/Outbound) --}}
+                                        <div class="form-group" id="stok-selector-group" style="display: none;">
+                                            <label>Pilih Stok Tersedia <span class="text-danger">*</span></label>
+                                            <select id="stok_id_selector" class="form-control select2bs4"
+                                                style="width: 100%;">
+                                                <option value="">-- Pilih Stok Asal --</option>
+                                                @foreach ($stoks as $stok)
+                                                    <option value="{{ $stok->id }}"
+                                                        data-produk="{{ $stok->produk_id }}"
+                                                        data-kondisi="{{ $stok->kondisi_id }}"
+                                                        data-gudang="{{ $stok->gudang_id }}"
+                                                        data-area="{{ $stok->area_id }}" data-rak="{{ $stok->rak_id }}"
+                                                        data-qty="{{ $stok->quantity }}">
+                                                        {{ $stok->produk->name }}
+                                                        | {{ $stok->kondisi->nama_kondisi ?? 'Standar' }}
+                                                        | {{ $stok->gudang->nama_gudang }}
+                                                        {{ $stok->area ? '> ' . $stok->area->kode_area : '' }}
+                                                        {{ $stok->rak ? '> ' . $stok->rak->kode_rak : '' }}
+                                                        (Qty: {{ $stok->quantity }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <small class="text-muted">Memilih stok akan otomatis mengisi Produk,
+                                                Kondisi, Lokasi Asal, dan Max Qty.</small>
+                                        </div>
 
-                                                <div class="form-group">
-                                                    <label for="kondisi_id">Kondisi Barang <span
-                                                            class="text-danger">*</span></label>
-                                                    <select id="kondisi_id" name="kondisi_id"
-                                                        class="form-control select2"
-                                                        data-placeholder="-- Pilih Kondisi --" style="width: 100%;"
-                                                        required>
-                                                        <option value=""></option>
-                                                        @foreach ($kondisis as $kondisi)
-                                                            <option value="{{ $kondisi->id }}"
-                                                                {{ old('kondisi_id') == $kondisi->id ? 'selected' : '' }}>
-                                                                {{ $kondisi->nama_kondisi }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                    @error('kondisi_id')
-                                                        <div class="text-danger small">{{ $message }}</div>
-                                                    @enderror
+                                        {{-- 2. Manual Product Selection (For Inbound) --}}
+                                        <div id="manual-product-group">
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <div class="form-group">
+                                                        <label>Produk <span class="text-danger">*</span></label>
+                                                        <select name="produk_id" id="produk_id"
+                                                            class="form-control select2bs4" required>
+                                                            <option value="">-- Pilih Produk --</option>
+                                                            @foreach ($products as $p)
+                                                                <option value="{{ $p->id }}">
+                                                                    {{ $p->name }} ({{ $p->sku }})</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
                                                 </div>
-
-                                                <div class="form-group">
-                                                    <label for="quantity">Jumlah (Qty) <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="number" name="quantity"
-                                                        class="form-control @error('quantity') is-invalid @enderror"
-                                                        value="{{ old('quantity') }}" required min="1"
-                                                        placeholder="0">
-                                                    @error('quantity')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label for="referensi">No. Referensi (Opsional)</label>
-                                                    <input type="text" name="referensi"
-                                                        class="form-control @error('referensi') is-invalid @enderror"
-                                                        value="{{ old('referensi') }}"
-                                                        placeholder="Contoh: PO-001, SJ-123">
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label for="tanggal_mutasi">Tanggal Mutasi <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="date" name="tanggal_mutasi"
-                                                        class="form-control @error('tanggal_mutasi') is-invalid @enderror"
-                                                        value="{{ old('tanggal_mutasi') ?? date('Y-m-d') }}" required>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label for="keterangan">Keterangan</label>
-                                                    <textarea name="keterangan" rows="3" class="form-control" placeholder="Catatan tambahan...">{{ old('keterangan') }}</textarea>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Kondisi <span class="text-danger">*</span></label>
+                                                        <select name="kondisi_id" id="kondisi_id"
+                                                            class="form-control select2bs4" required>
+                                                            @foreach ($kondisis as $k)
+                                                                <option value="{{ $k->id }}">
+                                                                    {{ $k->nama_kondisi }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {{-- Kolom Kanan: Lokasi --}}
-                                    <div class="col-md-6">
-                                        {{-- Lokasi Asal --}}
-                                        <div id="container_asal" class="card card-warning card-outline mb-3">
-                                            <div class="card-header">
-                                                <h3 class="card-title"><i class="fas fa-dolly text-warning mr-1"></i>
-                                                    Lokasi Asal (Sumber)</h3>
-                                            </div>
-                                            <div class="card-body">
-                                                <div id="lokasi-asal-list" class="mb-2"></div>
+                                    {{-- 3. Quantity (Always Visible) --}}
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Jumlah (Qty) <span class="text-danger">*</span></label>
+                                            <input type="number" name="quantity" class="form-control" min="1"
+                                                placeholder="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Keterangan</label>
+                                    <textarea name="keterangan" class="form-control" rows="2" placeholder="Catatan tambahan..."></textarea>
+                                </div>
 
-                                                <div class="form-group">
-                                                    <label>Gudang Asal</label>
-                                                    <select name="gudang_asal_id" class="form-control select2"
-                                                        style="width: 100%;">
-                                                        <option value="">-- Pilih Gudang --</option>
-                                                        @foreach ($gudangs as $gudang)
-                                                            <option value="{{ $gudang->id }}">
-                                                                {{ $gudang->nama_gudang }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    @error('gudang_asal_id')
-                                                        <div class="text-danger small">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
+                                {{-- Stock Info Card (Dynamic) --}}
+                                <div id="stock-info-card" class="alert alert-info mt-3" style="display:none;">
+                                    <h5><i class="fas fa-info-circle mr-1"></i> Informasi Stok</h5>
+                                    <div class="stocks-list text-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Locations Section: Side by Side --}}
+                        <div class="row">
+                            {{-- LEFT: Source --}}
+                            <div class="col-md-6" id="col-asal">
+                                <div class="card card-warning card-outline mb-3">
+                                    <div class="card-header">
+                                        <h3 class="card-title font-weight-bold text-warning">
+                                            <i class="fas fa-dolly mr-1"></i> LOKASI ASAL (SUMBER)
+                                        </h3>
+                                    </div>
+                                    <div class="card-body bg-light">
+                                        <div class="form-group">
+                                            <label>Gudang Asal <span class="text-danger">*</span></label>
+                                            <select name="gudang_asal_id" id="gudang_asal_id"
+                                                class="form-control select2bs4 locations-source">
+                                                <option value="">-- Pilih Gudang --</option>
+                                            </select>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Area Asal</label>
-                                                    <select name="area_asal_id" class="form-control select2"
-                                                        style="width: 100%;">
+                                                    <select name="area_asal_id" id="area_asal_id"
+                                                        class="form-control select2bs4 locations-source">
                                                         <option value="">-- Pilih Area --</option>
-                                                        @foreach ($gudangs as $g)
-                                                            @foreach ($g->areas as $a)
-                                                                <option value="{{ $a->id }}"
-                                                                    data-gudang="{{ $g->id }}">
-                                                                    {{ $g->nama_gudang }} - {{ $a->kode_area }}
-                                                                </option>
-                                                            @endforeach
-                                                        @endforeach
                                                     </select>
                                                 </div>
+                                            </div>
+                                            <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Rak Asal</label>
-                                                    <select name="rak_asal_id" class="form-control select2"
-                                                        style="width: 100%;">
+                                                    <select name="rak_asal_id" id="rak_asal_id"
+                                                        class="form-control select2bs4 locations-source">
                                                         <option value="">-- Pilih Rak --</option>
-                                                        {{-- Simplification: Loading all raks or dependent JS. For now loading all --}}
-                                                        @foreach ($raks ?? [] as $rak)
-                                                            <option value="{{ $rak->id }}">{{ $rak->kode_rak }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                    <small class="text-muted text-italic">* Pastikan memilih lokasi
-                                                        yang memiliki stok.</small>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{-- Lokasi Tujuan --}}
-                                        <div id="container_tujuan" class="card card-success card-outline">
-                                            <div class="card-header">
-                                                <h3 class="card-title"><i
-                                                        class="fas fa-share-square text-success mr-1"></i> Lokasi
-                                                    Tujuan</h3>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label>Gudang Tujuan</label>
-                                                    <select name="gudang_tujuan_id" class="form-control select2"
-                                                        style="width: 100%;">
-                                                        <option value="">-- Pilih Gudang --</option>
-                                                        @foreach ($gudangs as $gudang)
-                                                            <option value="{{ $gudang->id }}">
-                                                                {{ $gudang->nama_gudang }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    @error('gudang_tujuan_id')
-                                                        <div class="text-danger small">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-group">
-                                                    <label>Area Tujuan</label>
-                                                    <select name="area_tujuan_id" class="form-control select2"
-                                                        style="width: 100%;">
-                                                        <option value="">-- Pilih Area --</option>
-                                                        @foreach ($gudangs as $g)
-                                                            @foreach ($g->areas as $a)
-                                                                <option value="{{ $a->id }}">
-                                                                    {{ $g->nama_gudang }} - {{ $a->kode_area }}
-                                                                </option>
-                                                            @endforeach
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label>Rak Tujuan</label>
-                                                    <select name="rak_tujuan_id" class="form-control select2"
-                                                        style="width: 100%;">
-                                                        <option value="">-- Pilih Rak --</option>
-                                                        {{-- Simplified --}}
-                                                        @foreach ($raks ?? [] as $rak)
-                                                            <option value="{{ $rak->id }}">{{ $rak->kode_rak }}
-                                                            </option>
-                                                        @endforeach
                                                     </select>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="mt-4 mb-5 text-right">
-                                    <a href="{{ route('mutasi-stok.index') }}" class="btn btn-secondary mr-2"><i
-                                            class="fas fa-times"></i> Batal</a>
-                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan
-                                        Mutasi</button>
+                            {{-- RIGHT: Destination --}}
+                            <div class="col-md-6" id="col-tujuan">
+                                <div class="card card-success card-outline">
+                                    <div class="card-header">
+                                        <h3 class="card-title font-weight-bold text-success">
+                                            <i class="fas fa-share-square mr-1"></i> LOKASI TUJUAN
+                                        </h3>
+                                    </div>
+                                    <div class="card-body bg-light">
+                                        <div class="form-group">
+                                            <label>Gudang Tujuan <span class="text-danger">*</span></label>
+                                            <select name="gudang_tujuan_id" id="gudang_tujuan_id"
+                                                class="form-control select2bs4 locations-dest">
+                                                <option value="">-- Pilih Gudang --</option>
+                                            </select>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Area Tujuan</label>
+                                                    <select name="area_tujuan_id" id="area_tujuan_id"
+                                                        class="form-control select2bs4 locations-dest">
+                                                        <option value="">-- Pilih Area --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Rak Tujuan</label>
+                                                    <select name="rak_tujuan_id" id="rak_tujuan_id"
+                                                        class="form-control select2bs4 locations-dest">
+                                                        <option value="">-- Pilih Rak --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
-                    </div>
+
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg btn-block shadow">
+                                    <i class="fas fa-save mr-1"></i> SIMPAN MUTASI
+                                </button>
+                                <a href="{{ route('mutasi-stok.index') }}" class="btn btn-default btn-block mt-2">
+                                    Batal
+                                </a>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </section>
         </div>
@@ -297,105 +263,215 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        // Master Data from Controller
+        const masterGudang = @json($gudangs);
+
         $(document).ready(function() {
-            // Initialize Select2
-            $('.select2').select2({
+            // Init Select2
+            $('.select2bs4').select2({
                 theme: 'bootstrap4',
-                placeholder: $(this).data('placeholder'),
-                allowClear: true
+                width: '100%'
             });
 
-            const $jenisMutasi = $('#jenis_mutasi');
-            const $containerAsal = $('#container_asal');
-            const $containerTujuan = $('#container_tujuan');
-            const $produkSelect = $('#produk_id');
-            const $kondisiSelect = $('#kondisi_id');
-            const $lokasiAsalList = $('#lokasi-asal-list');
-            const $gudangAsal = $('select[name="gudang_asal_id"]');
-            const $areaAsal = $('select[name="area_asal_id"]');
-            const $rakAsal = $('select[name="rak_asal_id"]');
+            // --- Logic 1: Visible Sections & Fields based on Type
+            $('#jenis_mutasi').change(function() {
+                let val = $(this).val();
 
-            function updateFormVisibility() {
-                const jenis = $jenisMutasi.val();
+                // 1. Selector Mode Logic
+                if (val === 'pindah' || val === 'keluar') {
+                    // Mode: Existing Stock
+                    $('#stok-selector-group').show();
+                    $('#manual-product-group').hide();
 
-                if (jenis === 'masuk') {
-                    $containerAsal.hide();
-                    $containerTujuan.show();
-                    // Reset Asal Validation/Values if needed or just hide
-                } else if (jenis === 'keluar') {
-                    $containerAsal.show();
-                    $containerTujuan.hide();
-                } else if (jenis === 'pindah') {
-                    $containerAsal.show();
-                    $containerTujuan.show();
+                    $('#produk_id').removeAttr('required');
+                    $('#kondisi_id').removeAttr('required');
+                    $('#stok_id_selector').attr('required', true);
+
+                    // Show Qty input that was moved out of manual group? 
+                    // Wait, I moved Qty input out of manual group in HTML above? 
+                    // Ah, I need to make sure I actually DID move it out in the HTML string I'm creating.
+                    // Checking the HTML string I am about to write... 
+                    // I put Qty inside `manual-product-group` in my previous logic, I need to extract it.
+                    // See correction in HTML below.
                 } else {
-                    $containerAsal.hide();
-                    $containerTujuan.hide();
+                    // Mode: Inbound (New Stock)
+                    $('#stok-selector-group').hide();
+                    $('#manual-product-group').show();
+
+                    $('#produk_id').attr('required', true);
+                    $('#kondisi_id').attr('required', true);
+                    $('#stok_id_selector').removeAttr('required');
+                }
+
+                // 2. Location Columns Visibility
+                if (val === 'pindah') {
+                    $('#col-asal').show();
+                    $('#col-tujuan').show();
+
+                    $('#col-asal').removeClass('col-md-12').addClass('col-md-6');
+                    $('#col-tujuan').removeClass('col-md-12').addClass('col-md-6');
+
+                    requireFields('source', false); // filled by selector usually
+                    requireFields('dest', true);
+                } else if (val === 'masuk') {
+                    $('#col-asal').hide();
+                    $('#col-tujuan').show();
+
+                    $('#col-tujuan').removeClass('col-md-6').addClass(
+                        'col-md-12'); // Full width if only one
+
+                    requireFields('source', false);
+                    requireFields('dest', true);
+                } else if (val === 'keluar') {
+                    $('#col-asal').show();
+                    $('#col-tujuan').hide();
+
+                    $('#col-asal').removeClass('col-md-6').addClass('col-md-12'); // Full width if only one
+
+                    requireFields('source', false);
+                    requireFields('dest', false);
+                }
+            }).trigger('change');
+
+            function requireFields(group, isRequired) {
+                if (group === 'source') {
+                    $('#gudang_asal_id').prop('required', isRequired);
+                } else {
+                    $('#gudang_tujuan_id').prop('required', isRequired);
                 }
             }
 
-            function fetchStock() {
-                const produkId = $produkSelect.val();
-                const kondisiId = $kondisiSelect.val();
-                const jenis = $jenisMutasi.val();
+            // --- Logic: Stock Selector Change
+            $('#stok_id_selector').change(function() {
+                let $opt = $(this).find(':selected');
+                if (!$opt.val()) return;
 
-                if (['keluar', 'pindah'].includes(jenis) && produkId && kondisiId) {
-                    $lokasiAsalList.html(
-                        '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Mencari stok...</div>');
+                let data = $opt.data();
 
-                    // Note: You would likely create a more specific API endpoint for filtering by condition
-                    // For now reusing the existing logic pattern but ideally updated to filter by Condition too
-                    // Since the previous endpoint didn't take Condition, we might just show all locations and let user pick, 
-                    // OR we rely on the user to pick correct Gudang/Rak where that condition exists.
-                    // Let's call the existing endpoint and purely display info. 
-                    // A better approach: Create a new endpoint `get-stock-locations?produk_id=X&kondisi_id=Y`
-                    // But to avoid touching controller too much, let's use the existing `lokasi-asal-produk` if valid,
-                    // or just leave it manual selection.
+                // Fill Hidden Product/Condition triggers
+                // Note: The manual Product/Condition dropdowns are hidden but we should set their values
+                // so the backend receives 'produk_id' and 'kondisi_id' correctly if we use the same names.
+                // Wait, if I hide the SELECT with name="produk_id", it still submits if not disabled.
+                // But I removed 'required'. 
+                // So I should set the value of the 'produk_id' SELECT to match the data.produk.
+
+                $('#produk_id').val(data.produk).trigger('change');
+                $('#kondisi_id').val(data.kondisi).trigger('change');
+
+                // Since Qty is shared, we set Max
+                // Wait, where is the shared Qty input? I need to ensure there is ONE Qty input.
+                // In the HTML below, I will place Qty input in a common area.
+
+                $('input[name="quantity"]').attr('max', data.qty).attr('placeholder', 'Max: ' + data.qty);
+
+                // Fill Locations
+                $('#gudang_asal_id').val(data.gudang).trigger('change');
+                setTimeout(() => {
+                    $('#area_asal_id').val(data.area).trigger('change');
+                    setTimeout(() => {
+                        $('#rak_asal_id').val(data.rak).trigger('change');
+                    }, 100);
+                }, 100);
+            });
+
+            // --- Logic: Cascading Locations
+            function initGudangDropdowns() {
+                let opts = '<option value="">-- Pilih Gudang --</option>';
+                masterGudang.forEach(g => {
+                    opts += `<option value="${g.id}">${g.nama_gudang}</option>`;
+                });
+                $('#gudang_asal_id').html(opts);
+                $('#gudang_tujuan_id').html(opts);
+            }
+            initGudangDropdowns();
+
+            function handleGudangChange(prefix) {
+                let gudangId = $(`#gudang_${prefix}_id`).val();
+                let areaSelect = $(`#area_${prefix}_id`);
+                let rakSelect = $(`#rak_${prefix}_id`);
+
+                areaSelect.html('<option value="">-- Pilih Area --</option>');
+                rakSelect.html('<option value="">-- Pilih Rak --</option>');
+
+                if (gudangId) {
+                    let selectedGudang = masterGudang.find(g => g.id == gudangId);
+                    if (selectedGudang && selectedGudang.areas) {
+                        let opts = '<option value="">-- Pilih Area --</option>';
+                        selectedGudang.areas.forEach(a => {
+                            opts += `<option value="${a.id}">${a.nama_area} (${a.kode_area})</option>`;
+                        });
+                        areaSelect.html(opts);
+                    }
+                }
+            }
+
+            function handleAreaChange(prefix) {
+                let gudangId = $(`#gudang_${prefix}_id`).val();
+                let areaId = $(`#area_${prefix}_id`).val();
+                let rakSelect = $(`#rak_${prefix}_id`);
+
+                rakSelect.html('<option value="">-- Pilih Rak --</option>');
+
+                if (gudangId && areaId) {
+                    let selectedGudang = masterGudang.find(g => g.id == gudangId);
+                    if (selectedGudang) {
+                        let selectedArea = selectedGudang.areas.find(a => a.id == areaId);
+                        if (selectedArea && selectedArea.raks) {
+                            let opts = '<option value="">-- Pilih Rak --</option>';
+                            selectedArea.raks.forEach(r => {
+                                opts += `<option value="${r.id}">${r.kode_rak}</option>`;
+                            });
+                            rakSelect.html(opts);
+                        }
+                    }
+                }
+            }
+
+            $('#gudang_asal_id').change(() => handleGudangChange('asal'));
+            $('#area_asal_id').change(() => handleAreaChange('asal'));
+            $('#gudang_tujuan_id').change(() => handleGudangChange('tujuan'));
+            $('#area_tujuan_id').change(() => handleAreaChange('tujuan'));
+
+            // --- Logic: Product Check (for Inbound)
+            $('#produk_id').change(function() {
+                // If we are in 'Masuk' mode, we might want to show total stock somewhere?
+                // Or just leave it. The previous logic showed stock info.
+                // We can keep that.
+                let produkId = $(this).val();
+                let $infoCard = $('#stock-info-card');
+                let $list = $infoCard.find('.stocks-list');
+
+                if (produkId) {
+                    // Only fetch if displayed
+                    // But wait, if we are in 'pindah' mode, product is auto selected. 
+                    // So we can still show info.
+                    $list.html('<i class="fas fa-sync fa-spin"></i> Loading...');
+                    $infoCard.show();
 
                     $.ajax({
-                        url: `/lokasi-asal-produk/${produkId}`, // This endpoint returns all stock locations for a product
+                        url: '{{ url('admin/lokasi-asal-produk') }}/' + produkId,
                         method: 'GET',
                         success: function(res) {
-                            if (res.semua_lokasi.length > 0) {
-                                let html =
-                                    `<div class="alert alert-info py-2"><h6><i class="fas fa-info-circle"></i> Stok Tersedia (Semua Kondisi):</h6><ul class="list-unstyled mb-0" style="font-size: 0.9em;">`;
-                                res.semua_lokasi.forEach(function(item) {
-                                    html += `<li>
-                                    <i class="fas fa-map-marker-alt"></i> 
-                                    <b>${item.gudang_nama}</b> 
-                                    ${item.area_kode ? ' > ' + item.area_kode : ''} 
-                                    ${item.rak_kode ? ' > Rack ' + item.rak_kode : ''}
-                                </li>`;
+                            if (res.semua_lokasi && res.semua_lokasi.length > 0) {
+                                let html = '<ul class="list-unstyled mb-0">';
+                                res.semua_lokasi.forEach(s => {
+                                    html +=
+                                        `<li><i class="fas fa-map-marker-alt text-danger"></i> ${s.gudang_nama}, ${s.area_kode}, ${s.rak_kode} (Qty Available)</li>`;
                                 });
-                                html += `</ul></div>`;
-                                $lokasiAsalList.html(html);
+                                html += '</ul>';
+                                $list.html(html);
                             } else {
-                                $lokasiAsalList.html(
-                                    '<div class="alert alert-warning py-2 small">Tidak ada stok tercatat untuk produk ini.</div>'
-                                );
+                                $list.html('Belum ada stok.');
                             }
-                        },
-                        error: function() {
-                            $lokasiAsalList.html(''); // Silent fail
                         }
                     });
                 } else {
-                    $lokasiAsalList.html('');
+                    $infoCard.hide();
                 }
-            }
-
-            $jenisMutasi.on('change', function() {
-                updateFormVisibility();
-                fetchStock();
             });
-
-            $produkSelect.on('change', fetchStock);
-            $kondisiSelect.on('change', fetchStock);
-
-            // Initial check
-            updateFormVisibility();
         });
     </script>
 </body>

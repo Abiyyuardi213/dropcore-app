@@ -24,7 +24,7 @@ class AreaGudangController extends Controller
     {
         $request->validate([
             'gudang_id'      => 'required|exists:gudang,id',
-            'kode_area'      => 'required|string|max:255|unique:area_gudang,kode_area',
+            'kode_area'      => 'nullable|string|max:255|unique:area_gudang,kode_area',
             'nama_area'      => 'required|string|max:255',
             'jenis_area'     => 'nullable|string|max:100',
             'pic'            => 'nullable|string|max:255',
@@ -57,7 +57,7 @@ class AreaGudangController extends Controller
     {
         $request->validate([
             'gudang_id'      => 'required|exists:gudang,id',
-            'kode_area'      => 'required|string|max:255|unique:area_gudang,kode_area,' . $id,
+            'kode_area'      => 'nullable|string|max:255|unique:area_gudang,kode_area,' . $id,
             'nama_area'      => 'required|string|max:255',
             'jenis_area'     => 'nullable|string|max:100',
             'pic'            => 'nullable|string|max:255',

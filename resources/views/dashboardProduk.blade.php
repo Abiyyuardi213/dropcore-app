@@ -42,6 +42,7 @@
 
             <section class="content">
                 <div class="container-fluid">
+                    <!-- Info Boxes -->
                     <div class="row">
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-info">
@@ -49,9 +50,7 @@
                                     <h3>{{ $totalProduk ?? 0 }}</h3>
                                     <p>Total Produk Tersedia</p>
                                 </div>
-                                <div class="icon">
-                                    <i class="fas fa-warehouse"></i>
-                                </div>
+                                <div class="icon"><i class="fas fa-box-open"></i></div>
                                 <a href="{{ url('admin/product') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
@@ -60,14 +59,105 @@
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-success">
                                 <div class="inner">
-                                    <h3>{{ $totalStok ?? 0 }}</h3>
-                                    <p>Total Stok Produk Keseluruhan</p>
+                                    <h3>{{ number_format($totalStok ?? 0) }}</h3>
+                                    <p>Total Stok Keseluruhan</p>
                                 </div>
-                                <div class="icon">
-                                    <i class="fas fa-th-large"></i>
-                                </div>
+                                <div class="icon"><i class="fas fa-cubes"></i></div>
                                 <a href="{{ url('admin/stok') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="row">
+                        <!-- Left Col: Products by Category -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Produk per Kategori</h3>
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 10px">#</th>
+                                                <th>Nama Kategori</th>
+                                                <th>Jumlah Produk</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($produkPerKategori as $index => $cat)
+                                                <tr>
+                                                    <td>{{ $index + 1 }}.</td>
+                                                    <td>{{ $cat->category_name }}</td>
+                                                    <td><span class="badge badge-info">{{ $cat->products_count }}</span>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Expensive Products -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Top 5 Produk Termahal</h3>
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Nama Produk</th>
+                                                <th>Harga</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($expensiveProducts as $p)
+                                                <tr>
+                                                    <td>{{ $p->name }}</td>
+                                                    <td>Rp {{ number_format($p->price, 0, ',', '.') }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Col: Low Stock Alerts -->
+                        <div class="col-md-6">
+                            <div class="card card-danger">
+                                <div class="card-header">
+                                    <h3 class="card-title">Peringatan Stok Rendah</h3>
+                                </div>
+                                <div class="card-body p-0">
+                                    <ul class="products-list product-list-in-card pl-2 pr-2">
+                                        @forelse($lowStockProducts as $product)
+                                            <li class="item">
+                                                <div class="product-info ml-0">
+                                                    <a href="javascript:void(0)"
+                                                        class="product-title">{{ $product->name }}
+                                                        <span
+                                                            class="badge badge-danger float-right">{{ $product->total_stock }}
+                                                            Unit</span>
+                                                    </a>
+                                                    <span class="product-description">
+                                                        Min Stock: {{ $product->min_stock }} | SKU:
+                                                        {{ $product->sku }}
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        @empty
+                                            <li class="item p-3 text-center text-muted">Aman! Tidak ada produk dengan
+                                                stok rendah.</li>
+                                        @endforelse
+                                    </ul>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="{{ url('admin/product') }}" class="uppercase">Lihat Semua Produk</a>
+                                </div>
                             </div>
                         </div>
                     </div>

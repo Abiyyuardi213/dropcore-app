@@ -129,7 +129,7 @@ Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
 
     Route::get('dashboardProduk', [DashboardProdukController::class, 'index'])->name('dashboardProduk');
 
-    Route::post('/stok/update-kondisi/{id}', [StokController::class, 'updateKondisi']);
+    Route::post('/stok/update-kondisi/{id}', [StokController::class, 'updateKondisi'])->name('stok.update-kondisi');
     Route::resource('stok', StokController::class);
 
     Route::get('/stok/by-produk/{produk_id}', [StokController::class, 'getStokByProduk']);

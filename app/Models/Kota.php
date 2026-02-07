@@ -24,6 +24,12 @@ class Kota extends Model
         'name',
     ];
 
+    // Accessor for backward compatibility
+    public function getKotaAttribute()
+    {
+        return $this->name;
+    }
+
     protected static function booted()
     {
         static::created(function ($kota) {
@@ -57,8 +63,9 @@ class Kota extends Model
     public static function createKota($data)
     {
         return self::create([
+            'id'          => $data['id'] ?? (string) Str::uuid(),
             'provinsi_id' => $data['provinsi_id'],
-            'kota'        => $data['kota'],
+            'name'        => $data['kota'], // Map input 'kota' to 'name'
         ]);
     }
 
@@ -66,7 +73,7 @@ class Kota extends Model
     {
         $this->update([
             'provinsi_id' => $data['provinsi_id'] ?? $this->provinsi_id,
-            'kota'        => $data['kota'] ?? $this->kota,
+            'name'        => $data['kota'] ?? $this->name,
         ]);
     }
 

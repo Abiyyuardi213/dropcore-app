@@ -83,12 +83,13 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="kode_area">Kode Area <span
-                                                            class="text-danger">*</span></label>
+                                                    <label for="kode_area">Kode Area</label>
                                                     <input type="text" name="kode_area"
                                                         class="form-control @error('kode_area') is-invalid @enderror"
-                                                        value="{{ old('kode_area') }}" required
-                                                        placeholder="Contoh: A-01-BLK">
+                                                        value="{{ old('kode_area') }}"
+                                                        placeholder="Auto-generated (e.g., WH-001-A01)">
+                                                    <small class="text-muted">Biarkan kosong untuk generate
+                                                        otomatis.</small>
                                                     @error('kode_area')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror

@@ -32,6 +32,27 @@ class RakGudang extends Model
             if (!$rak->id) {
                 $rak->id = (string) Str::uuid();
             }
+
+            // Auto-generate kode_rak if not set
+            if (empty($rak->kode_rak) && $rak->area_id) {
+                $area = AreaGudang::find($rak->area_id);
+                $areaCode = $area ? $area->kode_area : 'AREA';
+
+                // Find latest rak for this area
+                $latest = self::where('area_id', $rak->area_id)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+
+                $number = 1;
+                if ($latest && $latest->kode_rak) {
+                    // Try to match pattern ending in -R{number}
+                    if (preg_match('/-R(\d+)$/', $latest->kode_rak, $matches)) {
+                        $number = (int) $matches[1] + 1;
+                    }
+                }
+
+                $rak->kode_rak = $areaCode . '-R' . str_pad($number, 2, '0', STR_PAD_LEFT);
+            }
         });
 
         static::created(function ($rak) {
@@ -67,7 +88,7 @@ class RakGudang extends Model
         return self::create([
             'gudang_id'     => $data['gudang_id'],
             'area_id'       => $data['area_id'],
-            'kode_rak'      => $data['kode_rak'],
+            'kode_rak'      => $data['kode_rak'] ?? null,
             'keterangan'    => $data['keterangan'] ?? null,
             'jenis_rak'     => $data['jenis_rak'] ?? null,
             'posisi'        => $data['posisi'] ?? null,

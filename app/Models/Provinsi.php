@@ -20,7 +20,16 @@ class Provinsi extends Model
         'id',
         'wilayah_id',
         'name',
+        // 'provinsi', // Removed
+        'deskripsi',
+        // 'status_provinsi', // Removed
     ];
+
+    // Accessor for backward compatibility
+    public function getProvinsiAttribute()
+    {
+        return $this->name;
+    }
 
     protected static function booted()
     {
@@ -55,10 +64,10 @@ class Provinsi extends Model
     public static function createProvinsi($data)
     {
         return self::create([
+            'id'              => $data['id'] ?? (string) Str::uuid(),
             'wilayah_id'      => $data['wilayah_id'],
-            'provinsi'        => $data['provinsi'],
+            'name'            => $data['provinsi'], // Map input 'provinsi' to 'name'
             'deskripsi'       => $data['deskripsi'] ?? null,
-            'status_provinsi' => $data['status_provinsi'] ?? true,
         ]);
     }
 
@@ -66,9 +75,8 @@ class Provinsi extends Model
     {
         return $this->update([
             'wilayah_id'      => $data['wilayah_id'] ?? $this->wilayah_id,
-            'provinsi'        => $data['provinsi'] ?? $this->provinsi,
+            'name'            => $data['provinsi'] ?? $this->name,
             'deskripsi'       => $data['deskripsi'] ?? $this->deskripsi,
-            'status_provinsi' => $data['status_provinsi'] ?? $this->status_provinsi,
         ]);
     }
 

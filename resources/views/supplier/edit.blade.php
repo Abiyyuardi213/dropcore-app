@@ -88,12 +88,7 @@
                                                         name="tipe_supplier"
                                                         value="{{ old('tipe_supplier', $supplier->tipe_supplier) }}">
                                                 </div>
-                                                <div class="form-group">
-                                                    <label for="website">Website</label>
-                                                    <input type="url"
-                                                        class="form-control @error('website') is-invalid @enderror"
-                                                        name="website" value="{{ old('website', $supplier->website) }}">
-                                                </div>
+
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
@@ -202,39 +197,15 @@
                                                         @foreach ($kotas as $kota)
                                                             <option value="{{ $kota->id }}"
                                                                 {{ old('kota_id', $supplier->kota_id) == $kota->id ? 'selected' : '' }}>
-                                                                {{ $kota->kota }}</option>
+                                                                {{ $kota->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="kecamatan_id">Kecamatan</label>
-                                                    <select name="kecamatan_id" id="kecamatan_id"
-                                                        class="form-control @error('kecamatan_id') is-invalid @enderror">
-                                                        <option value="">-- Pilih Kecamatan --</option>
-                                                        @foreach ($kecamatans as $kecamatan)
-                                                            <option value="{{ $kecamatan->id }}"
-                                                                {{ old('kecamatan_id', $supplier->kecamatan_id) == $kecamatan->id ? 'selected' : '' }}>
-                                                                {{ $kecamatan->kecamatan }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="kelurahan_id">Kelurahan</label>
-                                                    <select name="kelurahan_id" id="kelurahan_id"
-                                                        class="form-control @error('kelurahan_id') is-invalid @enderror">
-                                                        <option value="">-- Pilih Kelurahan --</option>
-                                                        @foreach ($kelurahans as $kelurahan)
-                                                            <option value="{{ $kelurahan->id }}"
-                                                                {{ old('kelurahan_id', $supplier->kelurahan_id) == $kelurahan->id ? 'selected' : '' }}>
-                                                                {{ $kelurahan->kelurahan }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
                                                     <label for="alamat">Alamat Lengkap</label>
-                                                    <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" rows="3">{{ old('alamat', $supplier->alamat) }}</textarea>
+                                                    <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" rows="5">{{ old('alamat', $supplier->alamat) }}</textarea>
                                                 </div>
                                             </div>
                                         </div>

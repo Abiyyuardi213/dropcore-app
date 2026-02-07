@@ -189,6 +189,10 @@
                                             </td>
                                             <td class="text-center">
                                                 <div class="btn-group">
+                                                    <a href="{{ route('stok.show', $stok->id) }}"
+                                                        class="btn btn-info btn-sm" title="Detail">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
                                                     <a href="{{ route('stok.edit', $stok->id) }}"
                                                         class="btn btn-warning btn-sm" title="Edit">
                                                         <i class="fas fa-edit"></i>
@@ -265,7 +269,7 @@
             // Delete Confirmation
             $(document).on('click', '.delete-stok-btn', function() {
                 let stokId = $(this).data('id');
-                let deleteUrl = "{{ url('stok') }}/" + stokId;
+                let deleteUrl = "{{ route('stok.index') }}/" + stokId;
 
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
@@ -304,8 +308,11 @@
                     timerProgressBar: true
                 });
 
+                let url = "{{ route('stok.update-kondisi', ':id') }}";
+                url = url.replace(':id', stokId);
+
                 $.ajax({
-                    url: '{{ url('stok/update-kondisi') }}/' + stokId,
+                    url: url,
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',

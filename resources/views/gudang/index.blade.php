@@ -81,6 +81,7 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
+                                            <th>Kode Gudang</th>
                                             <th>Nama Gudang</th>
                                             <th>Lokasi Gudang</th>
                                             <th>Deskripsi</th>
@@ -92,6 +93,9 @@
                                         @foreach ($gudangs as $index => $gudang)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
+                                                <td><span
+                                                        class="badge badge-info">{{ $gudang->kode_gudang ?? '-' }}</span>
+                                                </td>
                                                 <td>{{ $gudang->nama_gudang }}</td>
                                                 <td>{{ $gudang->lokasi }}</td>
                                                 <td>{{ $gudang->deskripsi }}</td>

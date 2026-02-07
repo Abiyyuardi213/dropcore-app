@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Kecamatan;
-use App\Models\Kelurahan;
 use App\Models\Kota;
 use App\Models\Provinsi;
 use Illuminate\Http\Request;
@@ -21,20 +19,14 @@ class SupplierController extends Controller
 
     public function create()
     {
-        $wilayahs = Wilayah::where('status_wilayah', 1)->get();
-        $provinsis = Provinsi::where('status_provinsi', 1)
-            ->orderBy('provinsi', 'asc')
-            ->get();
+        $wilayahs = Wilayah::all();
+        $provinsis = Provinsi::orderBy('name', 'asc')->get();
         $kotas = Kota::all();
-        $kecamatans = Kecamatan::all();
-        $kelurahans = Kelurahan::all();
 
         return view('supplier.create', compact(
             'wilayahs',
             'provinsis',
-            'kotas',
-            'kecamatans',
-            'kelurahans',
+            'kotas'
         ));
     }
 
@@ -47,46 +39,45 @@ class SupplierController extends Controller
             'alamat' => 'nullable|string',
             'no_telepon' => 'nullable|string',
             'email' => 'nullable|email',
-            'website' => 'nullable|url',
             'keterangan' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'tipe_supplier' => 'nullable|string',
-            'wilayah_id' => 'required|uuid',
-            'provinsi_id' => 'required|uuid',
-            'kota_id' => 'required|uuid',
-            'kecamatan_id' => 'required|uuid',
-            'kelurahan_id' => 'required|uuid',
+            'wilayah_id' => 'required|string',
+            'provinsi_id' => 'required|string',
+            'kota_id' => 'required|string',
+            // 'kecamatan_id' => 'required|uuid', // Removed
+            // 'kelurahan_id' => 'required|uuid', // Removed
             'status' => 'nullable|boolean',
         ]);
 
         $data = $request->all();
 
-        if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('public/suppliers');
-            $data['logo'] = Storage::url($path);
+        try {
+            if ($request->hasFile('logo')) {
+                $path = $request->file('logo')->store('public/suppliers');
+                $data['logo'] = Storage::url($path);
+            }
+
+            Supplier::createSupplier($data);
+
+            return redirect()->route('supplier.index')->with('success', 'Supplier berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan supplier: ' . $e->getMessage());
         }
-
-        Supplier::createSupplier($data);
-
-        return redirect()->route('supplier.index')->with('success', 'Supplier berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
         $supplier = Supplier::findOrFail($id);
-        $wilayahs = Wilayah::where('status_wilayah', 1)->get();
-        $provinsis = Provinsi::where('status_provinsi', 1)->orderBy('provinsi')->get();
+        $wilayahs = Wilayah::all();
+        $provinsis = Provinsi::orderBy('name', 'asc')->get();
         $kotas = Kota::all();
-        $kecamatans = Kecamatan::all();
-        $kelurahans = Kelurahan::all();
 
         return view('supplier.edit', compact(
             'supplier',
             'wilayahs',
             'provinsis',
-            'kotas',
-            'kecamatans',
-            'kelurahans'
+            'kotas'
         ));
     }
 
@@ -99,15 +90,14 @@ class SupplierController extends Controller
             'alamat' => 'nullable|string',
             'no_telepon' => 'nullable|string',
             'email' => 'nullable|email',
-            'website' => 'nullable|url',
             'keterangan' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'tipe_supplier' => 'nullable|string',
-            'wilayah_id' => 'required|uuid',
-            'provinsi_id' => 'required|uuid',
-            'kota_id' => 'required|uuid',
-            'kecamatan_id' => 'required|uuid',
-            'kelurahan_id' => 'required|uuid',
+            'wilayah_id' => 'required|string',
+            'provinsi_id' => 'required|string',
+            'kota_id' => 'required|string',
+            // 'kecamatan_id' => 'required|uuid', // Removed
+            // 'kelurahan_id' => 'required|uuid', // Removed
             'status' => 'nullable|boolean',
         ]);
 
@@ -140,7 +130,7 @@ class SupplierController extends Controller
 
     public function show($id)
     {
-        $supplier = Supplier::with(['wilayah', 'provinsi', 'kota', 'kecamatan', 'kelurahan'])->findOrFail($id);
+        $supplier = Supplier::with(['wilayah', 'provinsi', 'kota'])->findOrFail($id); // Removed kecamatan, kelurahan
         return view('supplier.show', compact('supplier'));
     }
 

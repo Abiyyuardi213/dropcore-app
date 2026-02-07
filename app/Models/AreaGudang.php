@@ -32,6 +32,27 @@ class AreaGudang extends Model
             if (!$area->id) {
                 $area->id = (string) Str::uuid();
             }
+
+            // Auto-generate kode_area if not set
+            if (empty($area->kode_area) && $area->gudang_id) {
+                $gudang = Gudang::find($area->gudang_id);
+                $gudangCode = $gudang ? $gudang->kode_gudang : 'WH';
+
+                // Find latest area for this gudang
+                $latest = self::where('gudang_id', $area->gudang_id)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+
+                $number = 1;
+                if ($latest && $latest->kode_area) {
+                    // Try to match pattern ending in -A{number}
+                    if (preg_match('/-A(\d+)$/', $latest->kode_area, $matches)) {
+                        $number = (int) $matches[1] + 1;
+                    }
+                }
+
+                $area->kode_area = $gudangCode . '-A' . str_pad($number, 2, '0', STR_PAD_LEFT);
+            }
         });
 
         static::created(function ($area) {
@@ -66,7 +87,7 @@ class AreaGudang extends Model
     {
         return self::create([
             'gudang_id'      => $data['gudang_id'],
-            'kode_area'      => $data['kode_area'],
+            'kode_area'      => $data['kode_area'] ?? null,
             'nama_area'      => $data['nama_area'],
             'jenis_area'     => $data['jenis_area'] ?? null,
             'pic'            => $data['pic'] ?? null,

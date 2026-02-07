@@ -106,16 +106,6 @@
                                                 <div class="col-md-6">
                                                     <strong><i class="fas fa-phone mr-1"></i> No. Telepon</strong>
                                                     <p class="text-muted">{{ $supplier->no_telepon ?? '-' }}</p>
-                                                    <hr>
-                                                    <strong><i class="fas fa-globe mr-1"></i> Website</strong>
-                                                    <p class="text-muted">
-                                                        @if ($supplier->website)
-                                                            <a href="{{ $supplier->website }}"
-                                                                target="_blank">{{ $supplier->website }}</a>
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -124,24 +114,16 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <strong><i class="fas fa-map-marker-alt mr-1"></i> Wilayah</strong>
-                                                    <p class="text-muted">{{ $supplier->wilayah->negara ?? '-' }}</p>
+                                                    <p class="text-muted">{{ $supplier->wilayah->name ?? '-' }}</p>
                                                     <hr>
                                                     <strong><i class="fas fa-map mr-1"></i> Provinsi</strong>
-                                                    <p class="text-muted">{{ $supplier->provinsi->provinsi ?? '-' }}
+                                                    <p class="text-muted">{{ $supplier->provinsi->name ?? '-' }}
                                                     </p>
                                                     <hr>
                                                     <strong><i class="fas fa-city mr-1"></i> Kota</strong>
-                                                    <p class="text-muted">{{ $supplier->kota->kota ?? '-' }}</p>
+                                                    <p class="text-muted">{{ $supplier->kota->name ?? '-' }}</p>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <strong><i class="fas fa-building mr-1"></i> Kecamatan</strong>
-                                                    <p class="text-muted">{{ $supplier->kecamatan->kecamatan ?? '-' }}
-                                                    </p>
-                                                    <hr>
-                                                    <strong><i class="fas fa-home mr-1"></i> Kelurahan</strong>
-                                                    <p class="text-muted">{{ $supplier->kelurahan->kelurahan ?? '-' }}
-                                                    </p>
-                                                    <hr>
                                                     <strong><i class="fas fa-map-pin mr-1"></i> Alamat Lengkap</strong>
                                                     <p class="text-muted">{{ $supplier->alamat ?? '-' }}</p>
                                                 </div>

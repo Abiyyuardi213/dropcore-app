@@ -64,6 +64,12 @@ class StokController extends Controller
         return redirect()->route('stok.index')->with('success', 'Stok produk berhasil ditambahkan.');
     }
 
+    public function show($id)
+    {
+        $stok = Stok::with(['produk', 'gudang', 'area', 'rak', 'kondisi'])->findOrFail($id);
+        return view('stok.show', compact('stok'));
+    }
+
     public function edit($id)
     {
         $stok = Stok::findOrFail($id);

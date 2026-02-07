@@ -108,12 +108,13 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="kode_rak">Kode Rak <span
-                                                            class="text-danger">*</span></label>
+                                                    <label for="kode_rak">Kode Rak</label>
                                                     <input type="text" name="kode_rak"
                                                         class="form-control @error('kode_rak') is-invalid @enderror"
-                                                        value="{{ old('kode_rak') }}" required
-                                                        placeholder="Contoh: R-A1-01">
+                                                        value="{{ old('kode_rak') }}"
+                                                        placeholder="Auto-generated (e.g., WH-001-A01-R01)">
+                                                    <small class="text-muted">Biarkan kosong untuk generate
+                                                        otomatis.</small>
                                                     @error('kode_rak')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror

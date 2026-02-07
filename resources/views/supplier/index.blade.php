@@ -82,7 +82,7 @@
                                                             {{ $supplier->no_telepon }}</small>
                                                     @endif
                                                 </td>
-                                                <td>{{ $supplier->kota->kota ?? '-' }}</td>
+                                                <td>{{ $supplier->kota->name ?? '-' }}</td>
                                                 <td>
                                                     @if ($supplier->status)
                                                         <span class="badge badge-success">Aktif</span>

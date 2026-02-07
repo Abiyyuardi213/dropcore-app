@@ -12,6 +12,7 @@ use App\Models\KondisiBarang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MutasiStokController extends Controller
 {
@@ -46,7 +47,12 @@ class MutasiStokController extends Controller
         $gudangs = Gudang::with('areas.raks')->orderBy('nama_gudang', 'asc')->get();
         $kondisis = KondisiBarang::all();
 
-        return view('mutasi-stok.create', compact('products', 'gudangs', 'kondisis'));
+        // Fetch existing stocks for selection in Outbound/Transfer
+        $stoks = Stok::with(['produk', 'gudang', 'area', 'rak', 'kondisi'])
+            ->where('quantity', '>', 0)
+            ->get();
+
+        return view('mutasi-stok.create', compact('products', 'gudangs', 'kondisis', 'stoks'));
     }
 
     public function store(Request $request)
@@ -231,6 +237,7 @@ class MutasiStokController extends Controller
             'user'
         ])->findOrFail($id);
 
-        return view('mutasi-stok.invoice', compact('mutasi'));
+        $pdf = Pdf::loadView('mutasi-stok.invoice_pdf', compact('mutasi'));
+        return $pdf->stream('Invoice-' . $mutasi->id . '.pdf');
     }
 }

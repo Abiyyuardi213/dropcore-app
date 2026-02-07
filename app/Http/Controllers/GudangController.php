@@ -21,6 +21,7 @@ class GudangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'kode_gudang'   => 'nullable|string|max:50|unique:gudang,kode_gudang',
             'nama_gudang'   => 'required|string|max:255',
             'jenis_gudang'  => 'required|string|max:50',
             'lokasi'        => 'required|string|max:255',
@@ -51,6 +52,7 @@ class GudangController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
+            'kode_gudang'   => 'nullable|string|max:50|unique:gudang,kode_gudang,' . $id,
             'nama_gudang'   => 'required|string|max:255',
             'jenis_gudang'  => 'required|string|max:50',
             'lokasi'        => 'required|string|max:255',

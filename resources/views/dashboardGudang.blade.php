@@ -50,46 +50,137 @@
 
             <section class="content">
                 <div class="container-fluid">
+                    <!-- Info Boxes -->
                     <div class="row">
                         <div class="col-lg-3 col-6">
-                            <div class="small-box bg-info">
+                            <div class="small-box bg-dark">
                                 <div class="inner">
                                     <h3>{{ $totalGudang ?? 0 }}</h3>
-                                    <p>Total Gudang Aktif</p>
+                                    <p>Total Gudang</p>
                                 </div>
-                                <div class="icon">
-                                    <i class="fas fa-warehouse"></i>
-                                </div>
+                                <div class="icon"><i class="fas fa-warehouse"></i></div>
                                 <a href="{{ url('admin/gudang') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
 
                         <div class="col-lg-3 col-6">
-                            <div class="small-box bg-success">
+                            <div class="small-box bg-secondary">
                                 <div class="inner">
                                     <h3>{{ $totalAreaGudang ?? 0 }}</h3>
-                                    <p>Total Area Gudang Aktif</p>
+                                    <p>Total Area</p>
                                 </div>
-                                <div class="icon">
-                                    <i class="fas fa-th-large"></i>
-                                </div>
+                                <div class="icon"><i class="fas fa-th-large"></i></div>
                                 <a href="{{ url('admin/areaGudang') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
 
                         <div class="col-lg-3 col-6">
-                            <div class="small-box bg-warning">
+                            <div class="small-box bg-light">
                                 <div class="inner">
                                     <h3>{{ $totalRakGudang ?? 0 }}</h3>
-                                    <p>Total Rak Gudang Aktif</p>
+                                    <p>Total Rak</p>
                                 </div>
-                                <div class="icon">
-                                    <i class="fas fa-layer-group"></i>
-                                </div>
+                                <div class="icon"><i class="fas fa-layer-group"></i></div>
                                 <a href="{{ url('admin/rak-gudang') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>{{ number_format($totalStokReal ?? 0) }}</h3>
+                                    <p>Total Real Stock (Items)</p>
+                                </div>
+                                <div class="icon"><i class="fas fa-boxes"></i></div>
+                                <a href="{{ url('admin/stok') }}" class="small-box-footer">More info <i
+                                        class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="row">
+                        <!-- Left Col: Warehouse Capacities -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Distribusi Stok per Gudang</h3>
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 10px">#</th>
+                                                <th>Nama Gudang</th>
+                                                <th>Lokasi</th>
+                                                <th>Total Stok</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($stokPerGudang as $index => $g)
+                                                <tr>
+                                                    <td>{{ $index + 1 }}.</td>
+                                                    <td>{{ $g->nama_gudang }}</td>
+                                                    <td>{{ $g->lokasi }}</td>
+                                                    <td><span
+                                                            class="badge badge-primary">{{ number_format($g->total_items ?? 0) }}
+                                                            Items</span></td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Col: Recent Mutations -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header border-transparent">
+                                    <h3 class="card-title">Mutasi Stok Terakhir</h3>
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table m-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Produk</th>
+                                                    <th>Jenis</th>
+                                                    <th>Qty</th>
+                                                    <th>Ket</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($recentMutations as $mutasi)
+                                                    <tr>
+                                                        <td>{{ $mutasi->produk->name ?? '-' }}</td>
+                                                        <td>
+                                                            <span
+                                                                class="badge badge-{{ $mutasi->jenis_mutasi == 'masuk' ? 'success' : ($mutasi->jenis_mutasi == 'keluar' ? 'danger' : 'warning') }}">
+                                                                {{ ucfirst($mutasi->jenis_mutasi) }}
+                                                            </span>
+                                                        </td>
+                                                        <td>{{ $mutasi->quantity }}</td>
+                                                        <td><small>{{ $mutasi->jenis_mutasi == 'pindah' ? 'Transfer' : 'Log' }}</small>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="card-footer clearfix">
+                                    <a href="{{ route('mutasi-stok.index') }}"
+                                        class="btn btn-sm btn-secondary float-right">Lihat Semua</a>
+                                </div>
                             </div>
                         </div>
                     </div>
