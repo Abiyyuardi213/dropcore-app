@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
+        rel="stylesheet">
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         @include('include.navbarSistem')
@@ -31,7 +34,8 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title">Daftar Kondisi Barang</h3>
-                            <a href="#" class="btn btn-primary btn-sm ml-auto" data-toggle="modal" data-target="#addKondisiModal">
+                            <a href="#" class="btn btn-primary btn-sm ml-auto" data-toggle="modal"
+                                data-target="#addKondisiModal">
                                 <i class="fas fa-plus"></i> Tambah Kondisi
                             </a>
                         </div>
@@ -47,23 +51,21 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($kondisis as $index => $kondisi)
+                                        @foreach ($kondisis as $index => $kondisi)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $kondisi->nama_kondisi }}</td>
                                                 <td>{{ $kondisi->deskripsi }}</td>
                                                 <td class="text-center">
                                                     <button class="btn btn-warning btn-sm edit-kondisi-btn"
-                                                        data-toggle="modal"
-                                                        data-target="#editKondisiModal"
+                                                        data-toggle="modal" data-target="#editKondisiModal"
                                                         data-id="{{ $kondisi->id }}"
                                                         data-kondisi="{{ $kondisi->nama_kondisi }}"
                                                         data-deskripsi="{{ $kondisi->deskripsi }}">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </button>
                                                     <button class="btn btn-danger btn-sm delete-kondisi-btn"
-                                                        data-toggle="modal"
-                                                        data-target="#deleteKondisiModal"
+                                                        data-toggle="modal" data-target="#deleteKondisiModal"
                                                         data-kondisi-id="{{ $kondisi->id }}">
                                                         <i class="fas fa-trash"></i> Hapus
                                                     </button>
@@ -84,11 +86,13 @@
     </div>
 
     <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteKondisiModal" tabindex="-1" aria-labelledby="deleteKondisiModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteKondisiModal" tabindex="-1" aria-labelledby="deleteKondisiModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteKondisisModalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
+                    <h5 class="modal-title" id="deleteKondisisModalLabel"><i class="fas fa-exclamation-triangle"></i>
+                        Konfirmasi Hapus</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -109,7 +113,8 @@
     </div>
 
     <!-- Modal Tambah Wilayah -->
-    <div class="modal fade" id="addKondisiModal" tabindex="-1" role="dialog" aria-labelledby="addKondisiModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addKondisiModal" tabindex="-1" role="dialog" aria-labelledby="addKondisiModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <form action="{{ route('kondisi-barang.store') }}" method="POST">
                 @csrf
@@ -140,7 +145,8 @@
     </div>
 
     <!-- Modal Edit Wilayah -->
-    <div class="modal fade" id="editKondisiModal" tabindex="-1" aria-labelledby="editKondisiLabel" aria-hidden="true">
+    <div class="modal fade" id="editKondisiModal" tabindex="-1" aria-labelledby="editKondisiLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <form id="editWilayahForm" method="POST">
                 @csrf
@@ -148,13 +154,15 @@
                 <div class="modal-content">
                     <div class="modal-header bg-warning text-white">
                         <h5 class="modal-title" id="editKondisiLabel"><i class="fas fa-edit"></i> Ubah Kondisi</h5>
-                        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+                        <button type="button" class="close text-white"
+                            data-dismiss="modal"><span>&times;</span></button>
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="kondisi_id" id="editKondisiId">
                         <div class="form-group">
                             <label>Nama Kondisi Barang</label>
-                            <input type="text" name="nama_kondisi" id="editKondisiBarang" class="form-control" required>
+                            <input type="text" name="nama_kondisi" id="editKondisiBarang" class="form-control"
+                                required>
                         </div>
                         <div class="form-group">
                             <label>Deskripsi</label>
@@ -162,7 +170,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                        <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Simpan
+                            Perubahan</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                     </div>
                 </div>
@@ -178,9 +187,8 @@
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-    <script src="{{ asset('js/ToastScript.js') }}"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $("#kondisiTable").DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -192,28 +200,19 @@
             });
         });
 
-        $(document).ready(function () {
-            $('.delete-kondisi-btn').click(function () {
+        $(document).ready(function() {
+            $('.delete-kondisi-btn').click(function() {
                 let kondisiId = $(this).data('kondisi-id');
                 let deleteUrl = "{{ url('kondisi-barang') }}/" + kondisiId;
                 $('#deleteForm').attr('action', deleteUrl);
             });
         });
 
-        $(document).ready(function() {
-            @if (session('success') || session('error'))
-                $('#toastNotification').toast({
-                    delay: 3000,
-                    autohide: true
-                }).toast('show');
-            @endif
-        });
-
-        $('#addKondisiModal').on('hidden.bs.modal', function () {
+        $('#addKondisiModal').on('hidden.bs.modal', function() {
             $(this).find('form')[0].reset();
         });
 
-        $(document).on('click', '.edit-kondisi-btn', function () {
+        $(document).on('click', '.edit-kondisi-btn', function() {
             let id = $(this).data('id');
             let nama_kondisi = $(this).data('kondisi');
             let deskripsi = $(this).data('deskripsi');
@@ -227,4 +226,5 @@
         });
     </script>
 </body>
+
 </html>
