@@ -9,7 +9,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Str;
+use Illuminate\Support\Facades\File;
 
 use App\Models\JasaPengiriman;
 use App\Models\MetodePembayaran;
@@ -197,7 +198,13 @@ class OrderController extends Controller
         if ($request->hasFile('payment_proof')) {
             $file = $request->file('payment_proof');
             $filename = time() . '_' . $order->order_number . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/payment_proofs'), $filename);
+
+            $path = public_path('uploads/payment_proofs');
+            if (!File::exists($path)) {
+                File::makeDirectory($path, 0755, true, true);
+            }
+
+            $file->move($path, $filename);
 
             $order->update([
                 'proof_of_payment' => $filename,
