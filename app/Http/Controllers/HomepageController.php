@@ -17,7 +17,7 @@ class HomepageController extends Controller
             }
         }
 
-        $products = \App\Models\Products::with(['category', 'uom'])->latest()->take(6)->get();
+        $products = \App\Models\Products::with(['category', 'uom'])->withSum('stok', 'quantity')->latest()->take(6)->get();
         $categories = \App\Models\Category::all();
 
         return view('homepage', compact('products', 'categories'));

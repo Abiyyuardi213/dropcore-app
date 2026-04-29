@@ -5,10 +5,8 @@
             event.preventDefault();
             event.stopPropagation();
         }
-        // Find the product image for the animation
         let productCard = event ? event.target.closest('.group') : null;
         if (!productCard && event && event.target) {
-            // Fallback for detail page where the structure might be different
             productCard = event.target.closest('section') || document.body;
         }
         let productImage = productCard ? productCard.querySelector('img') : null;
@@ -26,7 +24,7 @@
             })
             .then(response => {
                 if (response.status === 401) {
-                    window.location.href = "{{ route('login.distributor') }}";
+                    window.location.href = "{{ route('login.distributor.form') }}";
                     return;
                 }
                 return response.json();

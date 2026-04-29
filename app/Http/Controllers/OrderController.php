@@ -64,25 +64,21 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            // 1. Calculate Product Subtotal
             $productSubtotal = $cartItems->sum(function ($item) {
                 return $item->product->price * $item->quantity;
             });
 
-            // 2. Calculate Tax (11% of Product Subtotal)
             $taxBase = $productSubtotal;
             $taxAmount = $taxBase * 0.11;
 
-            // 3. Calculate Shipping Cost
             $shippingService = JasaPengiriman::findOrFail($request->shipping_service_id);
             $totalWeight = $cartItems->sum(function ($item) {
                 return ($item->product->weight ?? 0) * $item->quantity;
             });
-            // Minimum weight 1kg logic can be added if needed, or just raw calculation
-            $finalWeight = max(1, ceil($totalWeight)); // Round up to nearest kg, min 1kg
+
+            $finalWeight = max(1, ceil($totalWeight));
             $shippingCost = $finalWeight * $shippingService->biaya_dasar;
 
-            // 4. Final Total
             $finalTotal = $productSubtotal + $taxAmount + $shippingCost;
 
             $paymentMethod = MetodePembayaran::findOrFail($request->payment_method_id);
@@ -100,7 +96,6 @@ class OrderController extends Controller
                 'payment_method' => $paymentMethod->nama_bank . ' - ' . $paymentMethod->nomor_rekening, // Store name
             ]);
 
-            // First pass: Validation checks for stock availability
             foreach ($cartItems as $cartItem) {
                 if ($cartItem->product->total_stock < $cartItem->quantity) {
                     throw new \Exception("Stok produk '{$cartItem->product->name}' tidak mencukupi. Tersedia: {$cartItem->product->total_stock}");
@@ -116,11 +111,10 @@ class OrderController extends Controller
                     'subtotal' => $item->product->price * $item->quantity,
                 ]);
 
-                // Deduct Stock
                 $qtyNeeded = $item->quantity;
                 $stokBatches = \App\Models\Stok::where('produk_id', $item->product_id)
                     ->where('quantity', '>', 0)
-                    ->orderBy('created_at', 'asc') // FIFO
+                    ->orderBy('created_at', 'asc')
                     ->lockForUpdate()
                     ->get();
 
@@ -132,7 +126,6 @@ class OrderController extends Controller
                     $stok->decrement('quantity', $take);
                     $qtyNeeded -= $take;
 
-                    // Log Mutasi Stok (Keluar)
                     \App\Models\MutasiStok::createMutasi([
                         'produk_id' => $item->product_id,
                         'jenis_mutasi' => 'keluar',
@@ -147,15 +140,11 @@ class OrderController extends Controller
                     ]);
                 }
 
-                // Optional: Check if we successfully fulfilled the demand (paranoia check)
                 if ($qtyNeeded > 0) {
-                    // Should throw exception, but 'total_stock' check passed earlier.
-                    // It means concurrency handling worked or stock disappeared.
                     throw new \Exception("Gagal mengalokasikan stok untuk '{$item->product->name}'. Silakan coba lagi.");
                 }
             }
 
-            // Clear Cart
             Cart::where('user_id', $user->id)->delete();
 
             DB::commit();

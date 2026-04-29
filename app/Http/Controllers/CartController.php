@@ -33,9 +33,24 @@ class CartController extends Controller
         $productId = $request->product_id;
         $quantity = $request->quantity ?? 1;
 
+        // Check stock availability
+        $product = Products::withSum('stok', 'quantity')->find($productId);
+        if (!$product) {
+            return response()->json(['error' => 'Produk tidak ditemukan.'], 404);
+        }
+
+        $availableStock = $product->stok_sum_quantity ?? 0;
+
+        // Check existing cart quantity
         $cartItem = Cart::where('user_id', $user->id)
             ->where('product_id', $productId)
             ->first();
+
+        $currentCartQuantity = $cartItem ? $cartItem->quantity : 0;
+
+        if (($currentCartQuantity + $quantity) > $availableStock) {
+            return response()->json(['error' => 'Stok tidak mencukupi. Sisa stok: ' . $availableStock], 400);
+        }
 
         if ($cartItem) {
             $cartItem->quantity += $quantity;
@@ -72,6 +87,13 @@ class CartController extends Controller
         $request->validate([
             'quantity' => 'required|integer|min:1'
         ]);
+
+        $product = Products::withSum('stok', 'quantity')->find($cartItem->product_id);
+        $availableStock = $product->stok_sum_quantity ?? 0;
+
+        if ($request->quantity > $availableStock) {
+            return back()->with('error', 'Stok tidak mencukupi. Sisa stok: ' . $availableStock);
+        }
 
         $cartItem->update(['quantity' => $request->quantity]);
 

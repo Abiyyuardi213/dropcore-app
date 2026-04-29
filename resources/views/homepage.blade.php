@@ -199,10 +199,17 @@
                                                         {{ $product->uom->name ?? 'Unit' }}</span>
                                                 </div>
                                                 <div class="flex items-center gap-2 relative z-10">
-                                                    <button onclick="addToCart('{{ $product->id }}', event)"
-                                                        class="flex-1 inline-flex items-center justify-center rounded-md bg-primary h-9 px-4 text-xs font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
-                                                        <i class="bi bi-cart-plus me-2"></i> Tambah
-                                                    </button>
+                                                    @if (($product->stok_sum_quantity ?? 0) > 0)
+                                                        <button onclick="addToCart('{{ $product->id }}', event)"
+                                                            class="flex-1 inline-flex items-center justify-center rounded-md bg-primary h-9 px-4 text-xs font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
+                                                            <i class="bi bi-cart-plus me-2"></i> Tambah
+                                                        </button>
+                                                    @else
+                                                        <button disabled
+                                                            class="flex-1 inline-flex items-center justify-center rounded-md bg-muted h-9 px-4 text-xs font-medium text-muted-foreground shadow cursor-not-allowed">
+                                                            <i class="bi bi-x-circle me-2"></i> Habis
+                                                        </button>
+                                                    @endif
                                                     <button
                                                         class="h-9 w-9 inline-flex items-center justify-center rounded-md border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors">
                                                         <i class="bi bi-heart"></i>
