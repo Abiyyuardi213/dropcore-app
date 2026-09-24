@@ -33,3 +33,6 @@
         </li>
     </ul>
 </nav>
+<script>
+    document.body.classList.add('layout-navbar-fixed');
+</script>
