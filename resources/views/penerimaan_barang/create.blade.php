@@ -167,7 +167,7 @@
                                         <div class="form-group">
                                             <label>No. Referensi (SJ/PO)</label>
                                             <input type="text" class="form-control" name="referensi"
-                                                value="{{ old('referensi') }}" placeholder="Contoh: SJ-001/PT-ABC">
+                                                value="{{ old('referensi', $auto_referensi ?? '') }}" placeholder="Contoh: RF-A8X9K2">
                                         </div>
                                     </div>
                                 </div>

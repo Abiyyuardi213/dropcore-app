@@ -101,7 +101,7 @@
                                         <div class="form-group">
                                             <label>No. Referensi</label>
                                             <input type="text" class="form-control" name="referensi"
-                                                value="{{ old('referensi') }}" placeholder="No. Invoice / PO">
+                                                value="{{ old('referensi', $auto_referensi ?? '') }}" placeholder="No. Invoice / PO">
                                         </div>
                                     </div>
                                 </div>

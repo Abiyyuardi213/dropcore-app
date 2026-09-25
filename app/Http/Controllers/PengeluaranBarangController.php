@@ -31,8 +31,9 @@ class PengeluaranBarangController extends Controller
         $kondisis = KondisiBarang::all();
         $sumberKeuangan = \App\Models\SumberKeuangan::where('is_active', true)->orderBy('nama_sumber', 'asc')->get();
         $no_pengeluaran = PengeluaranBarang::generateNomorPengeluaran();
+        $auto_referensi = 'SJ-' . strtoupper(\Illuminate\Support\Str::random(6));
 
-        return view('pengeluaran_barang.create', compact('distributors', 'products', 'gudangs', 'kondisis', 'no_pengeluaran', 'sumberKeuangan'));
+        return view('pengeluaran_barang.create', compact('distributors', 'products', 'gudangs', 'kondisis', 'no_pengeluaran', 'sumberKeuangan', 'auto_referensi'));
     }
 
     public function store(Request $request)
@@ -78,7 +79,7 @@ class PengeluaranBarangController extends Controller
                 'telepon_konsumen'   => $request->telepon_konsumen,
                 'alamat_konsumen'    => $request->alamat_konsumen,
                 'tanggal_pengeluaran' => $request->tanggal_pengeluaran,
-                'referensi'          => $request->referensi,
+                'referensi'          => $request->referensi ?: ('SJ-' . strtoupper(\Illuminate\Support\Str::random(6))),
                 'keterangan'         => $request->keterangan,
                 'status'             => $status,
             ]);

@@ -33,8 +33,9 @@ class PenerimaanBarangController extends Controller
         $kondisis = KondisiBarang::all();
         $sumberKeuangan = \App\Models\SumberKeuangan::where('is_active', true)->orderBy('nama_sumber', 'asc')->get();
         $no_penerimaan = PenerimaanBarang::generateNomorPenerimaan();
+        $auto_referensi = 'RF-' . strtoupper(\Illuminate\Support\Str::random(6));
 
-        return view('penerimaan_barang.create', compact('distributors', 'suppliers', 'products', 'gudangs', 'kondisis', 'no_penerimaan', 'sumberKeuangan'));
+        return view('penerimaan_barang.create', compact('distributors', 'suppliers', 'products', 'gudangs', 'kondisis', 'no_penerimaan', 'sumberKeuangan', 'auto_referensi'));
     }
 
     public function store(Request $request)
@@ -72,7 +73,7 @@ class PenerimaanBarangController extends Controller
                 'supplier_id'        => ($request->tipe_pengirim == 'supplier') ? $request->supplier_id : null,
                 'user_id'            => optional(Auth::user())->id,
                 'tanggal_penerimaan' => $request->tanggal_penerimaan,
-                'referensi'          => $request->referensi,
+                'referensi'          => $request->referensi ?: ('RF-' . strtoupper(\Illuminate\Support\Str::random(6))),
                 'keterangan'         => $request->keterangan,
                 'status'             => $status,
             ]);
