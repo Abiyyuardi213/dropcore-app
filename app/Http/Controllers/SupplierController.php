@@ -54,8 +54,14 @@ class SupplierController extends Controller
 
         try {
             if ($request->hasFile('logo')) {
-                $path = $request->file('logo')->store('public/suppliers');
-                $data['logo'] = Storage::url($path);
+                $file = $request->file('logo');
+                $filename = time() . '_' . uniqid() . '.' . strtolower($file->getClientOriginalExtension());
+                $destinationPath = public_path('uploads/suppliers');
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0775, true);
+                }
+                $file->move($destinationPath, $filename);
+                $data['logo'] = 'uploads/suppliers/' . $filename;
             }
 
             Supplier::createSupplier($data);
@@ -106,13 +112,18 @@ class SupplierController extends Controller
 
         if ($request->hasFile('logo')) {
             // Delete old logo if exists
-            if ($supplier->logo) {
-                $oldPath = str_replace('/storage/', 'public/', $supplier->logo);
-                Storage::delete($oldPath);
+            if ($supplier->logo && file_exists(public_path(ltrim($supplier->logo, '/')))) {
+                @unlink(public_path(ltrim($supplier->logo, '/')));
             }
 
-            $path = $request->file('logo')->store('public/suppliers');
-            $data['logo'] = Storage::url($path);
+            $file = $request->file('logo');
+            $filename = time() . '_' . uniqid() . '.' . strtolower($file->getClientOriginalExtension());
+            $destinationPath = public_path('uploads/suppliers');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0775, true);
+            }
+            $file->move($destinationPath, $filename);
+            $data['logo'] = 'uploads/suppliers/' . $filename;
         }
 
         $supplier->updateSupplier($data);

@@ -35,9 +35,9 @@
                             <div class="card card-primary card-outline">
                                 <div class="card-body box-profile">
                                     <div class="text-center">
-                                        @if ($supplier->logo)
+                                        @if ($supplier->logo_url)
                                             <img class="profile-user-img img-fluid img-circle"
-                                                src="{{ asset($supplier->logo) }}" alt="User profile picture"
+                                                src="{{ $supplier->logo_url }}" alt="User profile picture"
                                                 style="width: 100px; height: 100px; object-fit: cover;">
                                         @else
                                             <div class="bg-secondary rounded-circle mx-auto d-flex justify-content-center align-items-center"

@@ -61,8 +61,8 @@
                                                 <td>{{ $supplier->kode_supplier }}</td>
                                                 <td>
                                                     <div class="d-flex align-items-center">
-                                                        @if ($supplier->logo)
-                                                            <img src="{{ asset($supplier->logo) }}" alt="Logo"
+                                                        @if ($supplier->logo_url)
+                                                            <img src="{{ $supplier->logo_url }}" alt="Logo"
                                                                 class="img-circle mr-2"
                                                                 style="width: 30px; height: 30px; object-fit: cover;">
                                                         @else

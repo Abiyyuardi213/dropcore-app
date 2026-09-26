@@ -138,4 +138,15 @@ class Supplier extends Model
             optional(Auth::user())->id
         );
     }
+
+    public function getLogoUrlAttribute()
+    {
+        if (!$this->logo) {
+            return null;
+        }
+        if (str_starts_with($this->logo, 'http://') || str_starts_with($this->logo, 'https://')) {
+            return $this->logo;
+        }
+        return asset(ltrim($this->logo, '/'));
+    }
 }

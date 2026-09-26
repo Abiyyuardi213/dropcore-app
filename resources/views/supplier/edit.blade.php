@@ -102,9 +102,9 @@
                                                         </div>
                                                     </div>
                                                     <small class="text-muted">Max 2MB. Format: JPG, PNG.</small>
-                                                    @if ($supplier->logo)
+                                                    @if ($supplier->logo_url)
                                                         <div class="mt-2">
-                                                            <img src="{{ asset($supplier->logo) }}"
+                                                            <img src="{{ $supplier->logo_url }}"
                                                                 alt="Logo Saat Ini" class="img-thumbnail"
                                                                 style="max-height: 100px;">
                                                             <p class="text-muted text-sm">Logo saat ini</p>
