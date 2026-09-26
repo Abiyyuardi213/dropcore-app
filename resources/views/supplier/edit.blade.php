@@ -163,8 +163,28 @@
                                     <!-- Tab Alamat -->
                                     <div class="tab-pane fade" id="address" role="tabpanel"
                                         aria-labelledby="address-tab">
+                                        <div class="row mb-3">
+                                            <div class="col-md-12">
+                                                <label class="font-weight-bold">Asal Supplier <span class="text-danger">*</span></label>
+                                                <div class="d-flex align-items-center mt-1">
+                                                    <div class="custom-control custom-radio mr-4">
+                                                        <input type="radio" id="asal_dalam_negeri" name="asal_supplier" value="dalam_negeri" class="custom-control-input" {{ old('asal_supplier', $supplier->asal_supplier ?? 'dalam_negeri') == 'dalam_negeri' ? 'checked' : '' }}>
+                                                        <label class="custom-control-label font-weight-normal" for="asal_dalam_negeri">
+                                                            <i class="fas fa-flag text-danger mr-1"></i> Dalam Negeri (Indonesia)
+                                                        </label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" id="asal_luar_negeri" name="asal_supplier" value="luar_negeri" class="custom-control-input" {{ old('asal_supplier', $supplier->asal_supplier ?? 'dalam_negeri') == 'luar_negeri' ? 'checked' : '' }}>
+                                                        <label class="custom-control-label font-weight-normal" for="asal_luar_negeri">
+                                                            <i class="fas fa-globe text-primary mr-1"></i> Luar Negeri (Import)
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <div class="col-md-6" id="wrapper-lokasi-indo">
                                                 <div class="form-group">
                                                     <label for="wilayah_id">Wilayah</label>
                                                     <select name="wilayah_id" id="wilayah_id"

@@ -32,6 +32,10 @@ class SupplierController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'asal_supplier' => $request->asal_supplier ?? 'dalam_negeri'
+        ]);
+
         $request->validate([
             'kode_supplier' => 'nullable|string|unique:suppliers,kode_supplier',
             'nama_supplier' => 'required|string|max:255',
@@ -42,7 +46,7 @@ class SupplierController extends Controller
             'keterangan' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'tipe_supplier' => 'nullable|string',
-            'asal_supplier' => 'required|in:dalam_negeri,luar_negeri',
+            'asal_supplier' => 'nullable|in:dalam_negeri,luar_negeri',
             'wilayah_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
             'provinsi_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
             'kota_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
@@ -88,6 +92,10 @@ class SupplierController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'asal_supplier' => $request->asal_supplier ?? 'dalam_negeri'
+        ]);
+
         $request->validate([
             'kode_supplier' => 'nullable|string|unique:suppliers,kode_supplier,' . $id,
             'nama_supplier' => 'required|string|max:255',
@@ -98,7 +106,7 @@ class SupplierController extends Controller
             'keterangan' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'tipe_supplier' => 'nullable|string',
-            'asal_supplier' => 'required|in:dalam_negeri,luar_negeri',
+            'asal_supplier' => 'nullable|in:dalam_negeri,luar_negeri',
             'wilayah_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
             'provinsi_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
             'kota_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
