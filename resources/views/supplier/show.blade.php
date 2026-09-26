@@ -113,15 +113,23 @@
                                         <div class="tab-pane" id="address">
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <strong><i class="fas fa-map-marker-alt mr-1"></i> Wilayah</strong>
-                                                    <p class="text-muted">{{ $supplier->wilayah->name ?? '-' }}</p>
-                                                    <hr>
-                                                    <strong><i class="fas fa-map mr-1"></i> Provinsi</strong>
-                                                    <p class="text-muted">{{ $supplier->provinsi->name ?? '-' }}
+                                                    <strong><i class="fas fa-globe mr-1"></i> Asal Supplier</strong>
+                                                    <p class="text-muted">
+                                                        <span class="badge badge-{{ ($supplier->asal_supplier ?? 'dalam_negeri') == 'luar_negeri' ? 'info' : 'primary' }}">
+                                                            {{ ($supplier->asal_supplier ?? 'dalam_negeri') == 'luar_negeri' ? 'Luar Negeri (Import)' : 'Dalam Negeri (Indonesia)' }}
+                                                        </span>
                                                     </p>
                                                     <hr>
-                                                    <strong><i class="fas fa-city mr-1"></i> Kota</strong>
-                                                    <p class="text-muted">{{ $supplier->kota->name ?? '-' }}</p>
+                                                    @if (($supplier->asal_supplier ?? 'dalam_negeri') == 'dalam_negeri')
+                                                        <strong><i class="fas fa-map-marker-alt mr-1"></i> Wilayah</strong>
+                                                        <p class="text-muted">{{ $supplier->wilayah->name ?? '-' }}</p>
+                                                        <hr>
+                                                        <strong><i class="fas fa-map mr-1"></i> Provinsi</strong>
+                                                        <p class="text-muted">{{ $supplier->provinsi->name ?? '-' }}</p>
+                                                        <hr>
+                                                        <strong><i class="fas fa-city mr-1"></i> Kota</strong>
+                                                        <p class="text-muted">{{ $supplier->kota->name ?? '-' }}</p>
+                                                    @endif
                                                 </div>
                                                 <div class="col-md-6">
                                                     <strong><i class="fas fa-map-pin mr-1"></i> Alamat Lengkap</strong>

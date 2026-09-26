@@ -82,7 +82,13 @@
                                                             {{ $supplier->no_telepon }}</small>
                                                     @endif
                                                 </td>
-                                                <td>{{ $supplier->kota->name ?? '-' }}</td>
+                                                <td>
+                                                    @if (($supplier->asal_supplier ?? 'dalam_negeri') == 'luar_negeri')
+                                                        <span class="badge badge-info"><i class="fas fa-globe mr-1"></i> Luar Negeri</span>
+                                                    @else
+                                                        {{ $supplier->kota->name ?? '-' }}
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     @if ($supplier->status)
                                                         <span class="badge badge-success">Aktif</span>

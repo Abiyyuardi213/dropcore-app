@@ -36,17 +36,16 @@ class SupplierController extends Controller
             'kode_supplier' => 'nullable|string|unique:suppliers,kode_supplier',
             'nama_supplier' => 'required|string|max:255',
             'penanggung_jawab' => 'nullable|string|max:255',
-            'alamat' => 'nullable|string',
+            'alamat' => 'required|string',
             'no_telepon' => 'nullable|string',
             'email' => 'nullable|email',
             'keterangan' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'tipe_supplier' => 'nullable|string',
-            'wilayah_id' => 'required|string',
-            'provinsi_id' => 'required|string',
-            'kota_id' => 'required|string',
-            // 'kecamatan_id' => 'required|uuid', // Removed
-            // 'kelurahan_id' => 'required|uuid', // Removed
+            'asal_supplier' => 'required|in:dalam_negeri,luar_negeri',
+            'wilayah_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
+            'provinsi_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
+            'kota_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
             'status' => 'nullable|boolean',
         ]);
 
@@ -93,17 +92,16 @@ class SupplierController extends Controller
             'kode_supplier' => 'nullable|string|unique:suppliers,kode_supplier,' . $id,
             'nama_supplier' => 'required|string|max:255',
             'penanggung_jawab' => 'nullable|string|max:255',
-            'alamat' => 'nullable|string',
+            'alamat' => 'required|string',
             'no_telepon' => 'nullable|string',
             'email' => 'nullable|email',
             'keterangan' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'tipe_supplier' => 'nullable|string',
-            'wilayah_id' => 'required|string',
-            'provinsi_id' => 'required|string',
-            'kota_id' => 'required|string',
-            // 'kecamatan_id' => 'required|uuid', // Removed
-            // 'kelurahan_id' => 'required|uuid', // Removed
+            'asal_supplier' => 'required|in:dalam_negeri,luar_negeri',
+            'wilayah_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
+            'provinsi_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
+            'kota_id' => 'nullable|required_if:asal_supplier,dalam_negeri|string',
             'status' => 'nullable|boolean',
         ]);
 

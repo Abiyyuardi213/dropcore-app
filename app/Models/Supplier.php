@@ -23,6 +23,7 @@ class Supplier extends Model
         'keterangan',
         'logo',
         'tipe_supplier',
+        'asal_supplier',
         'wilayah_id',
         'provinsi_id',
         'kota_id',
@@ -70,39 +71,46 @@ class Supplier extends Model
 
     public static function createSupplier($data)
     {
+        $isLuarNegeri = ($data['asal_supplier'] ?? 'dalam_negeri') === 'luar_negeri';
+
         return self::create([
-            'kode_supplier' => $data['kode_supplier'] ?? null,
-            'nama_supplier' => $data['nama_supplier'],
+            'kode_supplier'    => $data['kode_supplier'] ?? null,
+            'nama_supplier'    => $data['nama_supplier'],
             'penanggung_jawab' => $data['penanggung_jawab'] ?? null,
-            'email'        => $data['email'],
-            'no_telepon'   => $data['no_telepon'],
-            'alamat'       => $data['alamat'],
-            'keterangan'   => $data['keterangan'] ?? null,
-            'logo'         => $data['logo'] ?? null,
-            'tipe_supplier' => $data['tipe_supplier'] ?? null,
-            'wilayah_id'   => $data['wilayah_id'],
-            'provinsi_id'  => $data['provinsi_id'],
-            'kota_id'      => $data['kota_id'],
-            'status'       => $data['status'] ?? true,
+            'email'            => $data['email'] ?? null,
+            'no_telepon'       => $data['no_telepon'] ?? null,
+            'alamat'           => $data['alamat'] ?? null,
+            'keterangan'       => $data['keterangan'] ?? null,
+            'logo'             => $data['logo'] ?? null,
+            'tipe_supplier'    => $data['tipe_supplier'] ?? null,
+            'asal_supplier'    => $data['asal_supplier'] ?? 'dalam_negeri',
+            'wilayah_id'       => $isLuarNegeri ? null : ($data['wilayah_id'] ?? null),
+            'provinsi_id'      => $isLuarNegeri ? null : ($data['provinsi_id'] ?? null),
+            'kota_id'          => $isLuarNegeri ? null : ($data['kota_id'] ?? null),
+            'status'           => $data['status'] ?? true,
         ]);
     }
 
     public function updateSupplier($data)
     {
+        $asalSupplier = $data['asal_supplier'] ?? $this->asal_supplier ?? 'dalam_negeri';
+        $isLuarNegeri = $asalSupplier === 'luar_negeri';
+
         $this->update([
-            'kode_supplier' => $data['kode_supplier'] ?? $this->kode_supplier,
-            'nama_supplier' => $data['nama_supplier'],
+            'kode_supplier'    => $data['kode_supplier'] ?? $this->kode_supplier,
+            'nama_supplier'    => $data['nama_supplier'],
             'penanggung_jawab' => $data['penanggung_jawab'] ?? $this->penanggung_jawab,
-            'email'        => $data['email']        ?? $this->email,
-            'no_telepon'   => $data['no_telepon']    ?? $this->no_telepon,
-            'alamat'       => $data['alamat']       ?? $this->alamat,
-            'keterangan'   => $data['keterangan']   ?? $this->keterangan,
-            'logo'         => $data['logo']         ?? $this->logo,
-            'tipe_supplier' => $data['tipe_supplier'] ?? $this->tipe_supplier,
-            'wilayah_id'   => $data['wilayah_id']   ?? $this->wilayah_id,
-            'provinsi_id'  => $data['provinsi_id']  ?? $this->provinsi_id,
-            'kota_id'      => $data['kota_id']      ?? $this->kota_id,
-            'status'       => $data['status']       ?? $this->status,
+            'email'            => $data['email']        ?? $this->email,
+            'no_telepon'       => $data['no_telepon']    ?? $this->no_telepon,
+            'alamat'           => $data['alamat']       ?? $this->alamat,
+            'keterangan'       => $data['keterangan']   ?? $this->keterangan,
+            'logo'             => $data['logo']         ?? $this->logo,
+            'tipe_supplier'    => $data['tipe_supplier'] ?? $this->tipe_supplier,
+            'asal_supplier'    => $asalSupplier,
+            'wilayah_id'       => $isLuarNegeri ? null : ($data['wilayah_id'] ?? $this->wilayah_id),
+            'provinsi_id'      => $isLuarNegeri ? null : ($data['provinsi_id'] ?? $this->provinsi_id),
+            'kota_id'          => $isLuarNegeri ? null : ($data['kota_id'] ?? $this->kota_id),
+            'status'           => $data['status']       ?? $this->status,
         ]);
     }
 

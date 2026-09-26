@@ -194,7 +194,7 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="alamat">Alamat Lengkap</label>
+                                                    <label for="alamat" id="label-alamat">Alamat Lengkap <span class="text-danger">*</span></label>
                                                     <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" rows="5">{{ old('alamat') }}</textarea>
                                                 </div>
                                             </div>
@@ -273,6 +273,26 @@
                     html: errorMessages,
                 });
             @endif
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            function toggleAsalSupplier() {
+                var isLuar = $('#asal_luar_negeri').is(':checked');
+                if (isLuar) {
+                    $('#wrapper-lokasi-indo').slideUp();
+                    $('#wilayah_id, #provinsi_id, #kota_id').val('').trigger('change');
+                    $('#label-alamat').html('Alamat Lengkap (Termasuk Negara & Kota) <span class="text-danger">*</span>');
+                    $('#alamat').attr('placeholder', 'Contoh: 100 West 33rd Street, New York, NY 10001, United States');
+                } else {
+                    $('#wrapper-lokasi-indo').slideDown();
+                    $('#label-alamat').html('Alamat Lengkap <span class="text-danger">*</span>');
+                    $('#alamat').attr('placeholder', 'Masukkan alamat jalan, RT/RW, nomor bangungan, dll');
+                }
+            }
+
+            $('input[name="asal_supplier"]').on('change', toggleAsalSupplier);
+            toggleAsalSupplier();
         });
     </script>
 </body>
