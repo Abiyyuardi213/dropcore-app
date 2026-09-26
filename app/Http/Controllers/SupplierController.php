@@ -58,7 +58,7 @@ class SupplierController extends Controller
                 $filename = time() . '_' . uniqid() . '.' . strtolower($file->getClientOriginalExtension());
                 $destinationPath = public_path('uploads/suppliers');
                 if (!file_exists($destinationPath)) {
-                    mkdir($destinationPath, 0775, true);
+                    @mkdir($destinationPath, 0775, true);
                 }
                 $file->move($destinationPath, $filename);
                 $data['logo'] = 'uploads/suppliers/' . $filename;
@@ -120,7 +120,7 @@ class SupplierController extends Controller
             $filename = time() . '_' . uniqid() . '.' . strtolower($file->getClientOriginalExtension());
             $destinationPath = public_path('uploads/suppliers');
             if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0775, true);
+                @mkdir($destinationPath, 0775, true);
             }
             $file->move($destinationPath, $filename);
             $data['logo'] = 'uploads/suppliers/' . $filename;
