@@ -81,12 +81,20 @@ class PenerimaanBarangController extends Controller
             // 2. Process Details
             foreach ($request->items as $item) {
                 // Sanitize price input (remove non-numeric chars except digits)
-                // e.g. "98.500" -> "98500"
                 $rawHarga = $item['harga'] ?? 0;
                 $cleanHarga = preg_replace('/[^0-9]/', '', $rawHarga);
 
                 $qty = $item['qty'];
                 $harga = (float) $cleanHarga;
+
+                // Fallback to product price if user didn't specify price
+                if ($harga <= 0) {
+                    $produk = \App\Models\Products::find($item['produk_id']);
+                    if ($produk && $produk->price > 0) {
+                        $harga = (float) $produk->price;
+                    }
+                }
+
                 $subtotal = $qty * $harga;
                 $totalTransaksi += $subtotal;
 
@@ -142,7 +150,9 @@ class PenerimaanBarangController extends Controller
             ]);
 
             // 4. Financial Transaction (Expense)
-            if ($status === 'completed' && $totalWithTax > 0 && $request->sumber_id) {
+            $sumberId = $request->sumber_id ?: optional(\App\Models\SumberKeuangan::where('is_active', true)->first())->id;
+
+            if ($status === 'completed' && $totalWithTax > 0 && $sumberId) {
                 $kategori = \App\Models\KategoriKeuangan::firstOrCreate(
                     ['nama' => 'Pembelian Stok'],
                     ['jenis' => 'pengeluaran', 'deskripsi' => 'Otomatis dari Penerimaan Barang']
@@ -157,7 +167,7 @@ class PenerimaanBarangController extends Controller
                     'no_transaksi'         => $noTrx,
                     'jenis_transaksi'      => 'pengeluaran',
                     'kategori_keuangan_id' => $kategori->id,
-                    'sumber_id'            => $request->sumber_id,
+                    'sumber_id'            => $sumberId,
                     'jumlah'               => $totalWithTax,
                     'tanggal_transaksi'    => $request->tanggal_penerimaan,
                     'keterangan'           => 'Pembelian Stok Ref: ' . $penerimaan->no_penerimaan,
@@ -166,8 +176,10 @@ class PenerimaanBarangController extends Controller
                 ]);
 
                 // Deduct Balance
-                $akun = \App\Models\SumberKeuangan::findOrFail($request->sumber_id);
-                $akun->decrement('saldo', $totalWithTax);
+                $akun = \App\Models\SumberKeuangan::find($sumberId);
+                if ($akun) {
+                    $akun->decrement('saldo', $totalWithTax);
+                }
             }
 
             DB::commit();

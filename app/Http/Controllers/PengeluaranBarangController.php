@@ -111,7 +111,18 @@ class PengeluaranBarangController extends Controller
                     }
                 }
 
-                $harga = $item['harga'] ?? 0;
+                $rawHarga = $item['harga'] ?? 0;
+                $cleanHarga = preg_replace('/[^0-9]/', '', $rawHarga);
+                $harga = (float) $cleanHarga;
+
+                // Fallback to product price if user didn't specify price
+                if ($harga <= 0) {
+                    $produk = \App\Models\Products::find($item['produk_id']);
+                    if ($produk && $produk->price > 0) {
+                        $harga = (float) $produk->price;
+                    }
+                }
+
                 $subtotal = $qty * $harga;
                 $totalTransaksi += $subtotal;
 
@@ -136,7 +147,9 @@ class PengeluaranBarangController extends Controller
             }
 
             // 4. Financial Transaction (Income)
-            if ($status === 'completed' && $totalTransaksi > 0 && $request->sumber_id) {
+            $sumberId = $request->sumber_id ?: optional(\App\Models\SumberKeuangan::where('is_active', true)->first())->id;
+
+            if ($status === 'completed' && $totalTransaksi > 0 && $sumberId) {
                 $kategori = \App\Models\KategoriKeuangan::firstOrCreate(
                     ['nama' => 'Penjualan Stok'],
                     ['jenis' => 'pemasukkan', 'deskripsi' => 'Otomatis dari Pengeluaran Barang']
@@ -151,7 +164,7 @@ class PengeluaranBarangController extends Controller
                     'no_transaksi'         => $noTrx,
                     'jenis_transaksi'      => 'pemasukkan',
                     'kategori_keuangan_id' => $kategori->id,
-                    'sumber_id'            => $request->sumber_id,
+                    'sumber_id'            => $sumberId,
                     'jumlah'               => $totalTransaksi,
                     'tanggal_transaksi'    => $request->tanggal_pengeluaran,
                     'keterangan'           => 'Penjualan Stok Ref: ' . $pengeluaran->no_pengeluaran,
@@ -160,8 +173,10 @@ class PengeluaranBarangController extends Controller
                 ]);
 
                 // Increment Balance
-                $akun = \App\Models\SumberKeuangan::findOrFail($request->sumber_id);
-                $akun->increment('saldo', $totalTransaksi);
+                $akun = \App\Models\SumberKeuangan::find($sumberId);
+                if ($akun) {
+                    $akun->increment('saldo', $totalTransaksi);
+                }
             }
 
             DB::commit();

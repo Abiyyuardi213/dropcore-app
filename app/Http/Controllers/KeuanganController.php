@@ -12,6 +12,8 @@ class KeuanganController extends Controller
 {
     public function index(Request $request)
     {
+        self::syncMissingTransactions();
+
         $query = Keuangan::with(['sumber', 'kategori', 'user'])->orderBy('tanggal_transaksi', 'desc');
 
         if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
@@ -36,6 +38,112 @@ class KeuanganController extends Controller
         $categories = \App\Models\KategoriKeuangan::orderBy('nama', 'asc')->get();
 
         return view('keuangan.keuangan.index', compact('data', 'sumberKeuangan', 'categories'));
+    }
+
+    public static function syncMissingTransactions()
+    {
+        $defaultSumber = SumberKeuangan::where('is_active', true)->first();
+        if (!$defaultSumber) return;
+
+        // 1. Sync completed Penerimaan Barang
+        $penerimaans = \App\Models\PenerimaanBarang::with(['details.produk'])
+            ->where('status', 'completed')
+            ->get();
+
+        foreach ($penerimaans as $penerimaan) {
+            $ref = $penerimaan->no_penerimaan;
+            if (!$ref) continue;
+
+            $exists = Keuangan::where('keterangan', 'like', '%' . $ref . '%')->exists();
+            if (!$exists) {
+                $totalAmount = (float) $penerimaan->total_amount;
+                if ($totalAmount <= 0) {
+                    $totalTransaksi = 0;
+                    foreach ($penerimaan->details as $d) {
+                        $h = (float) $d->harga > 0 ? (float) $d->harga : (float) ($d->produk->price ?? 0);
+                        $totalTransaksi += ($d->qty * $h);
+                    }
+                    $totalAmount = $totalTransaksi * 1.10;
+                    if ($totalAmount > 0) {
+                        $penerimaan->update([
+                            'subtotal' => $totalTransaksi,
+                            'ppn_percentage' => 10,
+                            'ppn_amount' => $totalTransaksi * 0.1,
+                            'total_amount' => $totalAmount
+                        ]);
+                    }
+                }
+
+                if ($totalAmount > 0) {
+                    $kategori = \App\Models\KategoriKeuangan::firstOrCreate(
+                        ['nama' => 'Pembelian Stok'],
+                        ['jenis' => 'pengeluaran', 'deskripsi' => 'Otomatis dari Penerimaan Barang']
+                    );
+
+                    $dateStr = $penerimaan->tanggal_penerimaan ? date('Ymd', strtotime($penerimaan->tanggal_penerimaan)) : date('Ymd');
+                    $count = Keuangan::whereDate('created_at', today())->count() + 1;
+                    $noTrx = 'TRX-' . $dateStr . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+
+                    Keuangan::create([
+                        'no_transaksi'         => $noTrx,
+                        'jenis_transaksi'      => 'pengeluaran',
+                        'kategori_keuangan_id' => $kategori->id,
+                        'sumber_id'            => $defaultSumber->id,
+                        'jumlah'               => $totalAmount,
+                        'tanggal_transaksi'    => $penerimaan->tanggal_penerimaan ?? date('Y-m-d'),
+                        'keterangan'           => 'Pembelian Stok Ref: ' . $ref,
+                        'status'               => 'approved',
+                        'user_id'              => $penerimaan->user_id,
+                    ]);
+
+                    $defaultSumber->decrement('saldo', $totalAmount);
+                }
+            }
+        }
+
+        // 2. Sync completed Pengeluaran Barang
+        $pengeluarans = \App\Models\PengeluaranBarang::with(['details.produk'])
+            ->where('status', 'completed')
+            ->get();
+
+        foreach ($pengeluarans as $pengeluaran) {
+            $ref = $pengeluaran->no_pengeluaran;
+            if (!$ref) continue;
+
+            $exists = Keuangan::where('keterangan', 'like', '%' . $ref . '%')->exists();
+            if (!$exists) {
+                $totalAmount = 0;
+                foreach ($pengeluaran->details as $d) {
+                    $h = (float) $d->harga > 0 ? (float) $d->harga : (float) ($d->produk->price ?? 0);
+                    $totalAmount += ($d->qty * $h);
+                }
+
+                if ($totalAmount > 0) {
+                    $kategori = \App\Models\KategoriKeuangan::firstOrCreate(
+                        ['nama' => 'Penjualan Stok'],
+                        ['jenis' => 'pemasukkan', 'deskripsi' => 'Otomatis dari Pengeluaran Barang']
+                    );
+
+                    $dateStr = $pengeluaran->tanggal_pengeluaran ? date('Ymd', strtotime($pengeluaran->tanggal_pengeluaran)) : date('Ymd');
+                    $count = Keuangan::whereDate('created_at', today())->count() + 1;
+                    $noTrx = 'TRX-' . $dateStr . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+
+                    Keuangan::create([
+                        'no_transaksi'         => $noTrx,
+                        'jenis_transaksi'      => 'pemasukkan',
+                        'kategori_keuangan_id' => $kategori->id,
+                        'sumber_id'            => $defaultSumber->id,
+                        'jumlah'               => $totalAmount,
+                        'tanggal_transaksi'    => $pengeluaran->tanggal_pengeluaran ?? date('Y-m-d'),
+                        'keterangan'           => 'Penjualan Stok Ref: ' . $ref,
+                        'status'               => 'approved',
+                        'user_id'              => $pengeluaran->user_id,
+                    ]);
+
+                    $defaultSumber->increment('saldo', $totalAmount);
+                }
+            }
+        }
     }
 
     public function create()
