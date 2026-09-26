@@ -140,6 +140,7 @@
                                                         <option value="">-- Pilih Area Gudang --</option>
                                                         @foreach ($areas as $area)
                                                             <option value="{{ $area->id }}"
+                                                                data-gudang-id="{{ $area->gudang_id }}"
                                                                 {{ old('area_id', $stok->area_id) == $area->id ? 'selected' : '' }}>
                                                                 {{ $area->kode_area }} (Area {{ $area->nama_area }})
                                                             </option>
@@ -159,6 +160,7 @@
                                                         <option value="">-- Pilih Rak Gudang --</option>
                                                         @foreach ($raks as $rak)
                                                             <option value="{{ $rak->id }}"
+                                                                data-area-id="{{ $rak->area_id }}"
                                                                 {{ old('rak_id', $stok->rak_id) == $rak->id ? 'selected' : '' }}>
                                                                 {{ $rak->kode_rak }} (Posisi:
                                                                 {{ $rak->posisi ?? '-' }})
@@ -196,6 +198,70 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var $gudang = $('#gudang_id');
+            var $area = $('#area_id');
+            var $rak = $('#rak_id');
+
+            var $areaOptions = $area.find('option').clone();
+            var $rakOptions = $rak.find('option').clone();
+
+            function filterAreas(preserveValue) {
+                var selectedGudang = $gudang.val();
+                var currentAreaVal = preserveValue ? $area.val() : '';
+
+                $area.empty();
+                $areaOptions.each(function() {
+                    var gudangId = $(this).data('gudang-id');
+                    var val = $(this).val();
+                    if (val === "" || gudangId == selectedGudang) {
+                        $area.append($(this).clone());
+                    }
+                });
+
+                if (!selectedGudang) {
+                    $area.val("").prop('disabled', true);
+                } else {
+                    $area.prop('disabled', false);
+                    $area.val(currentAreaVal);
+                }
+
+                filterRaks(preserveValue);
+            }
+
+            function filterRaks(preserveValue) {
+                var selectedArea = $area.val();
+                var currentRakVal = preserveValue ? $rak.val() : '';
+
+                $rak.empty();
+                $rakOptions.each(function() {
+                    var areaId = $(this).data('area-id');
+                    var val = $(this).val();
+                    if (val === "" || areaId == selectedArea) {
+                        $rak.append($(this).clone());
+                    }
+                });
+
+                if (!selectedArea || $area.is(':disabled')) {
+                    $rak.val("").prop('disabled', true);
+                } else {
+                    $rak.prop('disabled', false);
+                    $rak.val(currentRakVal);
+                }
+            }
+
+            $gudang.on('change', function() {
+                filterAreas(false);
+            });
+
+            $area.on('change', function() {
+                filterRaks(false);
+            });
+
+            filterAreas(true);
+        });
+    </script>
 </body>
 
 </html>
