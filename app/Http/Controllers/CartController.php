@@ -82,29 +82,48 @@ class CartController extends Controller
     {
         $cartItem = Cart::where('id', $id)
             ->where('user_id', Auth::id())
-            ->firstOrFail();
+            ->first();
+
+        if (!$cartItem) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['error' => 'Item keranjang tidak ditemukan.'], 404);
+            }
+            return back()->with('error', 'Item keranjang tidak ditemukan.');
+        }
 
         $request->validate([
             'quantity' => 'required|integer|min:1'
         ]);
 
         $product = Products::withSum('stok', 'quantity')->find($cartItem->product_id);
-        $availableStock = $product->stok_sum_quantity ?? 0;
+        $availableStock = $product ? ($product->stok_sum_quantity ?? 0) : 0;
 
         if ($request->quantity > $availableStock) {
-            return back()->with('error', 'Stok tidak mencukupi. Sisa stok: ' . $availableStock);
+            $errorMsg = 'Stok tidak mencukupi. Sisa stok: ' . $availableStock;
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['error' => $errorMsg], 400);
+            }
+            return back()->with('error', $errorMsg);
         }
 
         $cartItem->update(['quantity' => $request->quantity]);
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => 'Keranjang diperbarui.']);
+        }
+
         return back()->with('success', 'Keranjang diperbarui.');
     }
 
-    public function remove($id)
+    public function remove(Request $request, $id)
     {
         Cart::where('id', $id)
             ->where('user_id', Auth::id())
             ->delete();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => 'Produk dihapus dari keranjang.']);
+        }
 
         return back()->with('success', 'Produk dihapus dari keranjang.');
     }

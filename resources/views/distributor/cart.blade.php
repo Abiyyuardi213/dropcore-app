@@ -82,15 +82,27 @@
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     <form action="{{ route('distributor.cart.update', $item->id) }}"
-                                                        method="POST" class="flex items-center justify-center gap-2">
+                                                        method="POST" class="flex items-center justify-center">
                                                         @csrf
                                                         @method('PATCH')
-                                                        <input type="number" name="quantity"
-                                                            value="{{ $item->quantity }}" min="1"
-                                                            class="h-8 w-16 rounded-md border border-input bg-background px-2 py-1 text-center text-xs focus:outline-none focus:ring-1 focus:ring-ring">
-                                                        <button type="submit"
-                                                            class="h-8 w-8 inline-flex items-center justify-center rounded-md border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground text-xs"><i
-                                                                class="bi bi-check-lg"></i></button>
+                                                        <div class="inline-flex items-center rounded-md border border-input shadow-sm">
+                                                            <button type="button" onclick="decrementQty(this)"
+                                                                class="h-8 w-8 flex items-center justify-center bg-muted hover:bg-accent text-foreground transition-colors rounded-l-md font-bold text-sm">
+                                                                <i class="bi bi-dash"></i>
+                                                            </button>
+                                                            <input type="number" name="quantity"
+                                                                value="{{ $item->quantity }}" min="1"
+                                                                onchange="this.form.submit()"
+                                                                class="h-8 w-14 border-x border-input bg-background px-1 text-center text-xs font-semibold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                                            <button type="button" onclick="incrementQty(this)"
+                                                                class="h-8 w-8 flex items-center justify-center bg-muted hover:bg-accent text-foreground transition-colors rounded-r-md font-bold text-sm">
+                                                                <i class="bi bi-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                        <button type="submit" title="Simpan Perubahan"
+                                                            class="h-8 w-8 ml-2 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 text-xs transition-colors">
+                                                            <i class="bi bi-check-lg"></i>
+                                                        </button>
                                                     </form>
                                                 </td>
                                                 <td class="px-6 py-4 text-right">
@@ -165,11 +177,47 @@
     @include('include.footer-client')
     @include('include.cart-scripts')
 
+    <script>
+        function decrementQty(btn) {
+            const input = btn.form.querySelector('input[name="quantity"]');
+            let val = parseInt(input.value) || 1;
+            if (val > 1) {
+                input.value = val - 1;
+                btn.form.submit();
+            }
+        }
+
+        function incrementQty(btn) {
+            const input = btn.form.querySelector('input[name="quantity"]');
+            let val = parseInt(input.value) || 1;
+            input.value = val + 1;
+            btn.form.submit();
+        }
+    </script>
+
     @if (session('success'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 if (typeof showToast === 'function') {
                     showToast('{{ session('success') }}', 'success');
+                }
+            });
+        </script>
+    @endif
+    @if (session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof showToast === 'function') {
+                    showToast('{{ session('error') }}', 'error');
+                }
+            });
+        </script>
+    @endif
+    @if ($errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof showToast === 'function') {
+                    showToast('{{ $errors->first() }}', 'error');
                 }
             });
         </script>
