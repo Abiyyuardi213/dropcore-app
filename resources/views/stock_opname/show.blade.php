@@ -149,11 +149,16 @@
     <script>
         $(document).ready(function() {
             @if (session('success'))
-                Swal.fire({
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                Toast.fire({
                     icon: 'success',
-                    title: 'Berhasil',
-                    text: '{{ session('success') }}',
-                    timer: 2000
+                    title: {!! json_encode(session('success')) !!}
                 });
             @endif
 

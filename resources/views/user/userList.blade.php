@@ -145,12 +145,16 @@
 
             // Flash Messages
             @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: '{{ session('success') }}',
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
                     timer: 3000,
-                    showConfirmButton: false
+                    timerProgressBar: true
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: {!! json_encode(session('success')) !!}
                 });
             @endif
 
