@@ -14,6 +14,17 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
         rel="stylesheet" />
+    <style>
+        .input-group .select2-container--bootstrap4 {
+            flex: 1 1 auto;
+            width: 1% !important;
+        }
+        .input-group .select2-container--bootstrap4 .select2-selection--single {
+            height: calc(2.25rem + 2px) !important;
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -102,19 +113,26 @@
                                                         <div class="form-group">
                                                             <label for="tipe_distributor">Tipe Distributor <span
                                                                     class="text-danger">*</span></label>
-                                                            <select name="tipe_distributor"
-                                                                class="form-control select2bs4 @error('tipe_distributor') is-invalid @enderror"
-                                                                required data-placeholder="Pilih Tipe">
-                                                                <option value="Distributor"
-                                                                    {{ old('tipe_distributor') == 'Distributor' ? 'selected' : '' }}>
-                                                                    Distributor</option>
-                                                                <option value="Principal"
-                                                                    {{ old('tipe_distributor') == 'Principal' ? 'selected' : '' }}>
-                                                                    Principal</option>
-                                                                <option value="Reseller"
-                                                                    {{ old('tipe_distributor') == 'Reseller' ? 'selected' : '' }}>
-                                                                    Reseller</option>
-                                                            </select>
+                                                            <div class="input-group">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text"><i
+                                                                            class="fas fa-layer-group"></i></span>
+                                                                </div>
+                                                                <select name="tipe_distributor"
+                                                                    class="form-control custom-select @error('tipe_distributor') is-invalid @enderror"
+                                                                    required>
+                                                                    <option value="">-- Pilih Tipe Distributor --</option>
+                                                                    <option value="Distributor"
+                                                                        {{ old('tipe_distributor', 'Distributor') == 'Distributor' ? 'selected' : '' }}>
+                                                                        Distributor</option>
+                                                                    <option value="Principal"
+                                                                        {{ old('tipe_distributor') == 'Principal' ? 'selected' : '' }}>
+                                                                        Principal</option>
+                                                                    <option value="Reseller"
+                                                                        {{ old('tipe_distributor') == 'Reseller' ? 'selected' : '' }}>
+                                                                        Reseller</option>
+                                                                </select>
+                                                            </div>
                                                             @error('tipe_distributor')
                                                                 <span class="text-danger text-sm">{{ $message }}</span>
                                                             @enderror
@@ -124,19 +142,25 @@
                                                         <div class="form-group">
                                                             <label for="status">Status <span
                                                                     class="text-danger">*</span></label>
-                                                            <select name="status"
-                                                                class="form-control select2bs4 @error('status') is-invalid @enderror"
-                                                                required data-placeholder="Pilih Status">
-                                                                <option value="active"
-                                                                    {{ old('status') == 'active' ? 'selected' : '' }}>
-                                                                    Active</option>
-                                                                <option value="inactive"
-                                                                    {{ old('status') == 'inactive' ? 'selected' : '' }}>
-                                                                    Inactive</option>
-                                                                <option value="blacklisted"
-                                                                    {{ old('status') == 'blacklisted' ? 'selected' : '' }}>
-                                                                    Blacklisted</option>
-                                                            </select>
+                                                            <div class="input-group">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text"><i
+                                                                            class="fas fa-toggle-on"></i></span>
+                                                                </div>
+                                                                <select name="status"
+                                                                    class="form-control custom-select @error('status') is-invalid @enderror"
+                                                                    required>
+                                                                    <option value="active"
+                                                                        {{ old('status', 'active') == 'active' ? 'selected' : '' }}>
+                                                                        Active</option>
+                                                                    <option value="inactive"
+                                                                        {{ old('status') == 'inactive' ? 'selected' : '' }}>
+                                                                        Inactive</option>
+                                                                    <option value="blacklisted"
+                                                                        {{ old('status') == 'blacklisted' ? 'selected' : '' }}>
+                                                                        Blacklisted</option>
+                                                                </select>
+                                                            </div>
                                                             @error('status')
                                                                 <span
                                                                     class="text-danger text-sm">{{ $message }}</span>
@@ -145,17 +169,23 @@
                                                         <div class="form-group">
                                                             <label for="kota_id">Kota <span
                                                                     class="text-danger">*</span></label>
-                                                            <select name="kota_id"
-                                                                class="form-control select2bs4 @error('kota_id') is-invalid @enderror"
-                                                                data-placeholder="Cari & Pilih Kota">
-                                                                <option value="">-- Pilih Kota --</option>
-                                                                @foreach ($kotas as $k)
-                                                                    <option value="{{ $k->id }}"
-                                                                        {{ old('kota_id') == $k->id ? 'selected' : '' }}>
-                                                                        {{ $k->kota }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
+                                                            <div class="input-group">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text"><i
+                                                                            class="fas fa-city"></i></span>
+                                                                </div>
+                                                                <select name="kota_id"
+                                                                    class="form-control select2bs4 @error('kota_id') is-invalid @enderror"
+                                                                    data-placeholder="Cari & Pilih Kota">
+                                                                    <option value="">-- Cari & Pilih Kota --</option>
+                                                                    @foreach ($kotas as $k)
+                                                                        <option value="{{ $k->id }}"
+                                                                            {{ old('kota_id') == $k->id ? 'selected' : '' }}>
+                                                                            {{ $k->kota }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
                                                             @error('kota_id')
                                                                 <span
                                                                     class="text-danger text-sm">{{ $message }}</span>
