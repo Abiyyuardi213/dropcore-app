@@ -16,7 +16,7 @@ class DistributorController extends Controller
 
     public function create()
     {
-        $kotas = Kota::orderBy('kota', 'asc')->get();
+        $kotas = Kota::orderBy('name', 'asc')->get();
         return view('distributor.create', compact('kotas'));
     }
 
@@ -48,7 +48,7 @@ class DistributorController extends Controller
     public function edit($id)
     {
         $distributor = Distributor::findOrFail($id);
-        $kotas = Kota::orderBy('kota', 'asc')->get();
+        $kotas = Kota::orderBy('name', 'asc')->get();
         return view('distributor.edit', compact('distributor', 'kotas'));
     }
 
