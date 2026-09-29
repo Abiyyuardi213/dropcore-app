@@ -382,20 +382,38 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a href="{{ route('penerimaan-barang.index') }}"
-                        class="nav-link {{ Request::is('admin/penerimaan-barang*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-truck-loading"></i>
-                        <p>Penerimaan Barang</p>
-                    </a>
-                </li>
+                @php
+                    $isTransaksi =
+                        request()->is('admin/penerimaan-barang*') ||
+                        request()->is('admin/pengeluaran-barang*');
+                @endphp
 
-                <li class="nav-item">
-                    <a href="{{ route('pengeluaran-barang.index') }}"
-                        class="nav-link {{ Request::is('admin/pengeluaran-barang*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-dolly"></i>
-                        <p>Pengeluaran Barang</p>
+                <li class="nav-item has-treeview {{ $isTransaksi ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ $isTransaksi ? 'active' : '' }} font-weight-bold">
+                        <i class="nav-icon fas fa-exchange-alt"></i>
+                        <p>
+                            Transaksi
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
+
+                    <ul class="nav nav-treeview" style="{{ $isTransaksi ? 'display: block;' : '' }}">
+                        <li class="nav-item">
+                            <a href="{{ route('penerimaan-barang.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/penerimaan-barang*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-truck-loading"></i>
+                                <p>Penerimaan Barang</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('pengeluaran-barang.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/pengeluaran-barang*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-dolly"></i>
+                                <p>Pengeluaran Barang</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <li class="nav-item">
