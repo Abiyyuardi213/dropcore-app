@@ -35,8 +35,6 @@ class DistributorController extends Controller
             'npwp'             => 'nullable|string|max:30',
             'website'          => 'nullable|url|max:255',
             'keterangan'       => 'nullable|string',
-            'latitude'         => 'nullable|numeric|between:-90,90',
-            'longitude'        => 'nullable|numeric|between:-180,180',
         ]);
 
         Distributor::createDistributor($request->all());
@@ -70,8 +68,6 @@ class DistributorController extends Controller
             'npwp'             => 'nullable|string|max:30',
             'website'          => 'nullable|url|max:255',
             'keterangan'       => 'nullable|string',
-            'latitude'         => 'nullable|numeric|between:-90,90',
-            'longitude'        => 'nullable|numeric|between:-180,180',
         ]);
 
         $distributor->updateDistributor($request->all());

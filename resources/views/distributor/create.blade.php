@@ -381,38 +381,7 @@
                                                                     class="text-danger text-sm">{{ $message }}</span>
                                                             @enderror
                                                         </div>
-                                                        <div class="row">
-                                                            <div class="col-6">
-                                                                <div class="form-group">
-                                                                    <label for="latitude">Latitude</label>
-                                                                    <div class="input-group">
-                                                                        <div class="input-group-prepend">
-                                                                            <span class="input-group-text"><i
-                                                                                    class="fas fa-map-pin"></i></span>
-                                                                        </div>
-                                                                        <input type="text" name="latitude"
-                                                                            class="form-control @error('latitude') is-invalid @enderror"
-                                                                            value="{{ old('latitude') }}"
-                                                                            placeholder="-6.2088">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-6">
-                                                                <div class="form-group">
-                                                                    <label for="longitude">Longitude</label>
-                                                                    <div class="input-group">
-                                                                        <div class="input-group-prepend">
-                                                                            <span class="input-group-text"><i
-                                                                                    class="fas fa-map-pin"></i></span>
-                                                                        </div>
-                                                                        <input type="text" name="longitude"
-                                                                            class="form-control @error('longitude') is-invalid @enderror"
-                                                                            value="{{ old('longitude') }}"
-                                                                            placeholder="106.8456">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        
                                                         <div class="form-group">
                                                             <label for="keterangan">Keterangan Tambahan</label>
                                                             <div class="input-group">
