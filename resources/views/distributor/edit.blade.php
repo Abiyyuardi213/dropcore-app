@@ -24,6 +24,39 @@
             border-top-left-radius: 0 !important;
             border-bottom-left-radius: 0 !important;
             border: 1px solid #ced4da !important;
+            display: flex !important;
+            align-items: center !important;
+            position: relative !important;
+        }
+        .input-group .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+            line-height: normal !important;
+            padding-left: 0.75rem !important;
+            padding-right: 2rem !important;
+            color: #495057 !important;
+            width: 100% !important;
+            display: block !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        .input-group .select2-container--bootstrap4 .select2-selection--single .select2-selection__clear {
+            position: absolute !important;
+            right: 1.5rem !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            font-weight: bold !important;
+            color: #6c757d !important;
+            float: none !important;
+            margin: 0 !important;
+            height: auto !important;
+            line-height: 1 !important;
+        }
+        .input-group .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow {
+            position: absolute !important;
+            right: 0.5rem !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            height: auto !important;
         }
         .select2-results__options {
             max-height: 220px !important;
