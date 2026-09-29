@@ -23,6 +23,15 @@
             height: calc(2.25rem + 2px) !important;
             border-top-left-radius: 0 !important;
             border-bottom-left-radius: 0 !important;
+            border: 1px solid #ced4da !important;
+        }
+        .select2-results__options {
+            max-height: 220px !important;
+            overflow-y: auto !important;
+        }
+        .select2-dropdown {
+            max-height: 300px !important;
+            overflow: hidden !important;
         }
     </style>
 </head>
@@ -416,11 +425,13 @@
         $(function() {
             // General Select2 init
             $('.select2bs4').each(function() {
-                $(this).select2({
+                var $el = $(this);
+                $el.select2({
                     theme: 'bootstrap4',
                     width: '100%',
-                    placeholder: $(this).data('placeholder') || "Pilih opsi",
-                    allowClear: true
+                    placeholder: $el.data('placeholder') || "Pilih opsi",
+                    allowClear: true,
+                    dropdownParent: $el.parent()
                 });
             });
         });
