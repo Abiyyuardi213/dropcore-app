@@ -58,7 +58,7 @@ class DashboardController extends Controller
             $orderTotal = Order::whereMonth('created_at', $month->month)
                 ->whereYear('created_at', $month->year)
                 ->where('status', '!=', 'cancelled')
-                ->sum('total_amount');
+                ->sum('total_price');
 
             $salesChartData[] = (float) $orderTotal;
 
@@ -73,7 +73,7 @@ class DashboardController extends Controller
         $totalPenjualanBulanIni = Order::whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->where('status', '!=', 'cancelled')
-            ->sum('total_amount');
+            ->sum('total_price');
 
         return view('dashboard', compact(
             'totalPeran',
