@@ -112,14 +112,6 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('category.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/category*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-tags"></i>
-                                <p>Master Kategori</p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
                             <a href="{{ route('wilayah.index') }}"
                                 class="nav-link text-sm pl-4 {{ Request::is('admin/wilayah*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-globe"></i>
@@ -239,6 +231,7 @@
                     $isProduk =
                         request()->is('admin/dashboardProduk*') ||
                         request()->is('admin/product*') ||
+                        request()->is('admin/category*') ||
                         request()->is('admin/stok*');
                 @endphp
 
@@ -266,6 +259,14 @@
                                 class="nav-link text-sm pl-4 {{ Request::is('admin/product*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-box"></i>
                                 <p>Produk</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('category.index') }}"
+                                class="nav-link text-sm pl-4 {{ Request::is('admin/category*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-tags"></i>
+                                <p>Kategori Produk</p>
                             </a>
                         </li>
 
