@@ -44,6 +44,11 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        $recentLogs = RiwayatAktivitasLog::with('user')
+            ->latest()
+            ->take(10)
+            ->get();
+
         // Monthly Sales Trend (Last 6 Months)
         $salesChartLabels = [];
         $salesChartData = [];
