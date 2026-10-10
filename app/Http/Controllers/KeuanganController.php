@@ -40,6 +40,25 @@ class KeuanganController extends Controller
         return view('keuangan.keuangan.index', compact('data', 'sumberKeuangan', 'categories'));
     }
 
+    public static function generateNoTransaksi($dateStr = null)
+    {
+        $date = $dateStr ? date('Ymd', strtotime($dateStr)) : date('Ymd');
+        $prefix = 'TRX-' . $date . '-';
+        
+        $lastTrx = Keuangan::where('no_transaksi', 'like', $prefix . '%')
+            ->orderBy('no_transaksi', 'desc')
+            ->first();
+
+        if ($lastTrx && preg_match('/' . preg_quote($prefix, '/') . '(\d+)$/', $lastTrx->no_transaksi, $matches)) {
+            $lastNum = (int)$matches[1];
+            $nextNum = $lastNum + 1;
+        } else {
+            $nextNum = 1;
+        }
+
+        return $prefix . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
+    }
+
     public static function syncMissingTransactions()
     {
         $defaultSumber = SumberKeuangan::where('is_active', true)->first();
@@ -80,9 +99,7 @@ class KeuanganController extends Controller
                         ['jenis' => 'pengeluaran', 'deskripsi' => 'Otomatis dari Penerimaan Barang']
                     );
 
-                    $dateStr = $penerimaan->tanggal_penerimaan ? date('Ymd', strtotime($penerimaan->tanggal_penerimaan)) : date('Ymd');
-                    $count = Keuangan::whereDate('created_at', today())->count() + 1;
-                    $noTrx = 'TRX-' . $dateStr . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+                    $noTrx = self::generateNoTransaksi($penerimaan->tanggal_penerimaan);
 
                     Keuangan::create([
                         'no_transaksi'         => $noTrx,
@@ -124,9 +141,7 @@ class KeuanganController extends Controller
                         ['jenis' => 'pemasukkan', 'deskripsi' => 'Otomatis dari Pengeluaran Barang']
                     );
 
-                    $dateStr = $pengeluaran->tanggal_pengeluaran ? date('Ymd', strtotime($pengeluaran->tanggal_pengeluaran)) : date('Ymd');
-                    $count = Keuangan::whereDate('created_at', today())->count() + 1;
-                    $noTrx = 'TRX-' . $dateStr . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+                    $noTrx = self::generateNoTransaksi($pengeluaran->tanggal_pengeluaran);
 
                     Keuangan::create([
                         'no_transaksi'         => $noTrx,
@@ -168,9 +183,7 @@ class KeuanganController extends Controller
         DB::transaction(function () use ($request) {
             $data = $request->all();
 
-            $date = date('Ymd');
-            $count = Keuangan::whereDate('created_at', today())->count() + 1;
-            $data['no_transaksi'] = 'TRX-' . $date . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+            $data['no_transaksi'] = self::generateNoTransaksi($request->tanggal_transaksi);
             $data['user_id'] = auth()->user()->id;
             $data['status'] = 'approved';
 

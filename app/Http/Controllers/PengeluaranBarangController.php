@@ -156,9 +156,7 @@ class PengeluaranBarangController extends Controller
                 );
 
                 // Auto Generate Finance Transaction No
-                $date = date('Ymd');
-                $count = \App\Models\Keuangan::whereDate('created_at', today())->count() + 1;
-                $noTrx = 'TRX-' . $date . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+                $noTrx = \App\Http\Controllers\KeuanganController::generateNoTransaksi($request->tanggal_pengeluaran);
 
                 \App\Models\Keuangan::create([
                     'no_transaksi'         => $noTrx,
