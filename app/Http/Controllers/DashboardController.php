@@ -44,11 +44,36 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        $recentLogs = RiwayatAktivitasLog::with('user')
-            ->latest()
-            ->take(10)
-            ->get();
+        // Monthly Sales Trend (Last 6 Months)
+        $salesChartLabels = [];
+        $salesChartData = [];
+        $pengeluaranChartData = [];
 
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $monthName = $month->translatedFormat('M Y');
+            $salesChartLabels[] = $monthName;
+
+            // Total sales amount from Orders
+            $orderTotal = Order::whereMonth('created_at', $month->month)
+                ->whereYear('created_at', $month->year)
+                ->where('status', '!=', 'cancelled')
+                ->sum('total_amount');
+
+            $salesChartData[] = (float) $orderTotal;
+
+            // Total outgoing stock transaction count / value
+            $pengeluaranCount = PengeluaranBarang::whereMonth('tanggal_pengeluaran', $month->month)
+                ->whereYear('tanggal_pengeluaran', $month->year)
+                ->count();
+
+            $pengeluaranChartData[] = $pengeluaranCount;
+        }
+
+        $totalPenjualanBulanIni = Order::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->where('status', '!=', 'cancelled')
+            ->sum('total_amount');
 
         return view('dashboard', compact(
             'totalPeran',
@@ -60,7 +85,11 @@ class DashboardController extends Controller
             'lowStockProducts',
             'recentMutations',
             'recentOrders',
-            'recentLogs'
+            'recentLogs',
+            'salesChartLabels',
+            'salesChartData',
+            'pengeluaranChartData',
+            'totalPenjualanBulanIni'
         ));
     }
 }

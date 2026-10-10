@@ -83,6 +83,40 @@
                         </div>
                     </div>
 
+                    <!-- Visualisasi perkembangan penjualan produk (Modern AdminLTE Chart Card) -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card card-outline card-primary shadow-sm">
+                                <div class="card-header border-0">
+                                    <div class="d-flex justify-content-between">
+                                        <h3 class="card-title font-weight-bold">
+                                            <i class="fas fa-chart-line text-primary mr-2"></i> Perkembangan Penjualan & Transaksi Produk
+                                        </h3>
+                                        <div class="card-tools">
+                                            <span class="badge badge-success px-2 py-1 mr-2">
+                                                <i class="fas fa-arrow-up mr-1"></i> Rp {{ number_format($totalPenjualanBulanIni ?? 0, 0, ',', '.') }} (Bulan Ini)
+                                            </span>
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex mb-3">
+                                        <p class="d-flex flex-column mb-0">
+                                            <span class="text-bold text-lg">Tren 6 Bulan Terakhir</span>
+                                            <span class="text-muted text-sm">Grafik nilai penjualan order (Rp) & frekuensi pengeluaran barang</span>
+                                        </p>
+                                    </div>
+                                    <div class="position-relative mb-2" style="height: 300px;">
+                                        <canvas id="salesTrendsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Main Row -->
                     <div class="row">
                         <!-- Left Column -->
@@ -260,6 +294,120 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        $(function () {
+            'use strict'
+
+            var ctx = document.getElementById('salesTrendsChart').getContext('2d');
+
+            var gradientSales = ctx.createLinearGradient(0, 0, 0, 300);
+            gradientSales.addColorStop(0, 'rgba(0, 123, 255, 0.4)');
+            gradientSales.addColorStop(1, 'rgba(0, 123, 255, 0.05)');
+
+            var salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode($salesChartLabels) !!},
+                    datasets: [
+                        {
+                            label: 'Nominal Penjualan (Rp)',
+                            backgroundColor: gradientSales,
+                            borderColor: '#007bff',
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: '#007bff',
+                            pointBorderColor: '#fff',
+                            fill: true,
+                            data: {!! json_encode($salesChartData) !!},
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Jumlah Transaksi Pengeluaran',
+                            type: 'bar',
+                            backgroundColor: '#28a745',
+                            borderColor: '#28a745',
+                            barThickness: 16,
+                            borderRadius: 4,
+                            data: {!! json_encode($pengeluaranChartData) !!},
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.datasetIndex === 0) {
+                                        label += 'Rp ' + new Intl.NumberFormat('id-ID').format(context.parsed.y);
+                                    } else {
+                                        label += context.parsed.y + ' Transaksi';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Nominal (Rp)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    if (value >= 1000000) {
+                                        return 'Rp ' + (value / 1000000) + ' Jt';
+                                    }
+                                    return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                            title: {
+                                display: true,
+                                text: 'Jumlah Transaksi'
+                            },
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 
 </body>
 
