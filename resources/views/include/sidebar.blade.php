@@ -45,12 +45,10 @@
                         request()->is('admin/dashboard-master*') ||
                         request()->is('admin/role*') ||
                         request()->is('admin/user*') ||
-                        request()->is('admin/category*') ||
                         request()->is('admin/wilayah*') ||
                         request()->is('admin/provinsi*') ||
                         request()->is('admin/kota*') ||
                         request()->is('admin/kecamatan*') ||
-                        request()->is('admin/kelurahan*') ||
                         request()->is('admin/kelurahan*') ||
                         request()->is('admin/supplier*') ||
                         request()->is('admin/kondisi-barang*') ||
