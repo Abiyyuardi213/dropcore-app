@@ -137,6 +137,33 @@
 
     </div>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3500,
+                timerProgressBar: true
+            });
+
+            @if (session('success'))
+                Toast.fire({
+                    icon: 'success',
+                    title: {!! json_encode(session('success')) !!}
+                });
+            @endif
+
+            @if (session('error'))
+                Toast.fire({
+                    icon: 'error',
+                    title: {!! json_encode(session('error')) !!}
+                });
+            @endif
+        });
+    </script>
 </body>
 
 </html>
