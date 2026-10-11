@@ -23,7 +23,7 @@
     <main class="flex-1">
         <!-- Header Section -->
         <div class="border-b bg-muted/30">
-            <div class="container mx-auto px-4 py-12 md:py-16">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16 py-12 md:py-16">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                         <h1 class="text-3xl font-bold tracking-tight">Katalog Produk</h1>
@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <div class="container mx-auto px-4 py-12">
+        <div class="container mx-auto px-6 md:px-12 lg:px-16 py-12">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
                 <!-- Sidebar Filters -->

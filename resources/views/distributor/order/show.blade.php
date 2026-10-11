@@ -16,7 +16,7 @@
     @include('include.navbar-client')
 
     <main class="flex-1 py-12">
-        <div class="container mx-auto px-4">
+        <div class="container mx-auto px-6 md:px-12 lg:px-16">
             <div class="max-w-3xl mx-auto">
                 <a href="{{ route('distributor.order.index') }}"
                     class="text-sm text-muted-foreground hover:text-primary mb-6 inline-block">

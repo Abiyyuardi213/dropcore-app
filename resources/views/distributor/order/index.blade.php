@@ -16,7 +16,7 @@
     @include('include.navbar-client')
 
     <main class="flex-1 py-12">
-        <div class="container mx-auto px-4">
+        <div class="container mx-auto px-6 md:px-12 lg:px-16">
             <h1 class="text-3xl font-bold tracking-tight mb-8">Riwayat Pesanan</h1>
 
             <div class="space-y-6">

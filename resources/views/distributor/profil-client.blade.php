@@ -25,13 +25,13 @@
     <main class="flex-1">
         <!-- Header -->
         <div class="border-b bg-muted/30">
-            <div class="container mx-auto px-4 py-12 md:py-16">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16 py-12 md:py-16">
                 <h1 class="text-3xl font-bold tracking-tight">Pengaturan Profil</h1>
                 <p class="text-muted-foreground mt-2">Kelola informasi pribadi dan keamanan akun Anda.</p>
             </div>
         </div>
 
-        <div class="container mx-auto px-4 py-12">
+        <div class="container mx-auto px-6 md:px-12 lg:px-16 py-12">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <!-- Left Sidebar: Profile Picture -->
                 <div class="lg:col-span-4">

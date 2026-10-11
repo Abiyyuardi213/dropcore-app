@@ -21,7 +21,7 @@
     @include('include.navbar-client')
 
     <main class="flex-1">
-        <div class="container mx-auto px-4 py-12">
+        <div class="container mx-auto px-6 md:px-12 lg:px-16 py-12">
             <h1 class="text-3xl font-bold tracking-tight mb-8">Keranjang Belanja</h1>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">

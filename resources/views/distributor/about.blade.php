@@ -23,7 +23,7 @@
     <main class="flex-1">
         <!-- Hero Section -->
         <section class="relative py-20 bg-muted/30 overflow-hidden border-b">
-            <div class="container mx-auto px-4 relative z-10">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16 relative z-10">
                 <div class="max-w-3xl">
                     <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-6">Membangun Masa Depan Konektivitas
                         Digital</h1>
@@ -37,7 +37,7 @@
 
         <!-- Our Story -->
         <section class="py-20">
-            <div class="container mx-auto px-4">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                     <div class="space-y-6">
                         <div
@@ -84,7 +84,7 @@
 
         <!-- Values -->
         <section class="py-20 bg-muted/20 border-y">
-            <div class="container mx-auto px-4">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16">
                 <div class="text-center max-w-2xl mx-auto mb-16">
                     <h2 class="text-3xl font-bold mb-4">Nilai-Nilai Kami</h2>
                     <p class="text-muted-foreground">Prinsip yang membimbing kami dalam setiap proyek dan interaksi
@@ -130,7 +130,7 @@
 
         <!-- CTA -->
         <section class="py-20">
-            <div class="container mx-auto px-4">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16">
                 <div class="bg-zinc-950 rounded-3xl p-8 md:p-16 text-center text-white relative overflow-hidden">
                     <div class="absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 bg-primary/20 rounded-full blur-3xl">
                     </div>

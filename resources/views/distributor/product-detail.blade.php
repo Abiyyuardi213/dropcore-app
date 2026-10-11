@@ -23,7 +23,7 @@
     <main class="flex-1">
         <!-- Breadcrumbs -->
         <div class="border-b bg-muted/20">
-            <div class="container mx-auto px-4 py-4">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16 py-4">
                 <nav class="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                     <a href="{{ route('homepage') }}" class="hover:text-primary transition-colors">Beranda</a>
                     <i class="bi bi-chevron-right text-[10px]"></i>
@@ -36,7 +36,7 @@
         </div>
 
         <section class="py-12 md:py-20">
-            <div class="container mx-auto px-4">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
 
                     <!-- Product Image Gallery -->
@@ -179,7 +179,7 @@
         <!-- Related Products -->
         @if (!$relatedProducts->isEmpty())
             <section class="py-16 border-t">
-                <div class="container mx-auto px-4">
+                <div class="container mx-auto px-6 md:px-12 lg:px-16">
                     <h2 class="text-2xl font-bold mb-8">Produk Terkait</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                         @foreach ($relatedProducts as $rel)

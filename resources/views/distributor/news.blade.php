@@ -23,7 +23,7 @@
     <main class="flex-1">
         <!-- Header -->
         <section class="py-16 md:py-24 bg-muted/30 border-b">
-            <div class="container mx-auto px-4 text-center">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16 text-center">
                 <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">Berita & Artikel</h1>
                 <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
                     Tetap terinformasi dengan perkembangan terbaru dari industri fiber optic, rilis produk, dan tips
@@ -34,7 +34,7 @@
 
         <!-- News Grid -->
         <section class="py-20">
-            <div class="container mx-auto px-4">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     @foreach ($newsItems as $news)
                         <article
@@ -107,7 +107,7 @@
 
         <!-- Newsletter -->
         <section class="py-20 bg-muted/20 border-t">
-            <div class="container mx-auto px-4 max-w-4xl">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16 max-w-4xl">
                 <div class="bg-card border rounded-3xl p-8 md:p-12 shadow-sm text-center">
                     <h2 class="text-2xl font-bold mb-4">Jangan Lewatkan Pembaruan Kami</h2>
                     <p class="text-muted-foreground mb-8">Dapatkan berita terbaru dan penawaran eksklusif langsung di

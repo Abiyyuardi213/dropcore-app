@@ -26,7 +26,7 @@
             <div
                 class="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
             </div>
-            <div class="container mx-auto px-4 py-24 md:py-32 relative z-10">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16 py-24 md:py-32 relative z-10">
                 <div class="max-w-3xl">
                     <div
                         class="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
@@ -58,7 +58,7 @@
 
         <!-- Stats/Features -->
         <section class="border-b bg-background py-12">
-            <div class="container mx-auto px-4">
+            <div class="container mx-auto px-6 md:px-12 lg:px-16">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
                     <div class="flex flex-col items-center text-center space-y-2">
                         <span class="text-3xl font-bold">100+</span>
@@ -80,7 +80,7 @@
             </div>
         </section>
 
-        <div class="container mx-auto px-4 py-16">
+        <div class="container mx-auto px-6 md:px-12 lg:px-16 py-16">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-12">
 
                 <!-- Sidebar (Desktop) -->

@@ -1,5 +1,5 @@
 <footer class="bg-zinc-950 py-12 text-zinc-300">
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-6 md:px-12 lg:px-16">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <!-- Logo -->
             <div>

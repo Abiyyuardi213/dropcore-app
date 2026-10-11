@@ -1,5 +1,5 @@
 <nav class="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-    <div class="container mx-auto px-4 flex h-16 items-center justify-between">
+    <div class="container mx-auto px-6 md:px-12 lg:px-16 flex h-16 items-center justify-between">
         <!-- Logo -->
         <a class="flex items-center gap-2 font-bold text-xl tracking-tight" href="{{ url('/homepage') }}">
             <img src="{{ asset('image/garuda-fiber.png') }}" alt="Logo" class="h-8 w-auto">
