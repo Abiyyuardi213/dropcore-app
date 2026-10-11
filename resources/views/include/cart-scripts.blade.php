@@ -125,8 +125,26 @@
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 3000,
+            timer: 3500,
             timerProgressBar: true
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        @if (session('success'))
+            showToast({!! json_encode(session('success')) !!}, 'success');
+        @endif
+
+        @if (session('error'))
+            showToast({!! json_encode(session('error')) !!}, 'error');
+        @endif
+
+        @if (session('warning'))
+            showToast({!! json_encode(session('warning')) !!}, 'warning');
+        @endif
+
+        @if (session('info'))
+            showToast({!! json_encode(session('info')) !!}, 'info');
+        @endif
+    });
 </script>
