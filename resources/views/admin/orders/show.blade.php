@@ -50,7 +50,7 @@
                                             @endphp
                                             @foreach ($order->items as $item)
                                                 <tr>
-                                                    <td>{{ $item->product->name }}</td>
+                                                    <td>{{ $item->product->name ?? 'Produk Dihapus / Tidak Ditemukan' }}</td>
                                                     <td>Rp {{ number_format($item->price, 0, ',', '.') }}</td>
                                                     <td>{{ $item->quantity }}</td>
                                                     <td class="text-right">Rp
@@ -75,7 +75,7 @@
                                         <td colspan="3" class="text-right font-weight-bold">
                                             PPN (11%) :
                                         </td>
-                                        <td class="text-right">Rp {{ number_format($ppn, 0, ',', '.') }}</td>
+                                        <td class="text-right" style="Rp {{ number_format($ppn, 0, ',', '.') }}">Rp {{ number_format($ppn, 0, ',', '.') }}</td>
                                     </tr>
                                     <tr class="bg-gray-light">
                                         <td colspan="3" class="text-right font-weight-bold" style="font-size: 1.2em;">
@@ -105,22 +105,22 @@
                                     </div>
 
                                     <dt class="col-sm-4">Nama Distributor</dt>
-                                    <dd class="col-sm-8">{{ $order->user->name }}</dd>
+                                    <dd class="col-sm-8">{{ $order->user->name ?? 'User Tidak Ditemukan' }}</dd>
 
                                     <dt class="col-sm-4">Email</dt>
-                                    <dd class="col-sm-8">{{ $order->user->email }}</dd>
+                                    <dd class="col-sm-8">{{ $order->user->email ?? '-' }}</dd>
 
                                     <dt class="col-sm-4">Telepon</dt>
                                     <dd class="col-sm-8">{{ $order->user->no_telepon ?? '-' }}</dd>
 
                                     <dt class="col-sm-4">Alamat Kirim</dt>
                                     <dd class="col-sm-8">
-                                        @if ($order->shipping_address == 'Alamat belum diatur' && $order->user->alamat)
+                                        @if ($order->shipping_address == 'Alamat belum diatur' && optional($order->user)->alamat)
                                             {{ $order->user->alamat }}
                                             <br><small class="text-info"><i class="fas fa-info-circle"></i> Menggunakan
                                                 alamat profil saat ini</small>
                                         @else
-                                            {{ $order->shipping_address }}
+                                            {{ $order->shipping_address ?? '-' }}
                                         @endif
                                     </dd>
 

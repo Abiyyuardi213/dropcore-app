@@ -161,9 +161,9 @@
             </div>
             <div class="info-column">
                 <div class="info-title">Pembeli Barang Kena Pajak / Penerima Jasa</div>
-                <div class="info-row"><span class="info-label">Nama:</span> {{ $order->user->name }}</div>
+                <div class="info-row"><span class="info-label">Nama:</span> {{ $order->user->name ?? 'Distributor / Pelanggan' }}</div>
                 <div class="info-row"><span class="info-label">Alamat:</span>
-                    {{ $order->shipping_address == 'Alamat belum diatur' && $order->user->alamat ? $order->user->alamat : $order->shipping_address }}
+                    {{ $order->shipping_address == 'Alamat belum diatur' && optional($order->user)->alamat ? $order->user->alamat : ($order->shipping_address ?? '-') }}
                 </div>
                 <div class="info-row"><span class="info-label">NPWP:</span> {{ $order->user->npwp ?? '-' }}</div>
                 <div class="info-row"><span class="info-label">NIK/Paspor:</span> {{ $order->user->nik ?? '-' }}</div>
@@ -194,7 +194,7 @@
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td>
-                            {{ $item->product->name }}<br>
+                            {{ $item->product->name ?? 'Produk Dihapus / Tidak Ditemukan' }}<br>
                             <small>Qty: {{ $item->quantity }} x @ Rp
                                 {{ number_format($item->price, 0, ',', '.') }}</small>
                         </td>

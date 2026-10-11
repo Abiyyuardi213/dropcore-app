@@ -27,7 +27,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $order->order_number }}</td>
-                                            <td>{{ $order->user->name }}</td>
+                                            <td>{{ $order->user->name ?? 'User Tidak Ditemukan' }}</td>
                                             <td>Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                                             <td>
                                                 <span
