@@ -342,13 +342,16 @@
                             <label class="mb-0 font-weight-bold"><i class="fas fa-key text-primary mr-1"></i> Pengaturan Hak Akses Modul</label>
                             <div class="btn-group btn-group-sm">
                                 <button type="button" class="btn btn-outline-primary preset-btn" data-target-form="#createRoleForm" data-preset="full_admin">
-                                    <i class="fas fa-check-double mr-1"></i> Pilih Semua (Setara Admin / IT)
+                                    <i class="fas fa-check-double mr-1"></i> Full Akses (Setara Admin / IT)
                                 </button>
                                 <button type="button" class="btn btn-outline-success preset-btn" data-target-form="#createRoleForm" data-preset="operational">
-                                    Operasional Gudang
+                                    <i class="fas fa-boxes mr-1"></i> Operasional Gudang & Staf
+                                </button>
+                                <button type="button" class="btn btn-outline-info preset-btn" data-target-form="#createRoleForm" data-preset="distributor">
+                                    <i class="fas fa-store mr-1"></i> Portal Distributor
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary preset-btn" data-target-form="#createRoleForm" data-preset="none">
-                                    Reset
+                                    <i class="fas fa-eraser mr-1"></i> Reset
                                 </button>
                             </div>
                         </div>
@@ -429,13 +432,16 @@
                             <label class="mb-0 font-weight-bold"><i class="fas fa-key text-info mr-1"></i> Hak Akses Modul</label>
                             <div class="btn-group btn-group-sm">
                                 <button type="button" class="btn btn-outline-primary preset-btn" data-target-form="#editRoleForm" data-preset="full_admin">
-                                    <i class="fas fa-check-double mr-1"></i> Pilih Semua (Setara Admin / IT)
+                                    <i class="fas fa-check-double mr-1"></i> Full Akses (Setara Admin / IT)
                                 </button>
                                 <button type="button" class="btn btn-outline-success preset-btn" data-target-form="#editRoleForm" data-preset="operational">
-                                    Operasional Gudang
+                                    <i class="fas fa-boxes mr-1"></i> Operasional Gudang & Staf
+                                </button>
+                                <button type="button" class="btn btn-outline-info preset-btn" data-target-form="#editRoleForm" data-preset="distributor">
+                                    <i class="fas fa-store mr-1"></i> Portal Distributor
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary preset-btn" data-target-form="#editRoleForm" data-preset="none">
-                                    Reset
+                                    <i class="fas fa-eraser mr-1"></i> Reset
                                 </button>
                             </div>
                         </div>
@@ -532,11 +538,15 @@
             syncPermCardVisuals($(document));
 
             // Handle Preset Buttons
-            $('.preset-btn').click(function() {
-                const targetForm = $($(this).data('target-form'));
-                const preset = $(this).data('preset');
-                let selected = [];
+            $(document).on('click', '.preset-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
 
+                const preset = $(this).attr('data-preset') || $(this).data('preset');
+                const targetSelector = $(this).attr('data-target-form') || $(this).data('targetForm') || $(this).data('target-form');
+                const $targetForm = (targetSelector && $(targetSelector).length) ? $(targetSelector) : $(this).closest('form');
+
+                let selected = [];
                 if (preset === 'full_admin') {
                     selected = adminPermissions;
                 } else if (preset === 'operational') {
@@ -547,19 +557,31 @@
                     selected = [];
                 }
 
-                targetForm.find('.perm-checkbox').each(function() {
+                $targetForm.find('.perm-checkbox').each(function() {
                     const val = $(this).val();
-                    $(this).prop('checked', selected.includes(val));
+                    const isChecked = selected.includes(val);
+                    $(this).prop('checked', isChecked);
                 });
 
-                syncPermCardVisuals(targetForm);
+                syncPermCardVisuals($targetForm);
+            });
+
+            // Sync visuals when any permission modal is shown
+            $('#permissionsModal, #createRoleModal, #editRoleModal').on('shown.bs.modal', function() {
+                syncPermCardVisuals($(this));
             });
 
             // Handle Manage Permissions Button Click
             $(document).on('click', '.manage-permissions-btn', function() {
                 const id = $(this).data('id');
                 const name = $(this).data('name');
-                const perms = $(this).data('permissions') || [];
+                const rawPerms = $(this).data('permissions');
+                let perms = [];
+                try {
+                    perms = Array.isArray(rawPerms) ? rawPerms : (typeof rawPerms === 'string' ? JSON.parse(rawPerms || '[]') : []);
+                } catch (err) {
+                    perms = [];
+                }
 
                 const url = "{{ url('admin/role') }}/" + id + "/permissions";
                 $('#permissionsForm').attr('action', url);
@@ -579,7 +601,13 @@
                 const name = $(this).data('name');
                 const description = $(this).data('description');
                 const status = $(this).data('status');
-                const perms = $(this).data('permissions') || [];
+                const rawPerms = $(this).data('permissions');
+                let perms = [];
+                try {
+                    perms = Array.isArray(rawPerms) ? rawPerms : (typeof rawPerms === 'string' ? JSON.parse(rawPerms || '[]') : []);
+                } catch (err) {
+                    perms = [];
+                }
 
                 const url = "{{ url('admin/role') }}/" + id;
 
