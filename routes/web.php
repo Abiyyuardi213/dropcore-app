@@ -77,6 +77,7 @@ Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
     Route::post('/pengguna/profil', [UserController::class, 'updateProfil'])->name('user.profil.update');
 
     Route::post('role/{id}/toggle-status', [RoleController::class, 'toggleStatus'])->name('role.toggleStatus');
+    Route::put('role/{id}/permissions', [RoleController::class, 'updatePermissions'])->name('role.permissions.update');
     Route::resource('role', RoleController::class);
 
     Route::resource('user', UserController::class);

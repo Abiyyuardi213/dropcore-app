@@ -43,11 +43,11 @@ class AuthController extends Controller
             Auth::login($user);
             $request->session()->regenerate(); // Regenerate session ID to prevent fixation
 
-            if ($user->role->role_name === 'admin') {
-                return redirect()->intended('/admin/dashboard')->with('success', 'Login berhasil! Selamat datang kembali.');
+            if ($user->role && $user->role->isAdminPanelRole()) {
+                return redirect()->intended($user->role->getFirstAllowedAdminUrl())->with('success', 'Login berhasil! Selamat datang kembali.');
             }
 
-            if ($user->role->role_name === 'distributor') {
+            if ($user->role && (strtolower($user->role->role_name) === 'distributor' || $user->role->hasPermission('portal_distributor'))) {
                 return redirect()->intended('/homepage')->with('success', 'Login berhasil! Selamat datang kembali.');
             }
 
@@ -72,7 +72,7 @@ class AuthController extends Controller
         if ($user && Hash::check($request->password, $user->password)) {
 
             // Cek jika bukan distributor
-            if ($user->role->role_name !== 'distributor') {
+            if (!$user->role || (strtolower($user->role->role_name) !== 'distributor' && !$user->role->hasPermission('portal_distributor'))) {
                 return back()->withErrors([
                     'login' => 'Akun ini bukan akun distributor. Gunakan halaman login admin.',
                 ]);
@@ -98,13 +98,14 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $roleName = Auth::user() ? Auth::user()->role->role_name : null;
+        $role = Auth::user() ? Auth::user()->role : null;
+        $isDistributor = $role && strtolower($role->role_name) === 'distributor' && !$role->isAdminPanelRole();
 
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        if ($roleName === 'distributor') {
+        if ($isDistributor) {
             return redirect('/login-distributor')->with('success', 'Logout berhasil! Sampai jumpa lagi.');
         }
 

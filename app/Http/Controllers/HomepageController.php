@@ -12,8 +12,8 @@ class HomepageController extends Controller
     {
         if (Auth::check()) {
             $user = Auth::user();
-            if (in_array($user->role->role_name, ['admin', 'staff'])) {
-                return redirect()->route('dashboard');
+            if ($user->role && $user->role->isAdminPanelRole()) {
+                return redirect($user->role->getFirstAllowedAdminUrl());
             }
         }
 

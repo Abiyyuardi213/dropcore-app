@@ -9,45 +9,95 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::orderBy('created_at', 'asc')->get(); // Urutkan dari yang paling lama ke terbaru
-        return view('role.index', compact('roles'));
+        Role::ensureSchemaAndDefaults();
+
+        $roles = Role::orderBy('created_at', 'asc')->get();
+        $availablePermissions = Role::AVAILABLE_PERMISSIONS;
+        $adminPermissionKeys = Role::getAdminPermissionKeys();
+
+        return view('role.index', compact('roles', 'availablePermissions', 'adminPermissionKeys'));
     }
-
-
 
     public function store(Request $request)
     {
+        Role::ensureSchemaAndDefaults();
+
         $request->validate([
-            'role_name' => 'required|string|max:255',
+            'role_name'        => 'required|string|max:255',
             'role_description' => 'nullable|string',
-            'role_status' => 'required|boolean',
+            'role_status'      => 'required|boolean',
+            'permissions'      => 'nullable|array',
+            'permissions.*'    => 'string',
         ]);
 
-        Role::createRole($request->all());
+        $data = $request->all();
+        if (!$request->has('permissions')) {
+            $data['permissions'] = strtolower(trim($request->role_name)) === 'distributor'
+                ? ['portal_distributor']
+                : Role::getAdminPermissionKeys();
+        }
 
-        return redirect()->route('role.index')->with('success', 'Role berhasil ditambahkan.');
+        Role::createRole($data);
+
+        return redirect()->route('role.index')->with('success', 'Peran dan hak akses berhasil ditambahkan.');
     }
 
     public function update(Request $request, $id)
     {
+        Role::ensureSchemaAndDefaults();
+
         $request->validate([
-            'role_name' => 'required|string|max:255',
+            'role_name'        => 'required|string|max:255',
             'role_description' => 'nullable|string',
-            'role_status' => 'required|boolean',
+            'role_status'      => 'required|boolean',
+            'permissions'      => 'nullable|array',
+            'permissions.*'    => 'string',
         ]);
 
         $role = Role::findOrFail($id);
-        $role->updateRole($request->all());
+        $data = $request->all();
+        if ($request->has('permissions_submitted') && !$request->has('permissions')) {
+            $data['permissions'] = [];
+        }
 
-        return redirect()->route('role.index')->with('success', 'Role berhasil diperbarui.');
+        $role->updateRole($data);
+
+        return redirect()->route('role.index')->with('success', 'Peran dan hak akses berhasil diperbarui.');
+    }
+
+    public function updatePermissions(Request $request, $id)
+    {
+        Role::ensureSchemaAndDefaults();
+
+        $request->validate([
+            'permissions'   => 'nullable|array',
+            'permissions.*' => 'string',
+        ]);
+
+        $role = Role::findOrFail($id);
+        $perms = $request->input('permissions', []);
+
+        if (strtolower(trim($role->role_name)) === 'admin' && !in_array('master_role', $perms, true)) {
+            $perms[] = 'master_role';
+        }
+
+        $role->update([
+            'permissions' => array_values(array_unique($perms)),
+        ]);
+
+        return redirect()->route('role.index')->with('success', "Hak akses untuk peran '{$role->role_name}' berhasil diperbarui.");
     }
 
     public function destroy($id)
     {
         $role = Role::findOrFail($id);
+        if (strtolower(trim($role->role_name)) === 'admin') {
+            return redirect()->route('role.index')->with('error', 'Peran utama Admin tidak dapat dihapus.');
+        }
+
         $role->deleteRole();
 
-        return redirect()->route('role.index')->with('success', 'Role berhasil dihapus.');
+        return redirect()->route('role.index')->with('success', 'Peran berhasil dihapus.');
     }
 
     public function toggleStatus($id)
@@ -58,7 +108,7 @@ class RoleController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Status role berhasil diperbarui.'
+                'message' => 'Status peran berhasil diperbarui.'
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -68,3 +118,4 @@ class RoleController extends Controller
         }
     }
 }
+

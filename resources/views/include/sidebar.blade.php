@@ -29,16 +29,30 @@
         </div>
 
         <!-- Menu -->
+        @php
+            $currentUserRole = Auth::user()->role ?? null;
+            $canAccess = function ($perm) use ($currentUserRole) {
+                return $currentUserRole ? $currentUserRole->hasPermission($perm) : false;
+            };
+            $canAnyMaster =
+                $canAccess('master_role') ||
+                $canAccess('master_hr') ||
+                $canAccess('master_wilayah') ||
+                $canAccess('master_mitra');
+        @endphp
+
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" data-accordion="false"
                 role="menu">
-                <li class="nav-item">
-                    <a href="{{ route('dashboard') }}"
-                        class="nav-link {{ Request::is('admin/dashboard') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-truck-loading"></i>
-                        <p>Dashboard Utama</p>
-                    </a>
-                </li>
+                @if ($canAccess('dashboard'))
+                    <li class="nav-item">
+                        <a href="{{ route('dashboard') }}"
+                            class="nav-link {{ Request::is('admin/dashboard') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-truck-loading"></i>
+                            <p>Dashboard Utama</p>
+                        </a>
+                    </li>
+                @endif
 
                 @php
                     $isMaster =
@@ -58,118 +72,124 @@
                         request()->is('admin/jabatan*');
                 @endphp
 
-                <li class="nav-item has-treeview {{ $isMaster ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ $isMaster ? 'active' : '' }} font-weight-bold">
-                        <i class="nav-icon fas fa-folder-open"></i>
-                        <p>
-                            Master Data
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                @if ($canAnyMaster)
+                    <li class="nav-item has-treeview {{ $isMaster ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isMaster ? 'active' : '' }} font-weight-bold">
+                            <i class="nav-icon fas fa-folder-open"></i>
+                            <p>
+                                Master Data
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
 
-                    <ul class="nav nav-treeview" style="{{ $isMaster ? 'display:block;' : '' }}">
+                        <ul class="nav nav-treeview" style="{{ $isMaster ? 'display:block;' : '' }}">
 
-                        <li class="nav-item">
-                            <a href="{{ route('dashboard-master') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/dashboard-master*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-warehouse"></i>
-                                <p>Dashboard Master</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('dashboard-master') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/dashboard-master*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-warehouse"></i>
+                                    <p>Dashboard Master</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('role.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/role*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-user-shield"></i>
-                                <p>Master Peran</p>
-                            </a>
-                        </li>
+                            @if ($canAccess('master_role'))
+                                <li class="nav-item">
+                                    <a href="{{ route('role.index') }}"
+                                        class="nav-link text-sm pl-4 {{ Request::is('admin/role*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-user-shield"></i>
+                                        <p>Master Peran</p>
+                                    </a>
+                                </li>
+                            @endif
 
-                        <li class="nav-item">
-                            <a href="{{ route('divisi.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/divisi*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-sitemap"></i>
-                                <p>Master Divisi</p>
-                            </a>
-                        </li>
+                            @if ($canAccess('master_hr'))
+                                <li class="nav-item">
+                                    <a href="{{ route('divisi.index') }}"
+                                        class="nav-link text-sm pl-4 {{ Request::is('admin/divisi*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-sitemap"></i>
+                                        <p>Master Divisi</p>
+                                    </a>
+                                </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('jabatan.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/jabatan*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-id-badge"></i>
-                                <p>Master Jabatan</p>
-                            </a>
-                        </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('jabatan.index') }}"
+                                        class="nav-link text-sm pl-4 {{ Request::is('admin/jabatan*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-id-badge"></i>
+                                        <p>Master Jabatan</p>
+                                    </a>
+                                </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('user.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/user*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-users-cog"></i>
-                                <p>Master Pengguna</p>
-                            </a>
-                        </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('user.index') }}"
+                                        class="nav-link text-sm pl-4 {{ Request::is('admin/user*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-users-cog"></i>
+                                        <p>Master Pengguna</p>
+                                    </a>
+                                </li>
+                            @endif
 
-                        <li class="nav-item">
-                            <a href="{{ route('wilayah.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/wilayah*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-globe"></i>
-                                <p>Master Wilayah</p>
-                            </a>
-                        </li>
+                            @if ($canAccess('master_wilayah'))
+                                <li class="nav-item">
+                                    <a href="{{ route('wilayah.index') }}"
+                                        class="nav-link text-sm pl-4 {{ Request::is('admin/wilayah*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-globe"></i>
+                                        <p>Master Wilayah</p>
+                                    </a>
+                                </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('provinsi.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/provinsi*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-map"></i>
-                                <p>Master Provinsi</p>
-                            </a>
-                        </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('provinsi.index') }}"
+                                        class="nav-link text-sm pl-4 {{ Request::is('admin/provinsi*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-map"></i>
+                                        <p>Master Provinsi</p>
+                                    </a>
+                                </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('kota.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/kota*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-city"></i>
-                                <p>Master Kota</p>
-                            </a>
-                        </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('kota.index') }}"
+                                        class="nav-link text-sm pl-4 {{ Request::is('admin/kota*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-city"></i>
+                                        <p>Master Kota</p>
+                                    </a>
+                                </li>
+                            @endif
 
+                            @if ($canAccess('master_mitra'))
+                                <li class="nav-item">
+                                    <a href="{{ route('supplier.index') }}"
+                                        class="nav-link text-sm pl-4 {{ Request::is('admin/supplier*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-truck"></i>
+                                        <p>Master Supplier</p>
+                                    </a>
+                                </li>
 
+                                <li class="nav-item">
+                                    <a href="{{ route('kondisi-barang.index') }}"
+                                        class="nav-link text-sm pl-4 {{ Request::is('admin/kondisi-barang*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-box-open"></i>
+                                        <p>Master Kondisi Barang</p>
+                                    </a>
+                                </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('supplier.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/supplier*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-truck"></i>
-                                <p>Master Supplier</p>
-                            </a>
-                        </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('jasa-pengiriman.index') }}"
+                                        class="nav-link text-sm pl-4 {{ Request::is('admin/jasa-pengiriman*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-shipping-fast"></i>
+                                        <p>Jasa Pengiriman</p>
+                                    </a>
+                                </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('kondisi-barang.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/kondisi-barang*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-box-open"></i>
-                                <p>Master Kondisi Barang</p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="{{ route('jasa-pengiriman.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/jasa-pengiriman*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-shipping-fast"></i>
-                                <p>Jasa Pengiriman</p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="{{ route('metode-pembayaran.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/metode-pembayaran*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-money-check-alt"></i>
-                                <p>Metode Pembayaran</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-
+                                <li class="nav-item">
+                                    <a href="{{ route('metode-pembayaran.index') }}"
+                                        class="nav-link text-sm pl-4 {{ Request::is('admin/metode-pembayaran*') ? 'active' : '' }}">
+                                        <i class="nav-icon fas fa-money-check-alt"></i>
+                                        <p>Metode Pembayaran</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
 
                 @php
                     $isGudang =
@@ -179,51 +199,53 @@
                         request()->is('admin/rak-gudang*');
                 @endphp
 
-                <li class="nav-item has-treeview {{ $isGudang ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ $isGudang ? 'active' : '' }} font-weight-bold">
-                        <i class="nav-icon fas fa-warehouse"></i>
-                        <p>
-                            Gudang
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                @if ($canAccess('gudang'))
+                    <li class="nav-item has-treeview {{ $isGudang ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isGudang ? 'active' : '' }} font-weight-bold">
+                            <i class="nav-icon fas fa-warehouse"></i>
+                            <p>
+                                Gudang
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
 
-                    <ul class="nav nav-treeview" style="{{ $isGudang ? 'display: block;' : '' }}">
+                        <ul class="nav nav-treeview" style="{{ $isGudang ? 'display: block;' : '' }}">
 
-                        <li class="nav-item">
-                            <a href="{{ route('dashboardGudang') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/dashboardGudang*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-chart-pie"></i>
-                                <p>Dashboard Gudang</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('dashboardGudang') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/dashboardGudang*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-chart-pie"></i>
+                                    <p>Dashboard Gudang</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('gudang.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/gudang*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-building"></i>
-                                <p>Gudang</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('gudang.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/gudang*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-building"></i>
+                                    <p>Gudang</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('areaGudang.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/areaGudang*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-th-large"></i>
-                                <p>Area Gudang</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('areaGudang.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/areaGudang*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-th-large"></i>
+                                    <p>Area Gudang</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('rak-gudang.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/rak-gudang*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-layer-group"></i>
-                                <p>Rak Gudang</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('rak-gudang.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/rak-gudang*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-layer-group"></i>
+                                    <p>Rak Gudang</p>
+                                </a>
+                            </li>
 
-                    </ul>
-                </li>
+                        </ul>
+                    </li>
+                @endif
 
                 @php
                     $isProduk =
@@ -233,51 +255,53 @@
                         request()->is('admin/stok*');
                 @endphp
 
-                <li class="nav-item has-treeview {{ $isProduk ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ $isProduk ? 'active' : '' }} font-weight-bold">
-                        <i class="nav-icon fas fa-boxes"></i>
-                        <p>
-                            Produk
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                @if ($canAccess('produk'))
+                    <li class="nav-item has-treeview {{ $isProduk ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isProduk ? 'active' : '' }} font-weight-bold">
+                            <i class="nav-icon fas fa-boxes"></i>
+                            <p>
+                                Produk
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
 
-                    <ul class="nav nav-treeview" style="{{ $isProduk ? 'display: block;' : '' }}">
+                        <ul class="nav nav-treeview" style="{{ $isProduk ? 'display: block;' : '' }}">
 
-                        <li class="nav-item">
-                            <a href="{{ route('dashboardProduk') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/dashboardProduk*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>Dashboard Produk</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('dashboardProduk') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/dashboardProduk*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                                    <p>Dashboard Produk</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('product.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/product*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-box"></i>
-                                <p>Produk</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('product.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/product*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-box"></i>
+                                    <p>Produk</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('category.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/category*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-tags"></i>
-                                <p>Kategori Produk</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('category.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/category*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-tags"></i>
+                                    <p>Kategori Produk</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('stok.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/stok*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-warehouse"></i>
-                                <p>Stok Produk</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('stok.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/stok*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-warehouse"></i>
+                                    <p>Stok Produk</p>
+                                </a>
+                            </li>
 
-                    </ul>
-                </li>
+                        </ul>
+                    </li>
+                @endif
 
                 @php
                     $isKeuangan =
@@ -287,99 +311,111 @@
                         request()->is('admin/keuangan*');
                 @endphp
 
-                <li class="nav-item has-treeview {{ $isKeuangan ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ $isKeuangan ? 'active' : '' }} font-weight-bold">
-                        <i class="nav-icon fas fa-wallet"></i>
-                        <p>
-                            Keuangan
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                @if ($canAccess('keuangan'))
+                    <li class="nav-item has-treeview {{ $isKeuangan ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isKeuangan ? 'active' : '' }} font-weight-bold">
+                            <i class="nav-icon fas fa-wallet"></i>
+                            <p>
+                                Keuangan
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
 
-                    <ul class="nav nav-treeview" style="{{ $isKeuangan ? 'display: block;' : '' }}">
+                        <ul class="nav nav-treeview" style="{{ $isKeuangan ? 'display: block;' : '' }}">
 
-                        <li class="nav-item">
-                            <a href="{{ route('dashboard-keuangan') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/dashboard-keuangan*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-chart-line"></i>
-                                <p>Dashboard Keuangan</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('dashboard-keuangan') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/dashboard-keuangan*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-chart-line"></i>
+                                    <p>Dashboard Keuangan</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('kas-pusat.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/kas-pusat*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-coins"></i>
-                                <p>Kas Pusat</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('kas-pusat.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/kas-pusat*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-coins"></i>
+                                    <p>Kas Pusat</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('sumber-keuangan.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/sumber-keuangan*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-money-bill-wave"></i>
-                                <p>Sumber Keuangan</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('sumber-keuangan.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/sumber-keuangan*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-money-bill-wave"></i>
+                                    <p>Sumber Keuangan</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('keuangan.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/keuangan*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-wallet"></i>
-                                <p>Keuangan</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('keuangan.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/keuangan*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-wallet"></i>
+                                    <p>Keuangan</p>
+                                </a>
+                            </li>
 
-                    </ul>
-                </li>
+                        </ul>
+                    </li>
+                @endif
 
-                <li class="nav-item">
-                    <a href="{{ route('admin.orders.index') }}"
-                        class="nav-link {{ Request::is('admin/orders*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-shopping-cart"></i>
-                        <p>Pesanan Distributor</p>
-                    </a>
-                </li>
+                @if ($canAccess('orders'))
+                    <li class="nav-item">
+                        <a href="{{ route('admin.orders.index') }}"
+                            class="nav-link {{ Request::is('admin/orders*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-shopping-cart"></i>
+                            <p>Pesanan Distributor</p>
+                        </a>
+                    </li>
+                @endif
 
-                <li class="nav-item">
-                    <a href="{{ route('distributor.index') }}"
-                        class="nav-link {{ Request::is('admin/distributor*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-truck-moving"></i>
-                        <p>Distributor</p>
-                    </a>
-                </li>
+                @if ($canAccess('distributor'))
+                    <li class="nav-item">
+                        <a href="{{ route('distributor.index') }}"
+                            class="nav-link {{ Request::is('admin/distributor*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-truck-moving"></i>
+                            <p>Distributor</p>
+                        </a>
+                    </li>
+                @endif
 
-                <li class="nav-item">
-                    <a href="{{ route('mutasi-stok.index') }}"
-                        class="nav-link {{ Request::is('admin/mutasi-stok*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-exchange-alt"></i>
-                        <p>Mutasi Stok</p>
-                    </a>
-                </li>
+                @if ($canAccess('mutasi_stok'))
+                    <li class="nav-item">
+                        <a href="{{ route('mutasi-stok.index') }}"
+                            class="nav-link {{ Request::is('admin/mutasi-stok*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-exchange-alt"></i>
+                            <p>Mutasi Stok</p>
+                        </a>
+                    </li>
+                @endif
 
-                <li class="nav-item">
-                    <a href="{{ route('stock-opname.index') }}"
-                        class="nav-link {{ Request::is('admin/stock-opname*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-clipboard-check"></i>
-                        <p>Stock Opname</p>
-                    </a>
-                </li>
+                @if ($canAccess('stock_opname'))
+                    <li class="nav-item">
+                        <a href="{{ route('stock-opname.index') }}"
+                            class="nav-link {{ Request::is('admin/stock-opname*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-clipboard-check"></i>
+                            <p>Stock Opname</p>
+                        </a>
+                    </li>
+                @endif
 
-                <li class="nav-item">
-                    <a href="{{ route('riwayat-aktivitas-produk.index') }}"
-                        class="nav-link {{ Request::is('admin/riwayat-aktivitas-produk*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-history"></i>
-                        <p>Riwayat Aktivitas Produk</p>
-                    </a>
-                </li>
+                @if ($canAccess('riwayat'))
+                    <li class="nav-item">
+                        <a href="{{ route('riwayat-aktivitas-produk.index') }}"
+                            class="nav-link {{ Request::is('admin/riwayat-aktivitas-produk*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-history"></i>
+                            <p>Riwayat Aktivitas Produk</p>
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a href="{{ route('riwayat-log.index') }}"
-                        class="nav-link {{ Request::is('admin/riwayat-logs*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-truck-loading"></i>
-                        <p>Log Aktivitas</p>
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a href="{{ route('riwayat-log.index') }}"
+                            class="nav-link {{ Request::is('admin/riwayat-logs*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-truck-loading"></i>
+                            <p>Log Aktivitas</p>
+                        </a>
+                    </li>
+                @endif
 
                 @php
                     $isTransaksi =
@@ -387,41 +423,45 @@
                         request()->is('admin/pengeluaran-barang*');
                 @endphp
 
-                <li class="nav-item has-treeview {{ $isTransaksi ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ $isTransaksi ? 'active' : '' }} font-weight-bold">
-                        <i class="nav-icon fas fa-exchange-alt"></i>
-                        <p>
-                            Transaksi
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                @if ($canAccess('transaksi'))
+                    <li class="nav-item has-treeview {{ $isTransaksi ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isTransaksi ? 'active' : '' }} font-weight-bold">
+                            <i class="nav-icon fas fa-exchange-alt"></i>
+                            <p>
+                                Transaksi
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
 
-                    <ul class="nav nav-treeview" style="{{ $isTransaksi ? 'display: block;' : '' }}">
-                        <li class="nav-item">
-                            <a href="{{ route('penerimaan-barang.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/penerimaan-barang*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-truck-loading"></i>
-                                <p>Penerimaan Barang</p>
-                            </a>
-                        </li>
+                        <ul class="nav nav-treeview" style="{{ $isTransaksi ? 'display: block;' : '' }}">
+                            <li class="nav-item">
+                                <a href="{{ route('penerimaan-barang.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/penerimaan-barang*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-truck-loading"></i>
+                                    <p>Penerimaan Barang</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="{{ route('pengeluaran-barang.index') }}"
-                                class="nav-link text-sm pl-4 {{ Request::is('admin/pengeluaran-barang*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-dolly"></i>
-                                <p>Pengeluaran Barang</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                            <li class="nav-item">
+                                <a href="{{ route('pengeluaran-barang.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('admin/pengeluaran-barang*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-dolly"></i>
+                                    <p>Pengeluaran Barang</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
 
-                <li class="nav-item">
-                    <a href="{{ route('laporan.index') }}"
-                        class="nav-link {{ Request::is('admin/laporan*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-file-alt"></i>
-                        <p>Laporan</p>
-                    </a>
-                </li>
+                @if ($canAccess('laporan'))
+                    <li class="nav-item">
+                        <a href="{{ route('laporan.index') }}"
+                            class="nav-link {{ Request::is('admin/laporan*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-file-alt"></i>
+                            <p>Laporan</p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
     </div>

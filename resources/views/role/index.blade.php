@@ -4,14 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dropcore - Peran</title>
+    <title>Dropcore - Manajemen Peran & Hak Akses</title>
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap"
         rel="stylesheet">
     <style>
+        body {
+            font-family: 'Source Sans Pro', sans-serif !important;
+        }
+
         .toggle-status {
             width: 50px;
             height: 24px;
@@ -47,6 +51,38 @@
             transform: translateX(26px);
             color: #28a745;
         }
+
+        .perm-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background: #fff;
+            height: 100%;
+        }
+
+        .perm-card:hover {
+            border-color: #007bff;
+            background: #f8fbff;
+        }
+
+        .perm-card.active-perm {
+            border-color: #007bff;
+            background: #eef6ff;
+        }
+
+        .perm-group-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #4a5568;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 4px;
+            margin-bottom: 10px;
+            margin-top: 12px;
+        }
     </style>
 </head>
 
@@ -55,12 +91,23 @@
         @include('include.navbarSistem')
         @include('include.sidebar')
 
+        @php
+            $groupedPermissions = collect($availablePermissions)->groupBy('group');
+        @endphp
+
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="container-fluid">
-                    <div class="row mb-2">
+                    <div class="row mb-2 align-items-center">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Manajemen Peran</h1>
+                            <h1 class="m-0 font-weight-bold"><i class="fas fa-user-shield text-primary mr-2"></i>Manajemen Peran & Hak Akses</h1>
+                            <p class="text-muted text-sm mb-0 mt-1">Kelola daftar role (Admin, Tim IT, Staff, Distributor) serta konfigurasi hak akses modul sistem.</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Manajemen Peran</li>
+                            </ol>
                         </div>
                     </div>
                 </div>
@@ -68,50 +115,107 @@
 
             <section class="content">
                 <div class="container-fluid">
-                    <div class="card">
+                    <div class="card card-outline card-primary shadow-sm">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title">Daftar Peran</h3>
+                            <h3 class="card-title font-weight-bold">Daftar Peran (Role) & Hak Akses</h3>
                             <button type="button" class="btn btn-primary btn-sm ml-auto" data-toggle="modal"
                                 data-target="#createRoleModal">
-                                <i class="fas fa-plus"></i> Tambah Peran
+                                <i class="fas fa-plus mr-1"></i> Tambah Peran Baru
                             </button>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="roleTable" class="table table-bordered table-striped">
+                                <table id="roleTable" class="table table-bordered table-striped table-hover">
                                     <thead>
                                         <tr>
-                                            <th>No</th>
-                                            <th>Nama Peran</th>
-                                            <th>Deskripsi</th>
-                                            <th>Status Peran</th>
-                                            <th>Aksi</th>
+                                            <th style="width: 5%">No</th>
+                                            <th style="width: 16%">Nama Peran</th>
+                                            <th style="width: 22%">Deskripsi</th>
+                                            <th style="width: 32%">Hak Akses Modul</th>
+                                            <th style="width: 10%" class="text-center">Status</th>
+                                            <th style="width: 15%" class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($roles as $index => $role)
+                                            @php
+                                                $effectivePerms = $role->getEffectivePermissions();
+                                                $isFullAdmin = $role->hasFullAdminAccess();
+                                                $isCoreAdmin = strtolower(trim($role->role_name)) === 'admin';
+                                            @endphp
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>{{ $role->role_name }}</td>
-                                                <td>{{ $role->role_description }}</td>
-                                                <td class="text-center">
+                                                <td>
+                                                    <span class="font-weight-bold text-dark">{{ $role->role_name }}</span>
+                                                    @if ($isCoreAdmin)
+                                                        <span class="badge badge-danger ml-1">Utama</span>
+                                                    @elseif ($isFullAdmin)
+                                                        <span class="badge badge-primary ml-1">Setara Admin</span>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $role->role_description ?? '-' }}</td>
+                                                <td>
+                                                    @if ($isFullAdmin)
+                                                        <span class="badge badge-success px-2 py-1">
+                                                            <i class="fas fa-check-double mr-1"></i> Full Akses Semua Modul ({{ count($adminPermissionKeys) }} Modul)
+                                                        </span>
+                                                        <small class="text-muted d-block mt-1">
+                                                            Memiliki akses penuh ke seluruh fitur sistem seperti Admin.
+                                                        </small>
+                                                    @elseif ($effectivePerms === ['portal_distributor'])
+                                                        <span class="badge badge-info px-2 py-1">
+                                                            <i class="fas fa-store mr-1"></i> Portal Belanja Distributor (Client)
+                                                        </span>
+                                                    @elseif (count($effectivePerms) > 0)
+                                                        <div class="d-flex flex-wrap" style="gap: 4px;">
+                                                            @foreach ($effectivePerms as $permKey)
+                                                                @if (isset($availablePermissions[$permKey]))
+                                                                    <span class="badge badge-secondary font-weight-normal px-2 py-1">
+                                                                        <i class="{{ $availablePermissions[$permKey]['icon'] }} mr-1"></i>
+                                                                        {{ $availablePermissions[$permKey]['label'] }}
+                                                                    </span>
+                                                                @endif
+                                                            @endforeach
+                                                        </div>
+                                                    @else
+                                                        <span class="badge badge-warning">Belum ada hak akses dipilih</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center align-middle">
                                                     <input type="checkbox" class="toggle-status"
                                                         data-role-id="{{ $role->id }}"
-                                                        {{ $role->role_status ? 'checked' : '' }}>
+                                                        {{ $role->role_status ? 'checked' : '' }}
+                                                        {{ $isCoreAdmin ? 'disabled title=Peran_Admin_Utama_Selalu_Aktif' : '' }}>
                                                 </td>
-                                                <td class="text-center">
-                                                    <button class="btn btn-info btn-sm edit-role-btn"
-                                                        data-id="{{ $role->id }}" data-name="{{ $role->role_name }}"
+                                                <td class="text-center align-middle" style="white-space: nowrap;">
+                                                    <button class="btn btn-warning btn-sm manage-permissions-btn mr-1"
+                                                        data-id="{{ $role->id }}"
+                                                        data-name="{{ $role->role_name }}"
+                                                        data-permissions='@json($effectivePerms)'
+                                                        data-toggle="modal"
+                                                        data-target="#permissionsModal"
+                                                        title="Kelola Hak Akses">
+                                                        <i class="fas fa-key"></i> Hak Akses
+                                                    </button>
+                                                    <button class="btn btn-info btn-sm edit-role-btn mr-1"
+                                                        data-id="{{ $role->id }}"
+                                                        data-name="{{ $role->role_name }}"
                                                         data-description="{{ $role->role_description }}"
-                                                        data-status="{{ $role->role_status }}" data-toggle="modal"
-                                                        data-target="#editRoleModal">
-                                                        <i class="fas fa-edit"></i> Edit
+                                                        data-status="{{ $role->role_status ? 1 : 0 }}"
+                                                        data-permissions='@json($effectivePerms)'
+                                                        data-toggle="modal"
+                                                        data-target="#editRoleModal"
+                                                        title="Edit Peran">
+                                                        <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="btn btn-danger btn-sm delete-role-btn"
-                                                        data-toggle="modal" data-target="#deleteRoleModal"
-                                                        data-role-id="{{ $role->id }}">
-                                                        <i class="fas fa-trash"></i> Hapus
-                                                    </button>
+                                                    @if (!$isCoreAdmin)
+                                                        <button class="btn btn-danger btn-sm delete-role-btn"
+                                                            data-toggle="modal" data-target="#deleteRoleModal"
+                                                            data-role-id="{{ $role->id }}"
+                                                            title="Hapus Peran">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -127,40 +231,152 @@
         @include('include.footerSistem')
     </div>
 
-    <!-- Modal Tambah Role -->
-    <div class="modal fade" id="createRoleModal" tabindex="-1" role="dialog" aria-labelledby="createRoleModalLabel"
+    <!-- Modal Kelola Hak Akses (Dedicated) -->
+    <div class="modal fade" id="permissionsModal" tabindex="-1" role="dialog" aria-labelledby="permissionsModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createRoleModalLabel">Tambah Peran Baru</h5>
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title font-weight-bold" id="permissionsModalLabel">
+                        <i class="fas fa-key mr-2"></i>Kelola Hak Akses Peran: <span id="perm_role_title"></span>
+                    </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="{{ route('role.store') }}" method="POST">
+                <form id="permissionsForm" method="POST">
                     @csrf
+                    @method('PUT')
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label for="role_name">Nama Peran</label>
-                            <input type="text" class="form-control" name="role_name" required
-                                placeholder="Masukkan nama peran" autocomplete="off">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center bg-light p-2 rounded mb-3 border">
+                            <span class="text-sm font-weight-bold text-secondary">
+                                <i class="fas fa-magic mr-1"></i> Template Cepat:
+                            </span>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-primary preset-btn" data-target-form="#permissionsForm" data-preset="full_admin">
+                                    <i class="fas fa-check-double mr-1"></i> Full Akses (Setara Admin / IT)
+                                </button>
+                                <button type="button" class="btn btn-outline-success preset-btn" data-target-form="#permissionsForm" data-preset="operational">
+                                    <i class="fas fa-boxes mr-1"></i> Operasional Gudang & Staf
+                                </button>
+                                <button type="button" class="btn btn-outline-info preset-btn" data-target-form="#permissionsForm" data-preset="distributor">
+                                    <i class="fas fa-store mr-1"></i> Portal Distributor
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary preset-btn" data-target-form="#permissionsForm" data-preset="none">
+                                    <i class="fas fa-eraser mr-1"></i> Reset
+                                </button>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="role_description">Deskripsi</label>
-                            <textarea class="form-control" name="role_description" required placeholder="Masukkan deskripsi peran"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="role_status">Status</label>
-                            <select class="form-control" name="role_status" required>
-                                <option value="1">Aktif</option>
-                                <option value="0">Nonaktif</option>
-                            </select>
-                        </div>
+
+                        @foreach ($groupedPermissions as $groupName => $perms)
+                            <div class="perm-group-title">{{ $groupName }}</div>
+                            <div class="row">
+                                @foreach ($perms as $key => $info)
+                                    <div class="col-md-6 mb-2">
+                                        <label class="perm-card d-flex align-items-start mb-0">
+                                            <input type="checkbox" name="permissions[]" value="{{ $key }}"
+                                                class="mt-1 mr-2 perm-checkbox">
+                                            <div>
+                                                <div class="font-weight-bold text-sm text-dark">
+                                                    <i class="{{ $info['icon'] }} text-primary mr-1"></i> {{ $info['label'] }}
+                                                </div>
+                                                <small class="text-muted d-block" style="line-height: 1.2;">{{ $info['desc'] }}</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endforeach
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Simpan Hak Akses</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Role -->
+    <div class="modal fade" id="createRoleModal" tabindex="-1" role="dialog" aria-labelledby="createRoleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title font-weight-bold" id="createRoleModalLabel">
+                        <i class="fas fa-plus-circle mr-1"></i> Tambah Peran & Hak Akses Baru
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="createRoleForm" action="{{ route('role.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="role_name">Nama Peran <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="role_name" required
+                                        placeholder="Contoh: Tim IT, Supervisor Gudang, Admin Keuangan" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role_status">Status Peran <span class="text-danger">*</span></label>
+                                    <select class="form-control" name="role_status" required>
+                                        <option value="1">Aktif</option>
+                                        <option value="0">Nonaktif</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="role_description">Deskripsi <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="role_description" rows="2" required
+                                placeholder="Masukkan deskripsi tugas dan tanggung jawab peran"></textarea>
+                        </div>
+
+                        <hr>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+                            <label class="mb-0 font-weight-bold"><i class="fas fa-key text-primary mr-1"></i> Pengaturan Hak Akses Modul</label>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-primary preset-btn" data-target-form="#createRoleForm" data-preset="full_admin">
+                                    <i class="fas fa-check-double mr-1"></i> Pilih Semua (Setara Admin / IT)
+                                </button>
+                                <button type="button" class="btn btn-outline-success preset-btn" data-target-form="#createRoleForm" data-preset="operational">
+                                    Operasional Gudang
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary preset-btn" data-target-form="#createRoleForm" data-preset="none">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+
+                        @foreach ($groupedPermissions as $groupName => $perms)
+                            <div class="perm-group-title">{{ $groupName }}</div>
+                            <div class="row">
+                                @foreach ($perms as $key => $info)
+                                    <div class="col-md-6 mb-2">
+                                        <label class="perm-card d-flex align-items-start mb-0">
+                                            <input type="checkbox" name="permissions[]" value="{{ $key }}"
+                                                class="mt-1 mr-2 perm-checkbox"
+                                                {{ $key !== 'portal_distributor' ? 'checked' : '' }}>
+                                            <div>
+                                                <div class="font-weight-bold text-sm text-dark">
+                                                    <i class="{{ $info['icon'] }} text-primary mr-1"></i> {{ $info['label'] }}
+                                                </div>
+                                                <small class="text-muted d-block" style="line-height: 1.2;">{{ $info['desc'] }}</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Simpan Peran</button>
                     </div>
                 </form>
             </div>
@@ -170,38 +386,83 @@
     <!-- Modal Edit Role -->
     <div class="modal fade" id="editRoleModal" tabindex="-1" role="dialog" aria-labelledby="editRoleModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editRoleModalLabel">Edit Peran</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title font-weight-bold" id="editRoleModalLabel">
+                        <i class="fas fa-edit mr-1"></i> Edit Peran & Hak Akses
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <form id="editRoleForm" method="POST">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="permissions_submitted" value="1">
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label for="edit_role_name">Nama Peran</label>
-                            <input type="text" class="form-control" id="edit_role_name" name="role_name" required
-                                autocomplete="off">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="edit_role_name">Nama Peran <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="edit_role_name" name="role_name" required
+                                        autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="edit_role_status">Status <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="edit_role_status" name="role_status" required>
+                                        <option value="1">Aktif</option>
+                                        <option value="0">Nonaktif</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label for="edit_role_description">Deskripsi</label>
-                            <textarea class="form-control" id="edit_role_description" name="role_description" required></textarea>
+                            <label for="edit_role_description">Deskripsi <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="edit_role_description" name="role_description" rows="2" required></textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="edit_role_status">Status</label>
-                            <select class="form-control" id="edit_role_status" name="role_status" required>
-                                <option value="1">Aktif</option>
-                                <option value="0">Nonaktif</option>
-                            </select>
+
+                        <hr>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+                            <label class="mb-0 font-weight-bold"><i class="fas fa-key text-info mr-1"></i> Hak Akses Modul</label>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-primary preset-btn" data-target-form="#editRoleForm" data-preset="full_admin">
+                                    <i class="fas fa-check-double mr-1"></i> Pilih Semua (Setara Admin / IT)
+                                </button>
+                                <button type="button" class="btn btn-outline-success preset-btn" data-target-form="#editRoleForm" data-preset="operational">
+                                    Operasional Gudang
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary preset-btn" data-target-form="#editRoleForm" data-preset="none">
+                                    Reset
+                                </button>
+                            </div>
                         </div>
+
+                        @foreach ($groupedPermissions as $groupName => $perms)
+                            <div class="perm-group-title">{{ $groupName }}</div>
+                            <div class="row">
+                                @foreach ($perms as $key => $info)
+                                    <div class="col-md-6 mb-2">
+                                        <label class="perm-card d-flex align-items-start mb-0">
+                                            <input type="checkbox" name="permissions[]" value="{{ $key }}"
+                                                class="mt-1 mr-2 perm-checkbox">
+                                            <div>
+                                                <div class="font-weight-bold text-sm text-dark">
+                                                    <i class="{{ $info['icon'] }} text-primary mr-1"></i> {{ $info['label'] }}
+                                                </div>
+                                                <small class="text-muted d-block" style="line-height: 1.2;">{{ $info['desc'] }}</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endforeach
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Simpan Perubahan</button>
                     </div>
                 </form>
             </div>
@@ -245,6 +506,9 @@
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
     <script>
         $(document).ready(function() {
+            const adminPermissions = @json($adminPermissionKeys);
+            const operationalPermissions = ['dashboard', 'gudang', 'produk', 'mutasi_stok', 'stock_opname', 'transaksi', 'orders', 'distributor', 'laporan'];
+
             $("#roleTable").DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -255,54 +519,106 @@
                 "responsive": true
             });
 
-            // Handle Edit Button Click
-            $('.edit-role-btn').click(function() {
-                var id = $(this).data('id');
-                var name = $(this).data('name');
-                var description = $(this).data('description');
-                var status = $(this).data('status');
+            function syncPermCardVisuals($container) {
+                $container.find('.perm-checkbox').each(function() {
+                    $(this).closest('.perm-card').toggleClass('active-perm', $(this).is(':checked'));
+                });
+            }
 
-                var url = "{{ url('role') }}/" + id;
+            $(document).on('change', '.perm-checkbox', function() {
+                $(this).closest('.perm-card').toggleClass('active-perm', $(this).is(':checked'));
+            });
+
+            syncPermCardVisuals($(document));
+
+            // Handle Preset Buttons
+            $('.preset-btn').click(function() {
+                const targetForm = $($(this).data('target-form'));
+                const preset = $(this).data('preset');
+                let selected = [];
+
+                if (preset === 'full_admin') {
+                    selected = adminPermissions;
+                } else if (preset === 'operational') {
+                    selected = operationalPermissions;
+                } else if (preset === 'distributor') {
+                    selected = ['portal_distributor'];
+                } else {
+                    selected = [];
+                }
+
+                targetForm.find('.perm-checkbox').each(function() {
+                    const val = $(this).val();
+                    $(this).prop('checked', selected.includes(val));
+                });
+
+                syncPermCardVisuals(targetForm);
+            });
+
+            // Handle Manage Permissions Button Click
+            $(document).on('click', '.manage-permissions-btn', function() {
+                const id = $(this).data('id');
+                const name = $(this).data('name');
+                const perms = $(this).data('permissions') || [];
+
+                const url = "{{ url('admin/role') }}/" + id + "/permissions";
+                $('#permissionsForm').attr('action', url);
+                $('#perm_role_title').text(name);
+
+                $('#permissionsForm .perm-checkbox').each(function() {
+                    const val = $(this).val();
+                    $(this).prop('checked', perms.includes(val));
+                });
+
+                syncPermCardVisuals($('#permissionsForm'));
+            });
+
+            // Handle Edit Button Click
+            $(document).on('click', '.edit-role-btn', function() {
+                const id = $(this).data('id');
+                const name = $(this).data('name');
+                const description = $(this).data('description');
+                const status = $(this).data('status');
+                const perms = $(this).data('permissions') || [];
+
+                const url = "{{ url('admin/role') }}/" + id;
 
                 $('#editRoleForm').attr('action', url);
                 $('#edit_role_name').val(name);
                 $('#edit_role_description').val(description);
                 $('#edit_role_status').val(status);
+
+                $('#editRoleForm .perm-checkbox').each(function() {
+                    const val = $(this).val();
+                    $(this).prop('checked', perms.includes(val));
+                });
+
+                syncPermCardVisuals($('#editRoleForm'));
             });
 
             // Handle Delete Button Click
-            $('.delete-role-btn').click(function() {
-                let roleId = $(this).data('role-id');
-                let deleteUrl = "{{ url('role') }}/" + roleId;
+            $(document).on('click', '.delete-role-btn', function() {
+                const roleId = $(this).data('role-id');
+                const deleteUrl = "{{ url('admin/role') }}/" + roleId;
                 $('#deleteForm').attr('action', deleteUrl);
             });
 
             // Handle Toggle Status
-            $(".toggle-status").change(function() {
+            $(document).on('change', '.toggle-status', function() {
                 let roleId = $(this).data("role-id");
                 let status = $(this).prop("checked") ? 1 : 0;
 
-                $.post("{{ url('role') }}/" + roleId + "/toggle-status", {
+                $.post("{{ url('admin/role') }}/" + roleId + "/toggle-status", {
                     _token: '{{ csrf_token() }}',
                     role_status: status
                 }, function(res) {
                     if (res.success) {
-                        // Use Bootstrap 5 Toast if available, or fall back to whatever is used
-                        if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
-                            // Assuming standard BS toast structure creation in JS for simple messages, 
-                            // but since we have a specific Toast structure in ToastModal, we might just reload or show alert if ToastModal isn't dynamic enough for AJAX updates without reload.
-                            // However, the ToastModal.blade.php relies on session flask. 
-                            // For AJAX, we often need a JS function to trigger it. 
-                            // The existing code tried to set text and show. Let's keep that pattern if it works.
-
-                            // Update the toast body content if generic generic toast exists
-                            var toastBody = $(".toast-body");
-                            if (toastBody.length) {
-                                toastBody.text(res.message);
-                                $("#toastNotification").toast('show');
-                            }
+                        if (window.Toast) {
+                            window.Toast.fire({
+                                icon: 'success',
+                                title: res.message
+                            });
                         } else {
-                            // Fallback for BS4 as per original code pattern
                             $(".toast-body").text(res.message);
                             $("#toastNotification").toast({
                                 autohide: true,
