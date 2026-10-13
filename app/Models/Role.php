@@ -190,6 +190,50 @@ class Role extends Model
                     ]);
                 }
             }
+
+            // Auto-clean any numeric/corrupted keys from previous collection groupBy bug
+            if (Schema::hasColumn('role', 'permissions')) {
+                $allRoles = DB::table('role')->whereNotNull('permissions')->get();
+                $availableKeys = array_keys(self::AVAILABLE_PERMISSIONS);
+                $operationalKeys = ['dashboard', 'gudang', 'produk', 'mutasi_stok', 'stock_opname', 'transaksi', 'orders', 'distributor', 'laporan'];
+
+                foreach ($allRoles as $er) {
+                    $raw = $er->permissions;
+                    $decoded = is_string($raw) ? json_decode($raw, true) : (array) $raw;
+                    if (!is_array($decoded)) {
+                        continue;
+                    }
+
+                    $hasCorruptedKey = false;
+                    foreach ($decoded as $item) {
+                        if (is_numeric($item) || !in_array($item, $availableKeys, true)) {
+                            $hasCorruptedKey = true;
+                            break;
+                        }
+                    }
+
+                    if ($hasCorruptedKey) {
+                        $cleaned = array_values(array_filter($decoded, function ($item) use ($availableKeys) {
+                            return is_string($item) && in_array($item, $availableKeys, true);
+                        }));
+
+                        $nameLower = strtolower(trim($er->role_name));
+                        if (empty($cleaned)) {
+                            if ($nameLower === 'staff' || $nameLower === 'staf') {
+                                $cleaned = $operationalKeys;
+                            } elseif ($nameLower === 'distributor') {
+                                $cleaned = ['portal_distributor'];
+                            } else {
+                                $cleaned = self::getAdminPermissionKeys();
+                            }
+                        }
+
+                        DB::table('role')->where('id', $er->id)->update([
+                            'permissions' => json_encode($cleaned),
+                        ]);
+                    }
+                }
+            }
         } catch (\Throwable $e) {
             // Ignore schema check errors if DB connection is not ready
         }
@@ -235,8 +279,12 @@ class Role extends Model
         $roleNameLower = strtolower(trim($this->role_name ?? ''));
 
         if (is_array($this->permissions)) {
-            $perms = $this->permissions;
-            if (in_array('*', $perms, true) || in_array('all', $perms, true)) {
+            $validKeys = array_keys(self::AVAILABLE_PERMISSIONS);
+            $perms = array_values(array_filter($this->permissions, function ($val) use ($validKeys) {
+                return is_string($val) && in_array($val, $validKeys, true);
+            }));
+
+            if (in_array('*', $this->permissions, true) || in_array('all', $this->permissions, true)) {
                 return self::getAdminPermissionKeys();
             }
             if ($roleNameLower === 'admin' && !in_array('master_role', $perms, true)) {

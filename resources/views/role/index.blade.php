@@ -92,7 +92,11 @@
         @include('include.sidebar')
 
         @php
-            $groupedPermissions = collect($availablePermissions)->groupBy('group');
+            $groupedPermissions = [];
+            foreach ($availablePermissions as $permKey => $info) {
+                $grp = $info['group'] ?? 'Lainnya';
+                $groupedPermissions[$grp][$permKey] = $info;
+            }
         @endphp
 
         <div class="content-wrapper">
@@ -167,16 +171,23 @@
                                                             <i class="fas fa-store mr-1"></i> Portal Belanja Distributor (Client)
                                                         </span>
                                                     @elseif (count($effectivePerms) > 0)
-                                                        <div class="d-flex flex-wrap" style="gap: 4px;">
-                                                            @foreach ($effectivePerms as $permKey)
-                                                                @if (isset($availablePermissions[$permKey]))
+                                                        @php
+                                                            $validBadges = array_values(array_filter($effectivePerms, function ($k) use ($availablePermissions) {
+                                                                return isset($availablePermissions[$k]);
+                                                            }));
+                                                        @endphp
+                                                        @if (count($validBadges) > 0)
+                                                            <div class="d-flex flex-wrap" style="gap: 4px;">
+                                                                @foreach ($validBadges as $permKey)
                                                                     <span class="badge badge-secondary font-weight-normal px-2 py-1">
                                                                         <i class="{{ $availablePermissions[$permKey]['icon'] }} mr-1"></i>
                                                                         {{ $availablePermissions[$permKey]['label'] }}
                                                                     </span>
-                                                                @endif
-                                                            @endforeach
-                                                        </div>
+                                                                @endforeach
+                                                            </div>
+                                                        @else
+                                                            <span class="badge badge-warning">Belum ada hak akses dipilih</span>
+                                                        @endif
                                                     @else
                                                         <span class="badge badge-warning">Belum ada hak akses dipilih</span>
                                                     @endif

@@ -35,6 +35,9 @@ class RoleController extends Controller
             $data['permissions'] = strtolower(trim($request->role_name)) === 'distributor'
                 ? ['portal_distributor']
                 : Role::getAdminPermissionKeys();
+        } else {
+            $validKeys = array_keys(Role::AVAILABLE_PERMISSIONS);
+            $data['permissions'] = array_values(array_intersect($request->input('permissions', []), $validKeys));
         }
 
         Role::createRole($data);
@@ -58,6 +61,9 @@ class RoleController extends Controller
         $data = $request->all();
         if ($request->has('permissions_submitted') && !$request->has('permissions')) {
             $data['permissions'] = [];
+        } elseif ($request->has('permissions')) {
+            $validKeys = array_keys(Role::AVAILABLE_PERMISSIONS);
+            $data['permissions'] = array_values(array_intersect($request->input('permissions', []), $validKeys));
         }
 
         $role->updateRole($data);
@@ -75,7 +81,8 @@ class RoleController extends Controller
         ]);
 
         $role = Role::findOrFail($id);
-        $perms = $request->input('permissions', []);
+        $validKeys = array_keys(Role::AVAILABLE_PERMISSIONS);
+        $perms = array_values(array_intersect($request->input('permissions', []), $validKeys));
 
         if (strtolower(trim($role->role_name)) === 'admin' && !in_array('master_role', $perms, true)) {
             $perms[] = 'master_role';
