@@ -10,15 +10,38 @@ use App\Models\Gudang;
 use App\Models\KondisiBarang;
 use App\Models\Stok;
 use Illuminate\Http\Request;
+use App\Services\InventoryPaymentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PengeluaranBarangController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = PengeluaranBarang::with(['distributor', 'user'])->latest()->get();
+        $filters = $request->validate([
+            'tanggal_awal' => ['nullable', 'date_format:Y-m-d'],
+            'tanggal_akhir' => array_merge(
+                ['nullable', 'date_format:Y-m-d'],
+                $request->filled('tanggal_awal') ? ['after_or_equal:tanggal_awal'] : []
+            ),
+            'tipe_penerima' => ['nullable', 'in:distributor,konsumen'],
+            'status' => ['nullable', 'in:pending,completed,canceled'],
+        ]);
+
+        $query = PengeluaranBarang::with(['distributor', 'user']);
+        if ($request->filled('tanggal_awal')) {
+            $query->whereDate('tanggal_pengeluaran', '>=', $filters['tanggal_awal']);
+        }
+        if ($request->filled('tanggal_akhir')) {
+            $query->whereDate('tanggal_pengeluaran', '<=', $filters['tanggal_akhir']);
+        }
+        foreach (['tipe_penerima', 'status'] as $field) {
+            if ($request->filled($field)) {
+                $query->where($field, $filters[$field]);
+            }
+        }
+        $data = $query->latest()->get();
         return view('pengeluaran_barang.index', compact('data'));
     }
 
@@ -44,10 +67,11 @@ class PengeluaranBarangController extends Controller
             'referensi'           => 'nullable|string|max:100',
             'keterangan'          => 'nullable|string',
             'submit_action'       => 'required|in:draft,process',
-            'sumber_id'          => 'required_if:submit_action,process|nullable|exists:sumber_keuangan,id',
+            'payment_status' => 'required|in:unpaid,paid',
+            'sumber_id' => ['nullable', \Illuminate\Validation\Rule::requiredIf($request->submit_action === 'process' && $request->payment_status === 'paid'), 'exists:sumber_keuangan,id'],
 
             // Conditional Validation
-            'distributor_id'      => 'nullable|required_if:tipe_penerima,distributor|exists:distributors,id',
+            'distributor_id'      => ['nullable', 'required_if:tipe_penerima,distributor', \Illuminate\Validation\Rule::exists(Distributor::class, 'id')],
             'nama_konsumen'       => 'nullable|required_if:tipe_penerima,konsumen|string',
             'telepon_konsumen'    => 'nullable|required_if:tipe_penerima,konsumen|string',
             'alamat_konsumen'     => 'nullable|required_if:tipe_penerima,konsumen|string',
@@ -60,11 +84,13 @@ class PengeluaranBarangController extends Controller
             'items.*.gudang_id'  => 'required|exists:gudang,id',
             'items.*.area_id'    => 'required|exists:area_gudang,id',
             'items.*.rak_id'     => 'required|exists:rak_gudang,id',
-            'items.*.harga'      => 'nullable|numeric|min:0',
+            'items.*.harga'      => 'required|numeric|min:0|decimal:0,2',
         ]);
 
         try {
             DB::beginTransaction();
+            $inventory = app(InventoryPaymentService::class);
+            $inventory->lockProducts($request->items);
 
             $status = ($request->submit_action === 'process') ? 'completed' : 'pending';
             $totalTransaksi = 0;
@@ -74,10 +100,10 @@ class PengeluaranBarangController extends Controller
                 'no_pengeluaran'     => PengeluaranBarang::generateNomorPengeluaran(),
                 'user_id'            => optional(Auth::user())->id,
                 'tipe_penerima'      => $request->tipe_penerima,
-                'distributor_id'     => $request->distributor_id,
-                'nama_konsumen'      => $request->nama_konsumen,
-                'telepon_konsumen'   => $request->telepon_konsumen,
-                'alamat_konsumen'    => $request->alamat_konsumen,
+                'distributor_id'     => $request->tipe_penerima === 'distributor' ? $request->distributor_id : null,
+                'nama_konsumen'      => $request->tipe_penerima === 'konsumen' ? $request->nama_konsumen : null,
+                'telepon_konsumen'   => $request->tipe_penerima === 'konsumen' ? $request->telepon_konsumen : null,
+                'alamat_konsumen'    => $request->tipe_penerima === 'konsumen' ? $request->alamat_konsumen : null,
                 'tanggal_pengeluaran' => $request->tanggal_pengeluaran,
                 'referensi'          => $request->referensi ?: ('SJ-' . strtoupper(\Illuminate\Support\Str::random(6))),
                 'keterangan'         => $request->keterangan,
@@ -86,6 +112,7 @@ class PengeluaranBarangController extends Controller
 
             // 2. Process Details
             foreach ($request->items as $item) {
+                $inventory->validateLocation($item);
                 $qty = $item['qty'];
                 $kondisiId = !empty($item['kondisi_id']) ? $item['kondisi_id'] : null;
 
@@ -111,19 +138,8 @@ class PengeluaranBarangController extends Controller
                     }
                 }
 
-                $rawHarga = $item['harga'] ?? 0;
-                $cleanHarga = preg_replace('/[^0-9]/', '', $rawHarga);
-                $harga = (float) $cleanHarga;
-
-                // Fallback to product price if user didn't specify price
-                if ($harga <= 0) {
-                    $produk = \App\Models\Products::find($item['produk_id']);
-                    if ($produk && $produk->price > 0) {
-                        $harga = (float) $produk->price;
-                    }
-                }
-
-                $subtotal = $qty * $harga;
+                $harga = round((float) $item['harga'], 2);
+                $subtotal = round($qty * $harga, 2);
                 $totalTransaksi += $subtotal;
 
                 PengeluaranBarangDetail::create([
@@ -146,35 +162,8 @@ class PengeluaranBarangController extends Controller
                 }
             }
 
-            // 4. Financial Transaction (Income)
-            $sumberId = $request->sumber_id ?: optional(\App\Models\SumberKeuangan::where('is_active', true)->first())->id;
-
-            if ($status === 'completed' && $totalTransaksi > 0 && $sumberId) {
-                $kategori = \App\Models\KategoriKeuangan::firstOrCreate(
-                    ['nama' => 'Penjualan Stok'],
-                    ['jenis' => 'pemasukkan', 'deskripsi' => 'Otomatis dari Pengeluaran Barang']
-                );
-
-                // Auto Generate Finance Transaction No
-                $noTrx = \App\Http\Controllers\KeuanganController::generateNoTransaksi($request->tanggal_pengeluaran);
-
-                \App\Models\Keuangan::create([
-                    'no_transaksi'         => $noTrx,
-                    'jenis_transaksi'      => 'pemasukkan',
-                    'kategori_keuangan_id' => $kategori->id,
-                    'sumber_id'            => $sumberId,
-                    'jumlah'               => $totalTransaksi,
-                    'tanggal_transaksi'    => $request->tanggal_pengeluaran,
-                    'keterangan'           => 'Penjualan Stok Ref: ' . $pengeluaran->no_pengeluaran,
-                    'status'               => 'approved',
-                    'user_id'              => optional(Auth::user())->id,
-                ]);
-
-                // Increment Balance
-                $akun = \App\Models\SumberKeuangan::find($sumberId);
-                if ($akun) {
-                    $akun->increment('saldo', $totalTransaksi);
-                }
+            if ($status === 'completed' && $request->payment_status === 'paid') {
+                $inventory->pay($pengeluaran, $request->sumber_id, $request->tanggal_pengeluaran);
             }
 
             DB::commit();
@@ -202,7 +191,8 @@ class PengeluaranBarangController extends Controller
             'details.kondisi'
         ])->findOrFail($id);
 
-        return view('pengeluaran_barang.show', compact('pengeluaran'));
+        $sumberKeuangan = \App\Models\SumberKeuangan::where('is_active', true)->orderBy('nama_sumber')->get();
+        return view('pengeluaran_barang.show', compact('pengeluaran', 'sumberKeuangan'));
     }
 
     public function print($id)
@@ -217,48 +207,30 @@ class PengeluaranBarangController extends Controller
             'details.kondisi'
         ])->findOrFail($id);
 
-        $pdf = Pdf::loadView('pengeluaran_barang.pdf', compact('pengeluaran'));
+        $pdf = Pdf::loadView('pengeluaran_barang.pdf', compact('pengeluaran'))->setPaper('a4', 'portrait');
         return $pdf->stream('Surat-Jalan-' . $pengeluaran->no_pengeluaran . '.pdf');
     }
 
     public function destroy($id)
     {
-        // Cancel/Rollback Transaction
         try {
-            DB::beginTransaction();
-            $pengeluaran = PengeluaranBarang::with('details')->findOrFail($id);
-
-            // Return Stock
-            foreach ($pengeluaran->details as $detail) {
-                $stok = Stok::where('produk_id', $detail->produk_id)
-                    ->where('gudang_id', $detail->gudang_id)
-                    ->where('area_id', $detail->area_id)
-                    ->where('rak_id', $detail->rak_id)
-                    ->where('kondisi_id', $detail->kondisi_id)
-                    ->first();
-
-                if ($stok) {
-                    $stok->quantity += $detail->qty;
-                    $stok->save();
-                } else {
-                    // If stock record gone (rare), recreate? Or just log? 
-                    // Recreating is safer to ensure inventory value exists.
-                    Stok::create([
-                        'produk_id'  => $detail->produk_id,
-                        'gudang_id'  => $detail->gudang_id,
-                        'area_id'    => $detail->area_id,
-                        'rak_id'     => $detail->rak_id,
-                        'kondisi_id' => $detail->kondisi_id,
-                        'quantity'   => $detail->qty,
-                    ]);
-                }
-            }
-
-            $pengeluaran->delete();
-            DB::commit();
-            return redirect()->route('pengeluaran-barang.index')->with('success', 'Pengeluaran barang dibatalkan dan stok dikembalikan.');
+            app(InventoryPaymentService::class)->cancel(PengeluaranBarang::findOrFail($id));
+            return redirect()->route('pengeluaran-barang.index')->with('success', 'Transaksi dibatalkan. Perubahan stok dan pembayaran telah dibalik; draft tidak mengubah stok atau saldo.');
         } catch (\Exception $e) {
-            DB::rollBack();
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function pay(Request $request, $id)
+    {
+        $request->validate([
+            'sumber_id' => 'required|exists:sumber_keuangan,id',
+            'tanggal_pembayaran' => 'required|date|after_or_equal:' . PengeluaranBarang::findOrFail($id)->tanggal_pengeluaran,
+        ]);
+        try {
+            app(InventoryPaymentService::class)->pay(PengeluaranBarang::findOrFail($id), $request->sumber_id, $request->tanggal_pembayaran);
+            return back()->with('success', 'Pelunasan berhasil dicatat dan saldo akun diperbarui.');
+        } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
     }

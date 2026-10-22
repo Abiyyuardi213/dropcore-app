@@ -14,6 +14,61 @@
         rel="stylesheet">
 
     <style>
+        .keuangan-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .keuangan-filters,
+        .keuangan-filter-fields,
+        .keuangan-filter-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: .5rem;
+        }
+
+        .keuangan-filters {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .keuangan-filters .form-group {
+            margin-bottom: 0;
+        }
+
+        .keuangan-filters label,
+        .keuangan-search label {
+            margin-bottom: .25rem;
+            font-size: .875rem;
+        }
+
+        .keuangan-filter-fields .row {
+            margin: 0 -.25rem;
+        }
+
+        .keuangan-filter-fields .row > div {
+            padding: 0 .25rem;
+        }
+
+        .keuangan-search {
+            margin-left: auto;
+            width: 200px;
+        }
+
+        @media (max-width: 767.98px) {
+            .keuangan-filters,
+            .keuangan-filter-fields,
+            .keuangan-filters .form-group,
+            .keuangan-search {
+                width: 100%;
+                flex-basis: 100%;
+            }
+        }
+
         .info-box-number {
             font-size: 1.5rem;
             font-weight: 700;
@@ -80,16 +135,79 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h3 class="card-title">Daftar Transaksi Keuangan</h3>
                             <div class="ml-auto">
-                                <button type="button" class="btn btn-default btn-sm mr-1" data-toggle="modal"
-                                    data-target="#filterModal">
-                                    <i class="fas fa-filter"></i> Filter
-                                </button>
                                 <a href="{{ route('keuangan.create') }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-plus"></i> Tambah Transaksi
                                 </a>
                             </div>
                         </div>
                         <div class="card-body">
+                            <div class="keuangan-toolbar">
+                                <form id="keuanganFilters" class="keuangan-filters" action="{{ route('keuangan.index') }}" method="GET">
+                                    <div class="keuangan-filter-fields">
+                                        <div class="form-group">
+                                            <label for="tanggal_awal">Rentang Tanggal</label>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <input type="date" id="tanggal_awal" name="tanggal_awal" aria-label="Tanggal awal" class="form-control form-control-sm"
+                                                        value="{{ request('tanggal_awal') }}">
+                                                </div>
+                                                <div class="col-6">
+                                                    <input type="date" id="tanggal_akhir" name="tanggal_akhir" aria-label="Tanggal akhir" class="form-control form-control-sm"
+                                                        value="{{ request('tanggal_akhir') }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="jenis_transaksi">Jenis Transaksi</label>
+                                            <select id="jenis_transaksi" name="jenis_transaksi" class="form-control form-control-sm">
+                                                <option value="">-- Semua Jenis --</option>
+                                                <option value="pemasukkan"
+                                                    {{ request('jenis_transaksi') == 'pemasukkan' ? 'selected' : '' }}>Pemasukkan
+                                                </option>
+                                                <option value="pengeluaran"
+                                                    {{ request('jenis_transaksi') == 'pengeluaran' ? 'selected' : '' }}>Pengeluaran
+                                                </option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="kategori_keuangan_id">Kategori</label>
+                                            <select id="kategori_keuangan_id" name="kategori_keuangan_id" class="form-control form-control-sm">
+                                                <option value="">-- Semua Kategori --</option>
+                                                @foreach ($categories as $cat)
+                                                    <option value="{{ $cat->id }}"
+                                                        {{ request('kategori_keuangan_id') == $cat->id ? 'selected' : '' }}>
+                                                        {{ $cat->nama }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="sumber_id">Akun Keuangan</label>
+                                            <select id="sumber_id" name="sumber_id" class="form-control form-control-sm">
+                                                <option value="">-- Semua Akun --</option>
+                                                @foreach ($sumberKeuangan as $sumber)
+                                                    <option value="{{ $sumber->id }}"
+                                                        {{ request('sumber_id') == $sumber->id ? 'selected' : '' }}>
+                                                        {{ $sumber->nama_sumber }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="keuangan-filter-actions">
+                                        <a href="{{ route('keuangan.index') }}" class="btn btn-default btn-sm">Reset</a>
+                                        <button type="submit" class="btn btn-primary btn-sm">Terapkan Filter</button>
+                                    </div>
+                                </form>
+                                <div class="keuangan-search">
+                                    <label for="keuanganSearch">Search:</label>
+                                    <input type="search" id="keuanganSearch" class="form-control form-control-sm"
+                                        placeholder="Cari transaksi..." aria-controls="keuanganTable">
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="keuanganTable" class="table table-bordered table-striped">
                                     <thead>
@@ -203,6 +321,7 @@
     <script>
         $(document).ready(function() {
             var table = $("#keuanganTable").DataTable({
+                "dom": 'rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
                 "paging": true,
                 "lengthChange": false,
                 "searching": true,
@@ -210,6 +329,10 @@
                 "info": true,
                 "autoWidth": false,
                 "responsive": true
+            });
+
+            $('#keuanganSearch').on('input', function() {
+                table.search(this.value).draw();
             });
 
             // SweetAlert Delete Confirmation with Event Delegation for DataTables
@@ -252,79 +375,6 @@
         @method('DELETE')
     </form>
 
-    <!-- Filter Modal -->
-    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="filterModalLabel">Filter Data Keuangan</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="{{ route('keuangan.index') }}" method="GET">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Rentang Tanggal</label>
-                            <div class="row">
-                                <div class="col-6">
-                                    <input type="date" name="tanggal_awal" class="form-control"
-                                        value="{{ request('tanggal_awal') }}">
-                                </div>
-                                <div class="col-6">
-                                    <input type="date" name="tanggal_akhir" class="form-control"
-                                        value="{{ request('tanggal_akhir') }}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Jenis Transaksi</label>
-                            <select name="jenis_transaksi" class="form-control">
-                                <option value="">-- Semua Jenis --</option>
-                                <option value="pemasukkan"
-                                    {{ request('jenis_transaksi') == 'pemasukkan' ? 'selected' : '' }}>Pemasukkan
-                                </option>
-                                <option value="pengeluaran"
-                                    {{ request('jenis_transaksi') == 'pengeluaran' ? 'selected' : '' }}>Pengeluaran
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Kategori</label>
-                            <select name="kategori_keuangan_id" class="form-control">
-                                <option value="">-- Semua Kategori --</option>
-                                @foreach ($categories as $cat)
-                                    <option value="{{ $cat->id }}"
-                                        {{ request('kategori_keuangan_id') == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->nama }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Akun Keuangan</label>
-                            <select name="sumber_id" class="form-control">
-                                <option value="">-- Semua Akun --</option>
-                                @foreach ($sumberKeuangan as $sumber)
-                                    <option value="{{ $sumber->id }}"
-                                        {{ request('sumber_id') == $sumber->id ? 'selected' : '' }}>
-                                        {{ $sumber->nama_sumber }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <a href="{{ route('keuangan.index') }}" class="btn btn-secondary">Reset</a>
-                        <button type="submit" class="btn btn-primary">Terapkan Filter</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
 </body>
 

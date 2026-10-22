@@ -4,29 +4,49 @@ namespace App\Http\Controllers;
 
 use App\Models\PenerimaanBarang;
 use App\Models\DetailPenerimaanBarang;
-use App\Models\Distributor;
 use App\Models\Products;
 use App\Models\Gudang;
 use App\Models\KondisiBarang;
 use App\Models\Stok;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use App\Services\InventoryPaymentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PenerimaanBarangController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = PenerimaanBarang::with(['distributor', 'supplier', 'user'])->latest()->get();
-        // Fallback for supplier_id if distributor relation is empty (legacy support if needed, but we focus on distributor)
+        $filters = $request->validate([
+            'tanggal_awal' => ['nullable', 'date_format:Y-m-d'],
+            'tanggal_akhir' => array_merge(
+                ['nullable', 'date_format:Y-m-d'],
+                $request->filled('tanggal_awal') ? ['after_or_equal:tanggal_awal'] : []
+            ),
+            'tipe_pengirim' => ['nullable', 'in:supplier,distributor'],
+            'status' => ['nullable', 'in:pending,completed,canceled'],
+        ]);
+
+        $query = PenerimaanBarang::with(['distributor', 'supplier', 'user']);
+        if ($request->filled('tanggal_awal')) {
+            $query->whereDate('tanggal_penerimaan', '>=', $filters['tanggal_awal']);
+        }
+        if ($request->filled('tanggal_akhir')) {
+            $query->whereDate('tanggal_penerimaan', '<=', $filters['tanggal_akhir']);
+        }
+        foreach (['tipe_pengirim', 'status'] as $field) {
+            if ($request->filled($field)) {
+                $query->where($field, $filters[$field]);
+            }
+        }
+        $data = $query->latest()->get();
         return view('penerimaan_barang.index', compact('data'));
     }
 
     public function create()
     {
-        $distributors = Distributor::orderBy('nama_distributor')->get();
         $suppliers = Supplier::orderBy('nama_supplier')->get();
         $products = Products::orderBy('name')->get();
         $gudangs = Gudang::with('areas.raks')->orderBy('nama_gudang')->get();
@@ -35,20 +55,20 @@ class PenerimaanBarangController extends Controller
         $no_penerimaan = PenerimaanBarang::generateNomorPenerimaan();
         $auto_referensi = 'RF-' . strtoupper(\Illuminate\Support\Str::random(6));
 
-        return view('penerimaan_barang.create', compact('distributors', 'suppliers', 'products', 'gudangs', 'kondisis', 'no_penerimaan', 'sumberKeuangan', 'auto_referensi'));
+        return view('penerimaan_barang.create', compact('suppliers', 'products', 'gudangs', 'kondisis', 'no_penerimaan', 'sumberKeuangan', 'auto_referensi'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'tipe_pengirim'      => 'required|in:supplier,distributor',
-            'distributor_id'     => 'nullable|required_if:tipe_pengirim,distributor|exists:distributors,id',
-            'supplier_id'        => 'nullable|required_if:tipe_pengirim,supplier|exists:suppliers,id',
+            'tipe_pengirim'      => 'required|in:supplier',
+            'supplier_id'        => 'required|exists:suppliers,id',
             'tanggal_penerimaan' => 'required|date',
             'referensi'          => 'nullable|string|max:100',
             'keterangan'         => 'nullable|string',
             'submit_action'      => 'required|in:draft,process',
-            'sumber_id'          => 'required_if:submit_action,process|nullable|exists:sumber_keuangan,id', // Required if processing
+            'payment_status' => 'required|in:unpaid,paid',
+            'sumber_id' => ['nullable', \Illuminate\Validation\Rule::requiredIf($request->submit_action === 'process' && $request->payment_status === 'paid'), 'exists:sumber_keuangan,id'],
 
             'items'              => 'required|array|min:1',
             'items.*.produk_id'  => 'required|exists:products,id',
@@ -57,20 +77,22 @@ class PenerimaanBarangController extends Controller
             'items.*.gudang_id'  => 'required|exists:gudang,id',
             'items.*.area_id'    => 'required|exists:area_gudang,id',
             'items.*.rak_id'     => 'required|exists:rak_gudang,id',
-            'items.*.harga'      => 'nullable|numeric|min:0',
+            'items.*.harga'      => 'required|numeric|min:0|decimal:0,2',
         ]);
 
         try {
             DB::beginTransaction();
+            $inventory = app(InventoryPaymentService::class);
+            $inventory->lockProducts($request->items);
 
             $status = ($request->submit_action === 'process') ? 'completed' : 'pending';
             $totalTransaksi = 0;
 
             // 1. Create Header
             $penerimaan = PenerimaanBarang::create([
-                'tipe_pengirim'      => $request->tipe_pengirim,
-                'distributor_id'     => ($request->tipe_pengirim == 'distributor') ? $request->distributor_id : null,
-                'supplier_id'        => ($request->tipe_pengirim == 'supplier') ? $request->supplier_id : null,
+                'tipe_pengirim'      => 'supplier',
+                'distributor_id'     => null,
+                'supplier_id'        => $request->supplier_id,
                 'user_id'            => optional(Auth::user())->id,
                 'tanggal_penerimaan' => $request->tanggal_penerimaan,
                 'referensi'          => $request->referensi ?: ('RF-' . strtoupper(\Illuminate\Support\Str::random(6))),
@@ -80,22 +102,10 @@ class PenerimaanBarangController extends Controller
 
             // 2. Process Details
             foreach ($request->items as $item) {
-                // Sanitize price input (remove non-numeric chars except digits)
-                $rawHarga = $item['harga'] ?? 0;
-                $cleanHarga = preg_replace('/[^0-9]/', '', $rawHarga);
-
+                $inventory->validateLocation($item);
                 $qty = $item['qty'];
-                $harga = (float) $cleanHarga;
-
-                // Fallback to product price if user didn't specify price
-                if ($harga <= 0) {
-                    $produk = \App\Models\Products::find($item['produk_id']);
-                    if ($produk && $produk->price > 0) {
-                        $harga = (float) $produk->price;
-                    }
-                }
-
-                $subtotal = $qty * $harga;
+                $harga = round((float) $item['harga'], 2);
+                $subtotal = round($qty * $harga, 2);
                 $totalTransaksi += $subtotal;
 
                 // Create Detail
@@ -118,7 +128,7 @@ class PenerimaanBarangController extends Controller
                         ->where('area_id', $item['area_id'])
                         ->where('rak_id', $item['rak_id'])
                         ->where('kondisi_id', $item['kondisi_id'])
-                        ->first();
+                        ->lockForUpdate()->first();
 
                     if ($stok) {
                         $stok->quantity += $qty;
@@ -138,7 +148,7 @@ class PenerimaanBarangController extends Controller
 
             // Calculate Tax
             $ppnPercentage = 10;
-            $ppnAmount = $totalTransaksi * ($ppnPercentage / 100);
+            $ppnAmount = round($totalTransaksi * ($ppnPercentage / 100), 2);
             $totalWithTax = $totalTransaksi + $ppnAmount;
 
             // Update Header with Financials
@@ -149,41 +159,14 @@ class PenerimaanBarangController extends Controller
                 'total_amount' => $totalWithTax
             ]);
 
-            // 4. Financial Transaction (Expense)
-            $sumberId = $request->sumber_id ?: optional(\App\Models\SumberKeuangan::where('is_active', true)->first())->id;
-
-            if ($status === 'completed' && $totalWithTax > 0 && $sumberId) {
-                $kategori = \App\Models\KategoriKeuangan::firstOrCreate(
-                    ['nama' => 'Pembelian Stok'],
-                    ['jenis' => 'pengeluaran', 'deskripsi' => 'Otomatis dari Penerimaan Barang']
-                );
-
-                // Auto Generate Finance Transaction No
-                $noTrx = \App\Http\Controllers\KeuanganController::generateNoTransaksi($request->tanggal_penerimaan);
-
-                \App\Models\Keuangan::create([
-                    'no_transaksi'         => $noTrx,
-                    'jenis_transaksi'      => 'pengeluaran',
-                    'kategori_keuangan_id' => $kategori->id,
-                    'sumber_id'            => $sumberId,
-                    'jumlah'               => $totalWithTax,
-                    'tanggal_transaksi'    => $request->tanggal_penerimaan,
-                    'keterangan'           => 'Pembelian Stok Ref: ' . $penerimaan->no_penerimaan,
-                    'status'               => 'approved',
-                    'user_id'              => optional(Auth::user())->id,
-                ]);
-
-                // Deduct Balance
-                $akun = \App\Models\SumberKeuangan::find($sumberId);
-                if ($akun) {
-                    $akun->decrement('saldo', $totalWithTax);
-                }
+            if ($status === 'completed' && $request->payment_status === 'paid') {
+                $inventory->pay($penerimaan, $request->sumber_id, $request->tanggal_penerimaan);
             }
 
             DB::commit();
 
             $msg = ($status === 'completed')
-                ? 'Penerimaan barang berhasil diproses, stok bertambah, dan transaksi keuangan tercatat.'
+                ? 'Penerimaan barang diproses dan stok bertambah. Pembayaran mengikuti status yang dipilih.'
                 : 'Penerimaan barang berhasil disimpan sebagai DRAFT.';
 
             return redirect()->route('penerimaan-barang.index')->with('success', $msg);
@@ -197,6 +180,7 @@ class PenerimaanBarangController extends Controller
     {
         $penerimaan = PenerimaanBarang::with([
             'distributor',
+            'supplier',
             'user',
             'details.produk',
             'details.gudang',
@@ -205,13 +189,15 @@ class PenerimaanBarangController extends Controller
             'details.kondisi'
         ])->findOrFail($id);
 
-        return view('penerimaan_barang.show', compact('penerimaan'));
+        $sumberKeuangan = \App\Models\SumberKeuangan::where('is_active', true)->orderBy('nama_sumber')->get();
+        return view('penerimaan_barang.show', compact('penerimaan', 'sumberKeuangan'));
     }
 
     public function print($id)
     {
         $penerimaan = PenerimaanBarang::with([
             'distributor',
+            'supplier',
             'user',
             'details.produk',
             'details.gudang',
@@ -220,7 +206,7 @@ class PenerimaanBarangController extends Controller
             'details.kondisi'
         ])->findOrFail($id);
 
-        $pdf = Pdf::loadView('penerimaan_barang.pdf', compact('penerimaan'));
+        $pdf = Pdf::loadView('penerimaan_barang.pdf', compact('penerimaan'))->setPaper('a4', 'portrait');
         return $pdf->stream('Penerimaan-Barang-' . $penerimaan->no_penerimaan . '.pdf');
     }
 
@@ -229,40 +215,26 @@ class PenerimaanBarangController extends Controller
 
     public function destroy($id)
     {
-        // For now, strict deletion without stock reversal logic for simplicity unless requested?
-        // User asked for "Real World". Real world: Reverse stock on delete/void.
-
         try {
-            DB::beginTransaction();
-            $penerimaan = PenerimaanBarang::with('details')->findOrFail($id);
-
-            // Reverse Stock
-            foreach ($penerimaan->details as $detail) {
-                $stok = Stok::where('produk_id', $detail->produk_id)
-                    ->where('gudang_id', $detail->gudang_id)
-                    ->where('area_id', $detail->area_id)
-                    ->where('rak_id', $detail->rak_id)
-                    ->where('kondisi_id', $detail->kondisi_id)
-                    ->first();
-
-                if ($stok) {
-                    if ($stok->quantity < $detail->qty) {
-                        throw new \Exception("Gagal menghapus! Stok barang {$detail->produk->name} saat ini kurang dari jumlah yang diterima dulu. Barang mungkin sudah terpakai.");
-                    }
-                    $stok->quantity -= $detail->qty;
-                    $stok->save();
-                } else {
-                    // Weird case: Stock record missing but we are deleting receipt. 
-                    // Just ignore or throw? Ignore is safer to allow deletion of bad data.
-                }
-            }
-
-            $penerimaan->delete();
-            DB::commit();
-            return redirect()->route('penerimaan-barang.index')->with('success', 'Penerimaan barang dibatalkan dan stok dikembalikan.');
+            app(InventoryPaymentService::class)->cancel(PenerimaanBarang::findOrFail($id));
+            return redirect()->route('penerimaan-barang.index')->with('success', 'Transaksi dibatalkan. Perubahan stok dan pembayaran telah dibalik; draft tidak mengubah stok atau saldo.');
         } catch (\Exception $e) {
-            DB::rollBack();
             return back()->with('error', $e->getMessage());
         }
     }
+
+    public function pay(Request $request, $id)
+    {
+        $request->validate([
+            'sumber_id' => 'required|exists:sumber_keuangan,id',
+            'tanggal_pembayaran' => 'required|date|after_or_equal:' . PenerimaanBarang::findOrFail($id)->tanggal_penerimaan,
+        ]);
+        try {
+            app(InventoryPaymentService::class)->pay(PenerimaanBarang::findOrFail($id), $request->sumber_id, $request->tanggal_pembayaran);
+            return back()->with('success', 'Pelunasan berhasil dicatat dan saldo akun diperbarui.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
 }

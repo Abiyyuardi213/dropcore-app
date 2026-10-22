@@ -17,17 +17,66 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
         rel="stylesheet">
     <style>
-        .select2-container .select2-selection--single {
-            height: 38px !important;
+        .select2-container--bootstrap4 .select2-selection--single {
+            display: flex;
+            align-items: center;
+            height: 38px;
+            padding: 0;
         }
 
-        .select2-container .select2-selection--single .select2-selection__rendered {
-            line-height: 24px !important;
-            padding-top: 5px;
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+            width: 100%;
+            padding: 0 2rem 0 .75rem;
+            line-height: 1.5;
+        }
+
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow {
+            top: 0;
+            right: .5rem;
+            height: 100%;
         }
 
         .table-input {
             min-width: 150px;
+        }
+
+        #table-items {
+            table-layout: fixed;
+            min-width: 1400px;
+            width: 100%;
+        }
+
+        #table-items th,
+        #table-items td {
+            padding: .75rem;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+        }
+
+        #table-items .select2-container {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        #table-items .location-details > .select2-container {
+            flex: 1 1 0;
+            width: 0 !important;
+        }
+
+        #table-items .location-details {
+            gap: .25rem;
+        }
+
+        #table-items .input-group {
+            flex-wrap: nowrap;
+        }
+
+        #table-items .qty-input,
+        #table-items .price-input,
+        #table-items .subtotal-display {
+            text-align: right;
+            padding-left: .5rem;
+            padding-right: .5rem;
         }
     </style>
 </head>
@@ -92,22 +141,14 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label>Sumber Pengirim <span class="text-danger">*</span></label>
-                                            <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
-                                                <label class="btn btn-outline-primary active">
-                                                    <input type="radio" name="tipe_pengirim" id="sourceSupplier"
-                                                        value="supplier" checked> Supplier
-                                                </label>
-                                                <label class="btn btn-outline-primary">
-                                                    <input type="radio" name="tipe_pengirim" id="sourceDistributor"
-                                                        value="distributor"> Distributor
-                                                </label>
-                                            </div>
+                                            <input type="hidden" name="tipe_pengirim" value="supplier">
+                                            <input type="text" class="form-control" value="Supplier" readonly aria-label="Sumber pengirim">
                                         </div>
                                     </div>
                                     <div class="col-md-3" id="supplier-wrapper">
                                         <div class="form-group">
                                             <label>Pilih Supplier <span class="text-danger">*</span></label>
-                                            <select name="supplier_id" class="form-control select2" id="supplierSelect">
+                                            <select name="supplier_id" class="form-control select2" id="supplierSelect" required>
                                                 <option value="">-- Pilih Supplier --</option>
                                                 @foreach ($suppliers as $s)
                                                     <option value="{{ $s->id }}"
@@ -121,28 +162,10 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-3" id="distributor-wrapper" style="display: none;">
-                                        <div class="form-group">
-                                            <label>Pilih Distributor <span class="text-danger">*</span></label>
-                                            <select name="distributor_id" class="form-control select2"
-                                                id="distributorSelect" disabled>
-                                                <option value="">-- Pilih Distributor --</option>
-                                                @foreach ($distributors as $d)
-                                                    <option value="{{ $d->id }}"
-                                                        data-kode="{{ $d->kode_distributor ?? '-' }}"
-                                                        data-telp="{{ $d->nomor_telepon ?? '-' }}"
-                                                        {{ old('distributor_id') == $d->id ? 'selected' : '' }}>
-                                                        {{ $d->nama_distributor }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label>Sumber Dana (Pembayaran) <span class="text-danger">*</span></label>
-                                            <select name="sumber_id" class="form-control select2" id="sumberSelect"
-                                                required>
+                                            <label>Akun Pembayaran (jika lunas)</label>
+                                            <select name="sumber_id" class="form-control select2" id="sumberSelect">
                                                 <option value="">-- Pilih Akun Pembayaran --</option>
                                                 @foreach ($sumberKeuangan as $sumber)
                                                     <option value="{{ $sumber->id }}"
@@ -172,6 +195,15 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="payment_status">Status Pembayaran</label>
+                                    <select id="payment_status" name="payment_status" class="form-control">
+                                        <option value="unpaid" @selected(old('payment_status', 'unpaid') == 'unpaid')>Belum dibayar (Utang supplier)</option>
+                                        <option value="paid" @selected(old('payment_status') == 'paid')>Lunas</option>
+                                    </select>
+                                    <small class="text-muted">Stok diproses terpisah dari pembayaran. Saldo hanya berubah saat lunas. Draft tidak mencatat pembayaran.</small>
+                                </div>
+
+                                <div class="form-group">
                                     <label>Keterangan</label>
                                     <textarea name="keterangan" class="form-control" rows="2" placeholder="Catatan tambahan...">{{ old('keterangan') }}</textarea>
                                 </div>
@@ -182,20 +214,20 @@
                         <div class="card card-primary card-outline">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title"><i class="fas fa-boxes mr-1"></i> Detail Barang Masuk</h3>
-                                <button type="button" class="btn btn-success btn-sm" id="btn-add-row"><i
+                                <button type="button" class="btn btn-success btn-sm ml-auto" id="btn-add-row"><i
                                         class="fas fa-plus"></i> Tambah Barang</button>
                             </div>
                             <div class="card-body p-0 table-responsive">
                                 <table class="table table-bordered table-striped" id="table-items">
                                     <thead class="thead-light">
                                         <tr>
-                                            <th style="width: 20%;">Produk <span class="text-danger">*</span></th>
-                                            <th style="width: 15%;">Kondisi <span class="text-danger">*</span></th>
-                                            <th style="width: 15%;">Lokasi (Gudang/Area/Rak) <span
+                                            <th style="width: 25%;">Produk <span class="text-danger">*</span></th>
+                                            <th style="width: 10%;">Kondisi <span class="text-danger">*</span></th>
+                                            <th style="width: 26%;">Lokasi (Gudang/Area/Rak) <span
                                                     class="text-danger">*</span></th>
-                                            <th style="width: 10%;">Qty <span class="text-danger">*</span></th>
-                                            <th style="width: 15%;">Harga Satuan (Opsional)</th>
-                                            <th style="width: 15%;">Subtotal</th>
+                                            <th style="width: 8%;">Qty <span class="text-danger">*</span></th>
+                                            <th style="width: 13%;">Harga Beli</th>
+                                            <th style="width: 13%;">Subtotal</th>
                                             <th style="width: 5%;">Aksi</th>
                                         </tr>
                                     </thead>
@@ -273,27 +305,10 @@
 
     <script>
         $(document).ready(function() {
-            // Toggle Source Logic
-            $('input[name="tipe_pengirim"]').change(function() {
-                if ($(this).val() === 'supplier') {
-                    $('#supplier-wrapper').show();
-                    $('#distributor-wrapper').hide();
-                    $('#supplierSelect').prop('disabled', false).prop('required', true);
-                    $('#distributorSelect').prop('disabled', true).prop('required', false);
-                } else {
-                    $('#supplier-wrapper').hide();
-                    $('#distributor-wrapper').show();
-                    $('#supplierSelect').prop('disabled', true).prop('required', false);
-                    $('#distributorSelect').prop('disabled', false).prop('required', true);
-                }
-            });
-
-            // Trigger change initially
-            $('input[name="tipe_pengirim"]:checked').trigger('change');
-
             // Global Submit Function
             window.submitForm = function(action) {
                 $('#submitAction').val(action);
+                $('[name="sumber_id"]').prop('required', action === 'process' && $('#payment_status').val() === 'paid');
                 $('#form-penerimaan').submit();
             }
 
@@ -355,7 +370,7 @@
             });
 
             // Init Specific Select2 with Templates
-            $('#supplierSelect, #distributorSelect').select2({
+            $('#supplierSelect').select2({
                 theme: 'bootstrap4',
                 width: '100%',
                 templateResult: formatSupplier,
@@ -377,13 +392,12 @@
                 // Build Options Strings
                 let productOpts = '<option value="">-- Produk --</option>';
                 products.forEach(p => productOpts +=
-                    `<option value="${p.id}">${p.name} (${p.code || '-'})</option>`);
+                    `<option value="${p.id}">${p.name} (${p.sku || '-'})</option>`);
 
                 let kondisiOpts = '';
                 kondisis.forEach(k => kondisiOpts += `<option value="${k.id}">${k.nama_kondisi}</option>`);
 
-                let gudangOpts = '<option value="">-- Gudang --</option>';
-                gudangs.forEach(g => gudangOpts += `<option value="${g.id}">${g.nama_gudang}</option>`);
+                let gudangOpts = '<option value="">-- Pilih produk dahulu --</option>';
 
                 const tr = `
                 <tr id="row-${rowIndex}">
@@ -399,11 +413,11 @@
                     </td>
                     <td>
                         <div class="mb-1">
-                             <select name="items[${rowIndex}][gudang_id]" class="form-control select2-sm gudang-select check-required" data-index="${rowIndex}" required>
+                             <select name="items[${rowIndex}][gudang_id]" class="form-control select2-sm gudang-select check-required" data-index="${rowIndex}" required disabled>
                                  ${gudangOpts}
                             </select>
                         </div>
-                        <div class="d-flex">
+                        <div class="d-flex location-details">
                             <select name="items[${rowIndex}][area_id]" class="form-control select2-sm area-select mr-1 check-required" data-index="${rowIndex}" required disabled>
                                 <option value="">Area</option>
                             </select>
@@ -411,6 +425,7 @@
                                 <option value="">Rak</option>
                             </select>
                         </div>
+                        <small class="location-hint text-muted d-block mt-1"></small>
                     </td>
                     <td>
                         <input type="number" name="items[${rowIndex}][qty]" class="form-control qty-input" min="1" value="1" required>
@@ -418,7 +433,11 @@
                     <td>
                         <div class="input-group">
                            <div class="input-group-prepend"><span class="input-group-text">Rp</span></div> 
-                           <input type="text" name="items[${rowIndex}][harga]" class="form-control price-input currency-input" placeholder="0">
+                           <input type="number" name="items[${rowIndex}][harga]" class="form-control price-input" min="0" step="0.01" required aria-label="Harga beli satuan">
+                        </div>
+                        <div class="small text-muted mt-2" aria-live="polite">
+                            <div>Harga jual produk: <strong class="product-selling-price">—</strong></div>
+                            <div>Harga beli master: <span class="product-purchase-price">—</span></div>
                         </div>
                     </td>
                     <td>
@@ -449,12 +468,36 @@
             // Add Row Button
             $('#btn-add-row').click(addRow);
 
+            $(document).on('change', '.select2-product', function() {
+                const product = products.find(product => String(product.id) === String($(this).val()));
+                const price = product?.purchase_price ?? '';
+                const row = $(this).closest('tr');
+                const formatReferencePrice = value => value === null || value === undefined || value === ''
+                    ? 'Belum diisi'
+                    : 'Rp ' + Number(value).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                row.find('.product-selling-price').text(product ? formatReferencePrice(product.price) : '—');
+                row.find('.product-purchase-price').text(product ? formatReferencePrice(product.purchase_price) : '—');
+                row.find('.price-input').val(price).trigger('input');
+                const locations = getProductWarehouses($(this).val());
+                row.data('available-warehouses', locations);
+                const warehouse = row.find('.gudang-select');
+                warehouse.empty().append(new Option('-- Gudang --', ''));
+                locations.forEach(location => warehouse.append(new Option(location.nama_gudang, location.id)));
+                warehouse.prop('disabled', !product).val('').trigger('change');
+                row.find('.location-hint').text(product ? 'Pilih lokasi tujuan penyimpanan barang masuk.' : '');
+                if (product && locations.length === 1) warehouse.val(locations[0].id).trigger('change');
+            });
+
             // Remove Row
             $(document).on('click', '.btn-remove', function() {
                 $(this).closest('tr').remove();
                 calculateTotal();
                 if ($('#table-items tbody tr').length === 0) $('#empty-state').show();
             });
+
+            function getProductWarehouses(productId) {
+                return productId ? gudangs : [];
+            }
 
             // Dynamic Location Logic
             $(document).on('change', '.gudang-select', function() {
@@ -467,7 +510,8 @@
                 $rakSelect.empty().append('<option value="">Rak</option>').prop('disabled', true);
 
                 if (gudangId) {
-                    const selectedGudang = gudangs.find(g => g.id == gudangId);
+                    const available = $(this).closest('tr').data('available-warehouses') || [];
+                    const selectedGudang = available.find(g => g.id == gudangId);
                     if (selectedGudang && selectedGudang.areas) {
                         $areaSelect.prop('disabled', false);
                         selectedGudang.areas.forEach(area => {
@@ -478,6 +522,9 @@
                             opt.data('raks', area.raks);
                             $areaSelect.append(opt);
                         });
+                        if (selectedGudang.areas.length === 1) {
+                            $areaSelect.val(selectedGudang.areas[0].id).trigger('change');
+                        }
                     }
                 }
             });
@@ -494,8 +541,9 @@
                 if (raks && raks.length > 0) {
                     $rakSelect.prop('disabled', false);
                     raks.forEach(rak => {
-                        $rakSelect.append(`<option value="${rak.id}">${rak.kode_rak}</option>`);
+                        $rakSelect.append(new Option(rak.kode_rak, rak.id));
                     });
+                    if (raks.length === 1) $rakSelect.val(raks[0].id).trigger('change');
                 } else if ($(this).val()) {
                     $rakSelect.append('<option value="">Tidak ada rak</option>');
                 }
@@ -523,12 +571,9 @@
                 const row = $(this).closest('tr');
                 const qty = parseFloat(row.find('.qty-input').val()) || 0;
 
-                // Parse Price (Remove dots)
-                let priceStr = row.find('.price-input').val() || "0";
-                priceStr = priceStr.replace(/\./g, ''); // Remove dots
-                const price = parseFloat(priceStr) || 0;
+                const price = parseFloat(row.find('.price-input').val()) || 0;
 
-                const subtotal = qty * price;
+                const subtotal = Math.round(qty * price * 100) / 100;
 
                 row.find('.subtotal-display').val('Rp ' + subtotal.toLocaleString('id-ID'));
                 calculateTotal();
@@ -539,14 +584,12 @@
                 $('#table-items tbody tr').each(function() {
                     const qty = parseFloat($(this).find('.qty-input').val()) || 0;
 
-                    let priceStr = $(this).find('.price-input').val() || "0";
-                    priceStr = priceStr.replace(/\./g, '');
-                    const price = parseFloat(priceStr) || 0;
+                    const price = parseFloat($(this).find('.price-input').val()) || 0;
 
-                    subtotal += (qty * price);
+                    subtotal += Math.round(qty * price * 100) / 100;
                 });
 
-                const ppn = subtotal * 0.10;
+                const ppn = Math.round(subtotal * 0.10 * 100) / 100;
                 const grandTotal = subtotal + ppn;
 
                 $('#subtotal-value').text('Rp ' + subtotal.toLocaleString('id-ID'));

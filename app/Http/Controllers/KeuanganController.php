@@ -210,6 +210,11 @@ class KeuanganController extends Controller
 
     public function edit($id)
     {
+        $linkedEntry = Keuangan::findOrFail($id);
+        if (in_array($linkedEntry->referensi_tabel, ['penerimaan_barang', 'pengeluaran_barang', 'penerimaan_barang_reversal', 'pengeluaran_barang_reversal'], true)) {
+            return back()->with('error', 'Pembayaran transaksi barang dikelola melalui dokumen asal. Gunakan pembatalan dokumen untuk membalik pembayaran.');
+        }
+
         $data = Keuangan::findOrFail($id);
         $sumberKeuangan = SumberKeuangan::where('is_active', true)->orderBy('nama_sumber', 'asc')->get();
         $categories = \App\Models\KategoriKeuangan::orderBy('nama', 'asc')->get();
@@ -219,6 +224,11 @@ class KeuanganController extends Controller
 
     public function update(Request $request, $id)
     {
+        $linkedEntry = Keuangan::findOrFail($id);
+        if (in_array($linkedEntry->referensi_tabel, ['penerimaan_barang', 'pengeluaran_barang', 'penerimaan_barang_reversal', 'pengeluaran_barang_reversal'], true)) {
+            return back()->with('error', 'Pembayaran transaksi barang dikelola melalui dokumen asal. Gunakan pembatalan dokumen untuk membalik pembayaran.');
+        }
+
         $request->validate([
             'jenis_transaksi' => 'required|in:pemasukkan,pengeluaran',
             'jumlah' => 'required|numeric|min:0.01',
@@ -285,6 +295,11 @@ class KeuanganController extends Controller
 
     public function destroy($id)
     {
+        $linkedEntry = Keuangan::findOrFail($id);
+        if (in_array($linkedEntry->referensi_tabel, ['penerimaan_barang', 'pengeluaran_barang', 'penerimaan_barang_reversal', 'pengeluaran_barang_reversal'], true)) {
+            return back()->with('error', 'Pembayaran transaksi barang dikelola melalui dokumen asal. Gunakan pembatalan dokumen untuk membalik pembayaran.');
+        }
+
         $transaksi = Keuangan::find($id);
 
         if (!$transaksi) {

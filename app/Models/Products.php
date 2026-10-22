@@ -21,6 +21,7 @@ class Products extends Model
         'dimensi',
         'berat',
         'price',
+        'purchase_price',
         'min_stock',
         'max_stock',
         'category_id',
@@ -104,6 +105,7 @@ class Products extends Model
             'dimensi'     => $data['dimensi'] ?? null,
             'berat'       => $data['weight'] ?? null, // Sync both for now or legacy
             'weight'      => $data['weight'] ?? null,
+            'purchase_price' => $data['purchase_price'] ?? null,
             'price'       => str_replace(',', '', $data['price']),
             'min_stock'   => $data['min_stock'] ?? 0,
             'max_stock'   => $data['max_stock'] ?? null,
@@ -128,6 +130,7 @@ class Products extends Model
             'dimensi'     => $data['dimensi']    ?? $this->dimensi,
             'berat'       => $data['weight']     ?? $this->berat,
             'weight'      => $data['weight']     ?? $this->weight,
+            'purchase_price' => array_key_exists('purchase_price', $data) ? $data['purchase_price'] : $this->purchase_price,
             'price'       => isset($data['price']) ? str_replace(',', '', $data['price']) : $this->price,
             'min_stock'   => $data['min_stock']  ?? $this->min_stock,
             'max_stock'   => $data['max_stock']  ?? $this->max_stock,

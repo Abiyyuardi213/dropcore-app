@@ -84,52 +84,7 @@ class DetailPenerimaanBarangController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'penerimaan_id' => 'required',
-            'produk_id'     => 'required',
-            'qty'           => 'required|numeric|min:1',
-            'harga'         => 'required|numeric|min:0',
-            'gudang_id'     => 'required',
-            'area_id'       => 'required',
-            'rak_id'        => 'required',
-        ]);
-
-        DB::transaction(function () use ($request) {
-
-            $subtotal = $request->qty * $request->harga;
-
-            $detail = DetailPenerimaanBarang::create([
-                'id'            => Str::uuid(),
-                'penerimaan_id' => $request->penerimaan_id,
-                'produk_id'     => $request->produk_id,
-                'qty'           => $request->qty,
-                'harga'         => $request->harga,
-                'subtotal'      => $subtotal,
-                'gudang_id'     => $request->gudang_id,
-                'area_id'       => $request->area_id,
-                'rak_id'        => $request->rak_id,
-            ]);
-
-            $stok = Stok::firstOrCreate(
-                [
-                    'produk_id' => $request->produk_id,
-                    'gudang_id' => $request->gudang_id,
-                    'area_id'   => $request->area_id,
-                    'rak_id'    => $request->rak_id,
-                ],
-                ['quantity' => 0]
-            );
-
-            $stok->quantity += $request->qty;
-            $stok->save();
-
-            $kas = KasPusat::first();
-            if ($kas) {
-                $kas->kurangiSaldo($subtotal);
-            }
-        });
-
-        return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke penerimaan.');
+        return back()->with('error', 'Detail transaksi tidak dapat diubah terpisah. Batalkan dokumen dan buat transaksi baru agar stok dan pembayaran tetap sesuai.');
     }
 
     // public function destroy($id)
@@ -155,30 +110,6 @@ class DetailPenerimaanBarangController extends Controller
 
     public function destroy($id)
     {
-        DB::transaction(function () use ($id) {
-
-            $detail = DetailPenerimaanBarang::findOrFail($id);
-
-            $stok = Stok::where('produk_id', $detail->produk_id)
-                        ->where('gudang_id', $detail->gudang_id)
-                        ->where('area_id', $detail->area_id)
-                        ->where('rak_id', $detail->rak_id)
-                        ->first();
-
-            if ($stok) {
-                $stok->quantity -= $detail->qty;
-                if ($stok->quantity < 0) $stok->quantity = 0;
-                $stok->save();
-            }
-
-            $kas = KasPusat::first();
-            if ($kas) {
-                $kas->tambahSaldo($detail->subtotal);
-            }
-
-            $detail->delete();
-        });
-
-        return redirect()->back()->with('success', 'Detail penerimaan berhasil dihapus.');
+        return back()->with('error', 'Detail transaksi tidak dapat diubah terpisah. Batalkan dokumen dan buat transaksi baru agar stok dan pembayaran tetap sesuai.');
     }
 }

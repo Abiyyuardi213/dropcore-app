@@ -63,8 +63,12 @@
         // 2. Legacy AJAX Support (jQuery)
         // Intercept Bootstrap toast show event to trigger SweetAlert
         if (typeof $ !== 'undefined') {
-            $('#toastNotification').on('show.bs.toast', function() {
-                var message = $(this).find('.toast-body').text();
+            $('#toastNotification').on('show.bs.toast', function(event) {
+                event.preventDefault();
+                var message = $(this).find('.toast-body').text().trim();
+                if (!message) {
+                    return;
+                }
                 // Simple heuristic to guess type if not explicit
                 var icon = 'success';
                 if (message.toLowerCase().includes('gagal') || message.toLowerCase().includes(

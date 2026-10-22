@@ -53,8 +53,8 @@ Route::get('tentang', [HomepageController::class, 'about'])->name('distributor.a
 Route::get('berita', [HomepageController::class, 'news'])->name('distributor.news');
 
 
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
-Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
+Route::get('/administrator/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
+Route::post('/administrator/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::get('/login-distributor', function () {
@@ -70,7 +70,8 @@ Route::get('/register-distributor', [AuthController::class, 'showRegisterForm'])
 Route::post('/register-distributor', [AuthController::class, 'registerDistributor'])
     ->name('register.distributor');
 
-Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
+Route::middleware(['role:admin,staff'])->prefix('administrator')->group(function () {
+    Route::get('dashboard-transaksi', [\App\Http\Controllers\DashboardTransaksiController::class, 'index'])->name('dashboard-transaksi')->middleware('auth');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
     Route::get('/pengguna/profil', [UserController::class, 'profil'])->name('user.profil');
@@ -177,6 +178,7 @@ Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
     // New Implementation uses 1-step form. 
     // So 'penerimaan-barang.detail' might be obsolete or just alias to 'show'.
 
+    Route::post('penerimaan-barang/{id}/pay', [PenerimaanBarangController::class, 'pay'])->name('penerimaan-barang.pay');
     Route::resource('penerimaan-barang', PenerimaanBarangController::class);
 
     Route::post(
@@ -194,6 +196,7 @@ Route::middleware(['role:admin,staff'])->prefix('admin')->group(function () {
 
     Route::get('pengeluaran-barang/{id}/print', [PengeluaranBarangController::class, 'print'])->name('pengeluaran-barang.print');
 
+    Route::post('pengeluaran-barang/{id}/pay', [PengeluaranBarangController::class, 'pay'])->name('pengeluaran-barang.pay');
     Route::resource('pengeluaran-barang', PengeluaranBarangController::class);
 
     // Legacy details routes - can be deprecated or kept as fail-safe if old links exist

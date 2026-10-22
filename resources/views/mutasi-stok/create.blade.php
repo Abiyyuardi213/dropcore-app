@@ -452,7 +452,7 @@
                     $infoCard.show();
 
                     $.ajax({
-                        url: '{{ url('admin/lokasi-asal-produk') }}/' + produkId,
+                        url: '{{ url('administrator/lokasi-asal-produk') }}/' + produkId,
                         method: 'GET',
                         success: function(res) {
                             if (res.semua_lokasi && res.semua_lokasi.length > 0) {

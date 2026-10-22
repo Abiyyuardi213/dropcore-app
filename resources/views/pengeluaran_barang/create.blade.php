@@ -14,13 +14,66 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
         rel="stylesheet">
     <style>
-        .select2-container .select2-selection--single {
-            height: 38px !important;
+        .select2-container--bootstrap4 .select2-selection--single {
+            display: flex;
+            align-items: center;
+            height: 38px;
+            padding: 0;
         }
 
-        .select2-container .select2-selection--single .select2-selection__rendered {
-            line-height: 24px !important;
-            padding-top: 5px;
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+            width: 100%;
+            padding: 0 2rem 0 .75rem;
+            line-height: 1.5;
+        }
+
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow {
+            top: 0;
+            right: .5rem;
+            height: 100%;
+        }
+
+        .table-input {
+            min-width: 150px;
+        }
+
+        #table-items {
+            table-layout: fixed;
+            min-width: 1400px;
+            width: 100%;
+        }
+
+        #table-items th,
+        #table-items td {
+            padding: .75rem;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+        }
+
+        #table-items .select2-container {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        #table-items .location-details > .select2-container {
+            flex: 1 1 0;
+            width: 0 !important;
+        }
+
+        #table-items .location-details {
+            gap: .25rem;
+        }
+
+        #table-items .input-group {
+            flex-wrap: nowrap;
+        }
+
+        #table-items .input-qty,
+        #table-items .input-price,
+        #table-items .input-subtotal {
+            text-align: right;
+            padding-left: .5rem;
+            padding-right: .5rem;
         }
     </style>
 </head>
@@ -106,52 +159,23 @@
                                     </div>
                                 </div>
 
-                                {{-- Dynamic Section based on Type --}}
-                                <div id="section-distributor" class="row">
-                                    <div class="col-md-6">
+                                <div class="row">
+                                    <div id="section-distributor" class="col-md-6">
                                         <div class="form-group">
                                             <label>Pilih Distributor <span class="text-danger">*</span></label>
                                             <select name="distributor_id" class="form-control select2">
                                                 <option value="">-- Pilih Distributor --</option>
                                                 @foreach ($distributors as $d)
-                                                    <option value="{{ $d->id }}">{{ $d->nama_distributor }}
+                                                    <option value="{{ $d->id }}" @selected(old('distributor_id') == $d->id)>{{ $d->nama_distributor }}
                                                     </option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div id="section-konsumen" class="row" style="display:none;">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Nama Konsumen <span class="text-danger">*</span></label>
-                                            <input type="text" name="nama_konsumen" class="form-control"
-                                                placeholder="Nama Lengkap">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Telepon</label>
-                                            <input type="text" name="telepon_konsumen" class="form-control"
-                                                placeholder="08...">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Alamat</label>
-                                            <input type="text" name="alamat_konsumen" class="form-control"
-                                                placeholder="Alamat pengiriman">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Akun Penerimaan (Masuk ke Saldo) <span
-                                                    class="text-danger">*</span></label>
-                                            <select name="sumber_id" class="form-control select2" required>
+                                            <label>Akun Penerimaan (jika lunas)</label>
+                                            <select name="sumber_id" class="form-control select2">
                                                 <option value="">-- Pilih Akun Penerimaan --</option>
                                                 @foreach ($sumberKeuangan as $sumber)
                                                     <option value="{{ $sumber->id }}"
@@ -165,6 +189,39 @@
                                     </div>
                                 </div>
 
+                                <div id="section-konsumen" class="row" style="display:none;">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Nama Konsumen <span class="text-danger">*</span></label>
+                                            <input type="text" name="nama_konsumen" class="form-control" value="{{ old('nama_konsumen') }}"
+                                                placeholder="Nama Lengkap">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Telepon</label>
+                                            <input type="text" name="telepon_konsumen" class="form-control" value="{{ old('telepon_konsumen') }}"
+                                                placeholder="08...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Alamat</label>
+                                            <input type="text" name="alamat_konsumen" class="form-control" value="{{ old('alamat_konsumen') }}"
+                                                placeholder="Alamat pengiriman">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="payment_status">Status Pembayaran</label>
+                                    <select id="payment_status" name="payment_status" class="form-control">
+                                        <option value="unpaid" @selected(old('payment_status', 'unpaid') == 'unpaid')>Belum dibayar (Piutang pelanggan)</option>
+                                        <option value="paid" @selected(old('payment_status') == 'paid')>Lunas</option>
+                                    </select>
+                                    <small class="text-muted">Stok diproses terpisah dari pembayaran. Saldo hanya berubah saat lunas. Draft tidak mencatat pembayaran.</small>
+                                </div>
+
                                 <div class="form-group">
                                     <label>Keterangan</label>
                                     <textarea name="keterangan" class="form-control" rows="1" placeholder="Catatan...">{{ old('keterangan') }}</textarea>
@@ -176,18 +233,18 @@
                         <div class="card card-warning card-outline">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title"><i class="fas fa-boxes mr-1"></i> Item Barang Keluar</h3>
-                                <button type="button" class="btn btn-success btn-sm" id="btn-add-row"><i
+                                <button type="button" class="btn btn-success btn-sm ml-auto" id="btn-add-row"><i
                                         class="fas fa-plus"></i> Tambah Item</button>
                             </div>
                             <div class="card-body p-0 table-responsive">
                                 <table class="table table-bordered table-striped" id="table-items">
                                     <thead class="thead-light">
                                         <tr>
-                                            <th style="width: 25%;">Produk <span class="text-danger">*</span></th>
+                                            <th style="width: 24%;">Produk <span class="text-danger">*</span></th>
                                             <th style="width: 30%;">Pilih Stok (Batch) <span
                                                     class="text-danger">*</span></th>
-                                            <th style="width: 10%;">Qty <span class="text-danger">*</span></th>
-                                            <th style="width: 15%;">Harga Jual (Opsional)</th>
+                                            <th style="width: 11%;">Qty <span class="text-danger">*</span></th>
+                                            <th style="width: 15%;">Harga Jual</th>
                                             <th style="width: 15%;">Subtotal</th>
                                             <th style="width: 5%;">Aksi</th>
                                         </tr>
@@ -243,6 +300,7 @@
         // Global Submit Handler
         window.submitForm = function(action) {
             $('#submitAction').val(action);
+                $('[name="sumber_id"]').prop('required', action === 'process' && $('#payment_status').val() === 'paid');
             $('#form-pengeluaran').submit();
         }
 
@@ -254,7 +312,10 @@
 
             // Toggle Type
             $('#tipe_penerima').change(function() {
-                if ($(this).val() === 'distributor') {
+                const isDistributor = $(this).val() === 'distributor';
+                $('#section-distributor :input').prop('disabled', !isDistributor).prop('required', isDistributor);
+                $('#section-konsumen :input').prop('disabled', isDistributor).prop('required', !isDistributor);
+                if (isDistributor) {
                     $('#section-distributor').show();
                     $('#section-konsumen').hide();
                 } else {
@@ -271,7 +332,7 @@
 
                 let productOpts = '<option value="">-- Pilih Produk --</option>';
                 products.forEach(p => productOpts +=
-                    `<option value="${p.id}">${p.name} (${p.code || '-'})</option>`);
+                    `<option value="${p.id}">${p.name} (${p.sku || '-'})</option>`);
 
                 const tr = `
                 <tr id="row-${rowIndex}">
@@ -294,15 +355,13 @@
                     <td>
                         <div class="input-group">
                             <input type="number" name="items[${rowIndex}][qty]" class="form-control input-qty" min="1" disabled placeholder="0">
-                            <div class="input-group-append">
-                                <span class="input-group-text text-xs">Max: <span class="max-qty">0</span></span>
-                            </div>
                         </div>
+                        <small class="text-muted d-block mt-1">Stok tersedia: <span class="max-qty">0</span></small>
                     </td>
                     <td>
                         <div class="input-group">
                            <div class="input-group-prepend"><span class="input-group-text">Rp</span></div> 
-                           <input type="number" name="items[${rowIndex}][harga]" class="form-control input-price" min="0" placeholder="0">
+                           <input type="number" name="items[${rowIndex}][harga]" class="form-control input-price" min="0" step="0.01" required placeholder="Harga jual">
                         </div>
                     </td>
                     <td>
@@ -314,7 +373,7 @@
                 </tr>
             `;
                 $('#table-items tbody').append(tr);
-                $(`#row-${rowIndex} .select2-product`).select2({
+                $(`#row-${rowIndex} .select2-product, #row-${rowIndex} .select2-stok`).select2({
                     theme: 'bootstrap4',
                     width: '100%'
                 });
@@ -335,6 +394,11 @@
                 const row = $(`#row-${index}`);
 
                 row.find('.input-produk-id').val(produkId);
+                const product = products.find(product => String(product.id) === String(produkId));
+                row.find('.input-price').val(product ? product.price : '');
+                row.find('.input-subtotal').val('Rp 0');
+                row.find('.input-gudang, .input-area, .input-rak, .input-kondisi').val('');
+                calculateTotal();
                 const stockSelect = row.find('.select2-stok');
 
                 stockSelect.empty().append('<option value="">Loading...</option>').prop('disabled', true);
@@ -344,7 +408,7 @@
                 if (!produkId) return;
 
                 // CORRECTION: Admin Prefix added
-                $.get(`/admin/stok/by-produk/${produkId}`, function(data) {
+                $.get(`/administrator/stok/by-produk/${produkId}`, function(data) {
                     stockSelect.empty().append('<option value="">-- Pilih Batch Stok --</option>');
                     if (data.length > 0) {
                         stockSelect.prop('disabled', false);
@@ -418,7 +482,7 @@
                 }
 
                 const price = parseFloat(row.find('.input-price').val()) || 0;
-                row.find('.input-subtotal').val('Rp ' + (qty * price).toLocaleString('id-ID'));
+                row.find('.input-subtotal').val('Rp ' + (Math.round(qty * price * 100) / 100).toLocaleString('id-ID'));
                 calculateTotal();
             });
 
@@ -428,7 +492,7 @@
                     const row = $(this);
                     const qty = parseFloat(row.find('.input-qty').val()) || 0;
                     const price = parseFloat(row.find('.input-price').val()) || 0;
-                    total += (qty * price);
+                    total += Math.round(qty * price * 100) / 100;
                 });
                 $('#total-value').text('Rp ' + total.toLocaleString('id-ID'));
             }

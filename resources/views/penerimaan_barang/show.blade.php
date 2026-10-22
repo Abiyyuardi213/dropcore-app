@@ -37,23 +37,31 @@
 
             <section class="content">
                 <div class="container-fluid">
+                    @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
+                    @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+                    @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
                     <div class="invoice p-3 mb-3">
                         <div class="row">
                             <div class="col-12">
                                 <h4>
-                                    <i class="fas fa-globe"></i> PT Garuda Fiber
+                                    <img src="{{ asset('image/garuda-fiber.png') }}" alt="Logo Garuda Fiber"
+                                        style="width: 150px; max-width: 100%; height: auto;">
                                     <small class="float-right">Date: {{ date('d/m/Y') }}</small>
                                 </h4>
                             </div>
                         </div>
                         <div class="row invoice-info">
                             <div class="col-sm-4 invoice-col">
-                                Dari (Distributor)
+                                @php
+                                    $pengirim = $penerimaan->supplier ?? $penerimaan->distributor;
+                                    $isSupplier = $penerimaan->supplier !== null;
+                                @endphp
+                                Dari ({{ $isSupplier ? 'Supplier' : 'Distributor' }})
                                 <address>
-                                    <strong>{{ $penerimaan->distributor->nama_distributor ?? ($penerimaan->supplier->nama_supplier ?? 'Unknown') }}</strong><br>
-                                    {{ $penerimaan->distributor->alamat ?? '-' }}<br>
-                                    Phone: {{ $penerimaan->distributor->nomor_telepon ?? '-' }}<br>
-                                    Email: {{ $penerimaan->distributor->email ?? '-' }}
+                                    <strong>{{ ($isSupplier ? $pengirim?->nama_supplier : $pengirim?->nama_distributor) ?: '-' }}</strong><br>
+                                    {{ $pengirim?->alamat ?: '-' }}<br>
+                                    Phone: {{ ($isSupplier ? $pengirim?->no_telepon : $pengirim?->telepon) ?: '-' }}<br>
+                                    Email: {{ $pengirim?->email ?: '-' }}
                                 </address>
                             </div>
                             <div class="col-sm-4 invoice-col">
@@ -69,7 +77,9 @@
                                 <b>Ref (SJ/PO):</b> {{ $penerimaan->referensi ?? '-' }}<br>
                                 <b>Tgl. Terima:</b>
                                 {{ \Carbon\Carbon::parse($penerimaan->tanggal_penerimaan)->format('d M Y') }}<br>
-                                <b>Status:</b> {{ ucfirst($penerimaan->status ?? 'Completed') }}
+                                <b>Status:</b> {{ ucfirst($penerimaan->status ?? 'Completed') }}<br>
+                                <b>Pembayaran:</b> {{ ['paid' => 'Lunas', 'unpaid' => 'Belum dibayar', 'reversed' => 'Dibalik / dibatalkan'][$penerimaan->payment_status] ?? 'Belum dibayar' }}<br>
+                                <b>Sisa Utang:</b> Rp {{ number_format($penerimaan->status === 'completed' && $penerimaan->payment_status === 'unpaid' ? app(\App\Services\InventoryPaymentService::class)->total($penerimaan) : 0, 2, ',', '.') }}
                             </div>
                         </div>
 
@@ -79,7 +89,7 @@
                                     <thead>
                                         <tr>
                                             <th>Produk</th>
-                                            <th>Kode</th>
+                                            <th>Kode Produk / SKU</th>
                                             <th>Kondisi</th>
                                             <th>Lokasi (Gudang > Area > Rak)</th>
                                             <th>Qty</th>
@@ -93,7 +103,7 @@
                                             @php $total += $d->subtotal; @endphp
                                             <tr>
                                                 <td>{{ $d->produk->name ?? 'Item Terhapus' }}</td>
-                                                <td>{{ $d->produk->code ?? '-' }}</td>
+                                                <td>{{ $d->produk->sku ?? '-' }}</td>
                                                 <td><span
                                                         class="badge badge-info">{{ $d->kondisi->nama_kondisi ?? '-' }}</span>
                                                 </td>
@@ -109,8 +119,8 @@
                                                     @endif
                                                 </td>
                                                 <td>{{ $d->qty }}</td>
-                                                <td>Rp {{ number_format($d->harga, 0, ',', '.') }}</td>
-                                                <td>Rp {{ number_format($d->subtotal, 0, ',', '.') }}</td>
+                                                <td>Rp {{ number_format($d->harga, 2, ',', '.') }}</td>
+                                                <td>Rp {{ number_format($d->subtotal, 2, ',', '.') }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -136,19 +146,19 @@
                                         <tr>
                                             <th>Subtotal:</th>
                                             <td>Rp
-                                                {{ number_format($penerimaan->subtotal > 0 ? $penerimaan->subtotal : $total, 0, ',', '.') }}
+                                                {{ number_format($penerimaan->subtotal > 0 ? $penerimaan->subtotal : $total, 2, ',', '.') }}
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>PPN
                                                 ({{ $penerimaan->ppn_percentage > 0 ? $penerimaan->ppn_percentage + 0 : 10 }}%):
                                             </th>
-                                            <td>Rp {{ number_format($penerimaan->ppn_amount, 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($penerimaan->ppn_amount, 2, ',', '.') }}</td>
                                         </tr>
                                         <tr>
                                             <th>Total Bayar:</th>
                                             <td>Rp
-                                                {{ number_format($penerimaan->total_amount > 0 ? $penerimaan->total_amount : $total + $penerimaan->ppn_amount, 0, ',', '.') }}
+                                                {{ number_format($penerimaan->total_amount > 0 ? $penerimaan->total_amount : $total + $penerimaan->ppn_amount, 2, ',', '.') }}
                                             </td>
                                         </tr>
                                     </table>
@@ -156,6 +166,29 @@
                             </div>
                         </div>
 
+        @if ($penerimaan->status === 'completed' && $penerimaan->payment_status === 'unpaid')
+            <div class="card card-outline card-primary no-print mt-3">
+                <div class="card-header"><h3 class="card-title">Pelunasan Utang Supplier</h3></div>
+                <div class="card-body">
+                    <p>Pelunasan mengubah saldo akun dan tidak mengubah stok. Pembayaran dicatat penuh sesuai total transaksi.</p>
+                    <form action="{{ route('penerimaan-barang.pay', $penerimaan->id) }}" method="POST">
+                        @csrf
+                        <div class="row align-items-end">
+                            <div class="col-md-5 form-group"><label for="payAccount">Akun Pembayaran</label>
+                                <select id="payAccount" name="sumber_id" class="form-control" required>
+                                    <option value="">-- Pilih Akun --</option>
+                                    @foreach ($sumberKeuangan as $akun)<option value="{{ $akun->id }}">{{ $akun->nama_sumber }}</option>@endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4 form-group"><label for="payDate">Tanggal Pembayaran</label>
+                                <input id="payDate" name="tanggal_pembayaran" type="date" class="form-control" value="{{ date('Y-m-d') }}" min="{{ \Carbon\Carbon::parse($penerimaan->tanggal_penerimaan)->format('Y-m-d') }}" required>
+                            </div>
+                            <div class="col-md-3 form-group"><button class="btn btn-primary" type="submit">Catat Pelunasan</button></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @endif
                         <div class="row no-print">
                             <div class="col-12">
                                 <a href="{{ route('penerimaan-barang.print', $penerimaan->id) }}" target="_blank"
@@ -171,6 +204,8 @@
                 </div>
             </section>
         </div>
+
+
         @include('include.footerSistem')
     </div>
     @include('services.LogoutModal')

@@ -46,9 +46,9 @@ class RoleMiddleware
             }
 
             // Jika mengakses dashboard utama namun role tidak diberi akses dashboard, arahkan ke modul pertama yang diizinkan
-            if ($request->is('admin/dashboard') && !$user->role->hasPermission('dashboard')) {
+            if ($request->is('administrator/dashboard') && !$user->role->hasPermission('dashboard')) {
                 $fallbackUrl = $user->role->getFirstAllowedAdminUrl();
-                if ($fallbackUrl !== '/admin/dashboard') {
+                if ($fallbackUrl !== '/administrator/dashboard') {
                     return redirect($fallbackUrl);
                 }
             }

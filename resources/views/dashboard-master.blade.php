@@ -52,7 +52,7 @@
                                     <p>Total Peran</p>
                                 </div>
                                 <div class="icon"><i class="fas fa-user-tag"></i></div>
-                                <a href="{{ url('admin/role') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('administrator/role') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -63,7 +63,7 @@
                                     <p>Total Pengguna</p>
                                 </div>
                                 <div class="icon"><i class="fas fa-user-friends"></i></div>
-                                <a href="{{ url('admin/user') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('administrator/user') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -74,7 +74,7 @@
                                     <p>Total Gudang</p>
                                 </div>
                                 <div class="icon"><i class="fas fa-warehouse"></i></div>
-                                <a href="{{ url('admin/gudang') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('administrator/gudang') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -85,7 +85,7 @@
                                     <p>Total Supplier</p>
                                 </div>
                                 <div class="icon"><i class="fas fa-truck"></i></div>
-                                <a href="{{ url('admin/supplier') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('administrator/supplier') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -169,9 +169,9 @@
                                     </div>
                                 </div>
                                 <div class="card-footer clearfix">
-                                    <a href="{{ url('admin/user/create') }}"
+                                    <a href="{{ url('administrator/user/create') }}"
                                         class="btn btn-sm btn-info float-left">Tambah User</a>
-                                    <a href="{{ url('admin/user') }}"
+                                    <a href="{{ url('administrator/user') }}"
                                         class="btn btn-sm btn-secondary float-right">Lihat Semua</a>
                                 </div>
                             </div>

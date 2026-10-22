@@ -594,7 +594,7 @@
                     perms = [];
                 }
 
-                const url = "{{ url('admin/role') }}/" + id + "/permissions";
+                const url = "{{ url('administrator/role') }}/" + id + "/permissions";
                 $('#permissionsForm').attr('action', url);
                 $('#perm_role_title').text(name);
 
@@ -620,7 +620,7 @@
                     perms = [];
                 }
 
-                const url = "{{ url('admin/role') }}/" + id;
+                const url = "{{ url('administrator/role') }}/" + id;
 
                 $('#editRoleForm').attr('action', url);
                 $('#edit_role_name').val(name);
@@ -638,7 +638,7 @@
             // Handle Delete Button Click
             $(document).on('click', '.delete-role-btn', function() {
                 const roleId = $(this).data('role-id');
-                const deleteUrl = "{{ url('admin/role') }}/" + roleId;
+                const deleteUrl = "{{ url('administrator/role') }}/" + roleId;
                 $('#deleteForm').attr('action', deleteUrl);
             });
 
@@ -647,7 +647,7 @@
                 let roleId = $(this).data("role-id");
                 let status = $(this).prop("checked") ? 1 : 0;
 
-                $.post("{{ url('admin/role') }}/" + roleId + "/toggle-status", {
+                $.post("{{ url('administrator/role') }}/" + roleId + "/toggle-status", {
                     _token: '{{ csrf_token() }}',
                     role_status: status
                 }, function(res) {

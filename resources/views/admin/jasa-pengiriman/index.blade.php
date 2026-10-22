@@ -152,7 +152,7 @@
                     editBiaya.value = biaya;
 
                     // Update form action
-                    editForm.action = "{{ url('admin/jasa-pengiriman') }}/" + id;
+                    editForm.action = "{{ url('administrator/jasa-pengiriman') }}/" + id;
                 });
             });
         });

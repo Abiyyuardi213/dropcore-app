@@ -135,7 +135,7 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="price">Harga Satuan (Rp) <span
+                                            <label for="price">Harga Jual (Rp) <span
                                                     class="text-danger">*</span></label>
                                             <input type="number"
                                                 class="form-control @error('price') is-invalid @enderror"
@@ -144,6 +144,14 @@
                                             @error('price')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="purchase_price">Harga Beli (Rp)</label>
+                                            <input type="number" id="purchase_price" name="purchase_price" class="form-control"
+                                                min="0" step="0.01" value="{{ old('purchase_price', $product->purchase_price) }}" placeholder="Isi harga beli dari supplier">
+                                            <small class="text-muted">Harga acuan pembelian, terpisah dari harga jual. Dapat disesuaikan saat menerima barang.</small>
+                                            @error('purchase_price')<div class="text-danger">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">

@@ -36,105 +36,105 @@ class Role extends Model
             'icon'  => 'fas fa-tachometer-alt',
             'group' => 'Utama',
             'desc'  => 'Akses halaman ringkasan utama dan grafik perkembangan penjualan',
-            'url'   => '/admin/dashboard',
+            'url'   => '/administrator/dashboard',
         ],
         'master_role' => [
             'label' => 'Master Peran & Hak Akses',
             'icon'  => 'fas fa-user-shield',
             'group' => 'Master Data',
             'desc'  => 'Mengelola daftar role/peran pengguna beserta pengaturan hak aksesnya',
-            'url'   => '/admin/role',
+            'url'   => '/administrator/role',
         ],
         'master_hr' => [
             'label' => 'Master SDM (Pengguna, Divisi, Jabatan)',
             'icon'  => 'fas fa-users-cog',
             'group' => 'Master Data',
             'desc'  => 'Mengelola data pengguna/karyawan, struktur divisi, dan jabatan',
-            'url'   => '/admin/user',
+            'url'   => '/administrator/user',
         ],
         'master_wilayah' => [
             'label' => 'Master Wilayah & Regional',
             'icon'  => 'fas fa-globe',
             'group' => 'Master Data',
             'desc'  => 'Mengelola data Wilayah, Provinsi, Kota, Kecamatan, dan Kelurahan',
-            'url'   => '/admin/wilayah',
+            'url'   => '/administrator/wilayah',
         ],
         'master_mitra' => [
             'label' => 'Master Mitra & Operasional',
             'icon'  => 'fas fa-folder-open',
             'group' => 'Master Data',
             'desc'  => 'Dashboard Master, Supplier, Kondisi Barang, Jasa Pengiriman, & Metode Pembayaran',
-            'url'   => '/admin/dashboard-master',
+            'url'   => '/administrator/dashboard-master',
         ],
         'gudang' => [
             'label' => 'Manajemen Gudang',
             'icon'  => 'fas fa-warehouse',
             'group' => 'Pergudangan & Produk',
             'desc'  => 'Dashboard Gudang, Data Gudang, Area Gudang, dan Rak Gudang',
-            'url'   => '/admin/dashboardGudang',
+            'url'   => '/administrator/dashboardGudang',
         ],
         'produk' => [
             'label' => 'Manajemen Produk & Stok',
             'icon'  => 'fas fa-boxes',
             'group' => 'Pergudangan & Produk',
             'desc'  => 'Dashboard Produk, Katalog Produk, Kategori Produk, dan Stok Produk',
-            'url'   => '/admin/dashboardProduk',
+            'url'   => '/administrator/dashboardProduk',
         ],
         'mutasi_stok' => [
             'label' => 'Mutasi Stok',
             'icon'  => 'fas fa-exchange-alt',
             'group' => 'Pergudangan & Produk',
             'desc'  => 'Pencatatan dan pengelolaan perpindahan stok antar gudang/area/rak',
-            'url'   => '/admin/mutasi-stok',
+            'url'   => '/administrator/mutasi-stok',
         ],
         'stock_opname' => [
             'label' => 'Stock Opname',
             'icon'  => 'fas fa-clipboard-check',
             'group' => 'Pergudangan & Produk',
             'desc'  => 'Pemeriksaan dan penyesuaian stok fisik gudang',
-            'url'   => '/admin/stock-opname',
+            'url'   => '/administrator/stock-opname',
         ],
         'transaksi' => [
             'label' => 'Transaksi Barang (In / Out)',
             'icon'  => 'fas fa-dolly',
             'group' => 'Transaksi & Distribusi',
             'desc'  => 'Penerimaan Barang dari Supplier dan Pengeluaran Barang',
-            'url'   => '/admin/penerimaan-barang',
+            'url'   => '/administrator/penerimaan-barang',
         ],
         'orders' => [
             'label' => 'Pesanan Distributor',
             'icon'  => 'fas fa-shopping-cart',
             'group' => 'Transaksi & Distribusi',
             'desc'  => 'Verifikasi pembayaran, pengiriman, dan faktur pesanan distributor',
-            'url'   => '/admin/orders',
+            'url'   => '/administrator/orders',
         ],
         'distributor' => [
             'label' => 'Data Distributor',
             'icon'  => 'fas fa-truck-moving',
             'group' => 'Transaksi & Distribusi',
             'desc'  => 'Mengelola daftar mitra distributor',
-            'url'   => '/admin/distributor',
+            'url'   => '/administrator/distributor',
         ],
         'keuangan' => [
             'label' => 'Manajemen Keuangan',
             'icon'  => 'fas fa-wallet',
             'group' => 'Keuangan & Laporan',
             'desc'  => 'Dashboard Keuangan, Kas Pusat, Sumber Keuangan, dan Arus Kas Keuangan',
-            'url'   => '/admin/dashboard-keuangan',
+            'url'   => '/administrator/dashboard-keuangan',
         ],
         'laporan' => [
             'label' => 'Laporan Sistem',
             'icon'  => 'fas fa-file-alt',
             'group' => 'Keuangan & Laporan',
             'desc'  => 'Melihat dan mencetak laporan operasional',
-            'url'   => '/admin/laporan',
+            'url'   => '/administrator/laporan',
         ],
         'riwayat' => [
             'label' => 'Riwayat & Log Aktivitas',
             'icon'  => 'fas fa-history',
             'group' => 'Keuangan & Laporan',
             'desc'  => 'Audit log aktivitas sistem dan riwayat aktivitas produk',
-            'url'   => '/admin/riwayat-logs',
+            'url'   => '/administrator/riwayat-logs',
         ],
         'portal_distributor' => [
             'label' => 'Portal Belanja Distributor (Client)',
@@ -323,51 +323,51 @@ class Role extends Model
     {
         $effective = $this->getEffectivePermissions();
         if (in_array('dashboard', $effective, true)) {
-            return '/admin/dashboard';
+            return '/administrator/dashboard';
         }
         foreach (self::AVAILABLE_PERMISSIONS as $key => $info) {
             if ($key !== 'portal_distributor' && in_array($key, $effective, true) && !empty($info['url'])) {
                 return $info['url'];
             }
         }
-        return '/admin/pengguna/profil';
+        return '/administrator/pengguna/profil';
     }
 
     public function canAccessRequest(Request $request): bool
     {
         // Selalu izinkan halaman profil pengguna sendiri dan endpoint AJAX stok internal
         if (
-            $request->is('admin/pengguna/profil*') ||
-            $request->is('admin/stok/by-produk*') ||
-            $request->is('admin/stok/produk*') ||
-            $request->is('admin/lokasi-asal-produk*')
+            $request->is('administrator/pengguna/profil*') ||
+            $request->is('administrator/stok/by-produk*') ||
+            $request->is('administrator/stok/produk*') ||
+            $request->is('administrator/lokasi-asal-produk*')
         ) {
             return $this->isAdminPanelRole();
         }
 
-        if ($request->is('admin/dashboard')) {
+        if ($request->is('administrator/dashboard')) {
             return $this->hasPermission('dashboard');
         }
 
-        if ($request->is('admin/role*')) {
+        if ($request->is('administrator/role*')) {
             return $this->hasPermission('master_role');
         }
 
-        if ($request->is('admin/user*') || $request->is('admin/divisi*') || $request->is('admin/jabatan*')) {
+        if ($request->is('administrator/user*') || $request->is('administrator/divisi*') || $request->is('administrator/jabatan*')) {
             return $this->hasPermission('master_hr');
         }
 
         if (
-            $request->is('admin/wilayah*') ||
-            $request->is('admin/provinsi*') ||
-            $request->is('admin/kota*') ||
-            $request->is('admin/kecamatan*') ||
-            $request->is('admin/kelurahan*')
+            $request->is('administrator/wilayah*') ||
+            $request->is('administrator/provinsi*') ||
+            $request->is('administrator/kota*') ||
+            $request->is('administrator/kecamatan*') ||
+            $request->is('administrator/kelurahan*')
         ) {
             return $this->hasPermission('master_wilayah');
         }
 
-        if ($request->is('admin/dashboard-master*')) {
+        if ($request->is('administrator/dashboard-master*')) {
             return $this->hasPermission('master_mitra') ||
                    $this->hasPermission('master_role') ||
                    $this->hasPermission('master_hr') ||
@@ -375,71 +375,72 @@ class Role extends Model
         }
 
         if (
-            $request->is('admin/supplier*') ||
-            $request->is('admin/kondisi-barang*') ||
-            $request->is('admin/jasa-pengiriman*') ||
-            $request->is('admin/metode-pembayaran*')
+            $request->is('administrator/supplier*') ||
+            $request->is('administrator/kondisi-barang*') ||
+            $request->is('administrator/jasa-pengiriman*') ||
+            $request->is('administrator/metode-pembayaran*')
         ) {
             return $this->hasPermission('master_mitra');
         }
 
         if (
-            $request->is('admin/dashboardGudang*') ||
-            $request->is('admin/gudang*') ||
-            $request->is('admin/areaGudang*') ||
-            $request->is('admin/rak-gudang*')
+            $request->is('administrator/dashboardGudang*') ||
+            $request->is('administrator/gudang*') ||
+            $request->is('administrator/areaGudang*') ||
+            $request->is('administrator/rak-gudang*')
         ) {
             return $this->hasPermission('gudang');
         }
 
         if (
-            $request->is('admin/dashboardProduk*') ||
-            $request->is('admin/product*') ||
-            $request->is('admin/category*') ||
-            $request->is('admin/stok*')
+            $request->is('administrator/dashboardProduk*') ||
+            $request->is('administrator/product*') ||
+            $request->is('administrator/category*') ||
+            $request->is('administrator/stok*')
         ) {
             return $this->hasPermission('produk');
         }
 
         if (
-            $request->is('admin/dashboard-keuangan*') ||
-            $request->is('admin/kas-pusat*') ||
-            $request->is('admin/sumber-keuangan*') ||
-            $request->is('admin/keuangan*')
+            $request->is('administrator/dashboard-keuangan*') ||
+            $request->is('administrator/kas-pusat*') ||
+            $request->is('administrator/sumber-keuangan*') ||
+            $request->is('administrator/keuangan*')
         ) {
             return $this->hasPermission('keuangan');
         }
 
-        if ($request->is('admin/orders*')) {
+        if ($request->is('administrator/orders*')) {
             return $this->hasPermission('orders');
         }
 
-        if ($request->is('admin/distributor*')) {
+        if ($request->is('administrator/distributor*')) {
             return $this->hasPermission('distributor');
         }
 
-        if ($request->is('admin/mutasi-stok*')) {
+        if ($request->is('administrator/mutasi-stok*')) {
             return $this->hasPermission('mutasi_stok');
         }
 
-        if ($request->is('admin/stock-opname*')) {
+        if ($request->is('administrator/stock-opname*')) {
             return $this->hasPermission('stock_opname');
         }
 
         if (
-            $request->is('admin/penerimaan-barang*') ||
-            $request->is('admin/detail-penerimaan*') ||
-            $request->is('admin/pengeluaran-barang*') ||
-            $request->is('admin/detail-pengeluaran*')
+            $request->is('administrator/dashboard-transaksi') ||
+            $request->is('administrator/penerimaan-barang*') ||
+            $request->is('administrator/detail-penerimaan*') ||
+            $request->is('administrator/pengeluaran-barang*') ||
+            $request->is('administrator/detail-pengeluaran*')
         ) {
             return $this->hasPermission('transaksi');
         }
 
-        if ($request->is('admin/riwayat-aktivitas-produk*') || $request->is('admin/riwayat-logs*')) {
+        if ($request->is('administrator/riwayat-aktivitas-produk*') || $request->is('administrator/riwayat-logs*')) {
             return $this->hasPermission('riwayat');
         }
 
-        if ($request->is('admin/laporan*')) {
+        if ($request->is('administrator/laporan*')) {
             return $this->hasPermission('laporan');
         }
 

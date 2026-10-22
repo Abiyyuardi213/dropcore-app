@@ -109,7 +109,7 @@ class AuthController extends Controller
             return redirect('/login-distributor')->with('success', 'Logout berhasil! Sampai jumpa lagi.');
         }
 
-        return redirect('/login')->with('success', 'Logout berhasil! Sampai jumpa lagi.');
+        return redirect()->route('login')->with('success', 'Logout berhasil! Sampai jumpa lagi.');
     }
 
     public function showRegisterForm()

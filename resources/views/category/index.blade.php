@@ -227,7 +227,7 @@
             // Delete Button Handler
             $('.delete-category-btn').click(function() {
                 let categoryId = $(this).data('category-id');
-                let deleteUrl = "{{ url('admin/category') }}/" + categoryId; // Corrected URL prefix
+                let deleteUrl = "{{ url('administrator/category') }}/" + categoryId; // Corrected URL prefix
                 $('#deleteForm').attr('action', deleteUrl);
             });
 

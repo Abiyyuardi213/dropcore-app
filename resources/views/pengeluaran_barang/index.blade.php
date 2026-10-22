@@ -12,6 +12,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        .pengeluaran-toolbar { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+        .pengeluaran-filters { display: flex; flex: 1; flex-wrap: wrap; align-items: flex-end; gap: .5rem; min-width: 0; }
+        .pengeluaran-filters .form-group { margin-bottom: 0; }
+        .pengeluaran-toolbar label { font-size: .875rem; margin-bottom: .25rem; }
+        .pengeluaran-search { width: 200px; margin-left: auto; }
+        .pengeluaran-filter-actions { display: flex; gap: .5rem; }
+        @media (max-width: 767.98px) {
+            .pengeluaran-filters, .pengeluaran-filters .form-group, .pengeluaran-search { width: 100%; flex-basis: 100%; }
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -45,6 +56,46 @@
                         </div>
 
                         <div class="card-body">
+                            @if ($errors->any())
+                                <div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>
+                            @endif
+                            <div class="pengeluaran-toolbar">
+                                <form action="{{ route('pengeluaran-barang.index') }}" method="GET" class="pengeluaran-filters">
+                                    <div class="form-group">
+                                        <label for="tanggal_awal">Tanggal Awal</label>
+                                        <input type="date" id="tanggal_awal" name="tanggal_awal" class="form-control form-control-sm" value="{{ request('tanggal_awal') }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tanggal_akhir">Tanggal Akhir</label>
+                                        <input type="date" id="tanggal_akhir" name="tanggal_akhir" class="form-control form-control-sm" value="{{ request('tanggal_akhir') }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tipe_penerima">Tipe Penerima</label>
+                                        <select id="tipe_penerima" name="tipe_penerima" class="form-control form-control-sm">
+                                            <option value="">-- Semua Penerima --</option>
+                                            <option value="konsumen" @selected(request('tipe_penerima') == 'konsumen')>Konsumen</option>
+                                            <option value="distributor" @selected(request('tipe_penerima') == 'distributor')>Distributor</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="status">Status</label>
+                                        <select id="status" name="status" class="form-control form-control-sm">
+                                            <option value="">-- Semua Status --</option>
+                                            <option value="pending" @selected(request('status') == 'pending')>Pending</option>
+                                            <option value="canceled" @selected(request('status') == 'canceled')>Canceled</option>
+                                            <option value="completed" @selected(request('status') == 'completed')>Completed</option>
+                                        </select>
+                                    </div>
+                                    <div class="pengeluaran-filter-actions">
+                                        <a href="{{ route('pengeluaran-barang.index') }}" class="btn btn-default btn-sm">Reset</a>
+                                        <button type="submit" class="btn btn-primary btn-sm">Terapkan Filter</button>
+                                    </div>
+                                </form>
+                                <div class="pengeluaran-search">
+                                    <label for="pengeluaranSearch">Search:</label>
+                                    <input type="search" id="pengeluaranSearch" class="form-control form-control-sm" placeholder="Cari pengeluaran..." aria-controls="pengeluaranTable">
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table id="pengeluaranTable" class="table table-hover text-nowrap">
                                     <thead>
@@ -55,7 +106,8 @@
                                             <th>Tujuan (Penerima)</th>
                                             <th>Ref.</th>
                                             <th>User</th>
-                                            <th>Status</th>
+                                            <th>Status Barang</th>
+                                            <th>Pembayaran</th>
                                             <th class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
@@ -90,6 +142,7 @@
                                                             class="badge badge-secondary">{{ ucfirst($item->status) }}</span>
                                                     @endif
                                                 </td>
+                                                <td><span class="badge badge-{{ $item->payment_status === 'paid' ? 'success' : 'secondary' }}">{{ ['paid' => 'Lunas', 'unpaid' => 'Belum dibayar', 'reversed' => 'Dibalik'][$item->payment_status] ?? 'Belum dibayar' }}</span></td>
                                                 <td class="text-center">
                                                     <a href="{{ route('pengeluaran-barang.show', $item->id) }}"
                                                         class="btn btn-info btn-xs" title="Lihat Detail">
@@ -138,7 +191,8 @@
 
     <script>
         $(document).ready(function() {
-            $("#pengeluaranTable").DataTable({
+            var table = $("#pengeluaranTable").DataTable({
+                "dom": 'rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
                 "paging": true,
                 "lengthChange": false,
                 "searching": true,
@@ -148,17 +202,21 @@
                 "responsive": true
             });
 
+            $('#pengeluaranSearch').on('input', function() {
+                table.search(this.value).draw();
+            });
+
             // SweetAlert Delete
             $('.btn-delete').click(function() {
                 let id = $(this).data('id');
                 Swal.fire({
                     title: 'Batalkan Pengeluaran?',
-                    text: "Menghapus data ini akan MENGEMBALIKAN stok barang ke gudang!",
+                    text: "Pembatalan transaksi selesai membalik stok dan pembayaran. Draft tidak mengubah stok atau saldo.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, Hapus & Refund Stok!',
+                    confirmButtonText: 'Ya, Batalkan Transaksi',
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {

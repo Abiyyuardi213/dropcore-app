@@ -1,272 +1,142 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Pengeluaran Barang - {{ $pengeluaran->no_pengeluaran }}</title>
-
+    <title>Surat Jalan Pengeluaran - {{ $pengeluaran->no_pengeluaran }}</title>
     <style>
-        /*
-         * STYLING CSS MONOKROMATIK (HITAM PUTIH) UNTUK LAPORAN PDF
-         */
-
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 11px;
-            margin: 40px;
-            color: #333;
-            /* Hitam gelap */
-            line-height: 1.5;
-        }
-
-        /* --- Header Section --- */
-        .header {
-            width: 100%;
-            margin-bottom: 25px;
-            border-bottom: 3px solid #333;
-            /* Garis pemisah hitam tebal */
-            padding-bottom: 10px;
-        }
-
-        .header .logo {
-            width: 100px;
-        }
-
-        .header-right {
-            text-align: right;
-            font-size: 11px;
-            line-height: 1.6;
-        }
-
-        .title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-            margin-top: 5px;
-            margin-bottom: 0;
-        }
-
-        /* --- Section Title --- */
-        .section-title {
-            font-weight: bold;
-            margin-top: 25px;
-            margin-bottom: 8px;
-            font-size: 13px;
-            color: #333;
-            border-bottom: 1px solid #333;
-            padding-bottom: 3px;
-        }
-
-        /* --- Info Blocks (Penerima & Keterangan) --- */
-        .info-table {
-            width: 100%;
-            margin-top: 5px;
-            margin-bottom: 20px;
-        }
-
-        .info-block {
-            font-size: 11px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            /* Border abu-abu terang */
-            border-left: 5px solid #666;
-            /* Garis vertikal menonjol */
-            border-radius: 2px;
-            background-color: #f9f9f9;
-            /* Latar belakang abu-abu sangat terang */
-        }
-
-        .info-block strong {
-            display: block;
-            font-size: 12px;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        /* --- Product Table (Detail Barang) --- */
-        table.product-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        .product-table th {
-            background: #666;
-            /* Header tabel abu-abu gelap */
-            color: white;
-            font-weight: 600;
-            padding: 8px;
-            border: 1px solid #666;
-            text-align: left;
-        }
-
-        .product-table td {
-            padding: 7px 8px;
-            border: 1px solid #ddd;
-            vertical-align: top;
-        }
-
-        .product-table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        /* --- Total Section --- */
-        .total-box {
-            margin-top: 15px;
-            width: 100%;
-        }
-
-        .total-box td {
-            padding: 6px 0;
-            font-size: 12px;
-        }
-
-        .total-label {
-            font-weight: bold;
-            text-align: right;
-            width: 150px;
-            padding-right: 10px;
-            color: #333;
-        }
-
-        .total-value {
-            font-weight: bold;
-            text-align: right;
-            border-top: 3px solid #333;
-            /* Garis tebal hitam di atas nilai total */
-            padding-top: 5px;
-            font-size: 14px;
-            width: 150px;
-            color: #333;
-        }
-
-        /* --- Footer --- */
-        .footer {
-            margin-top: 70px;
-            border-top: 1px solid #aaa;
-            padding-top: 10px;
-            text-align: center;
-            font-size: 10px;
-            color: #666;
-        }
+        @page { size: A4 portrait; margin: 32px 34px 40px; }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 9px; color: #222; line-height: 1.5; margin: 0; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        td, th { vertical-align: top; overflow-wrap: break-word; }
+        .masthead { margin-bottom: 20px; }
+        .logo { width: 108px; height: auto; margin-bottom: 8px; }
+        .muted { color: #666; }
+        .document-title { background: #222; color: #fff; padding: 12px 14px; text-align: center; font-size: 19px; font-weight: bold; letter-spacing: 1px; }
+        .document-subtitle { text-align: right; margin-top: 7px; font-size: 9px; }
+        .section-bar { background: #eee; padding: 7px 10px; border: 1px solid #222; font-weight: bold; color: #222; }
+        .info { border: 1px solid #222; margin-bottom: 16px; }
+        .info > tbody > tr > td { padding: 10px; }
+        .info .split { border-left: 1px solid #222; }
+        .label { font-size: 8px; color: #666; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
+        .sender { font-size: 11px; font-weight: bold; }
+        .meta td { padding: 2px 0; }
+        .items { border: 1px solid #222; }
+        .items th { background: #eee; border: 1px solid #222; padding: 8px 5px; font-size: 8px; }
+        .items td { border: 1px solid #aaa; padding: 9px 5px; font-size: 8px; }
+        .items thead { display: table-header-group; }
+        .items tr { page-break-inside: avoid; }
+        .right { text-align: right; }
+        .center { text-align: center; }
+        .sku { font-size: 7px; color: #666; margin-top: 4px; }
+        .location { font-size: 7px; color: #666; margin-top: 4px; }
+        .closing { margin-top: 14px; page-break-inside: avoid; }
+        .notes { padding-right: 18px; }
+        .totals td { padding: 6px 8px; border-bottom: 1px solid #ddd; }
+        .grand td { background: #eee; border-top: 2px solid #222; font-weight: bold; font-size: 11px; }
+        .signatures { margin-top: 30px; page-break-inside: avoid; }
+        .signatures td { text-align: center; width: 33.33%; padding: 0 12px; }
+        .signature-name { margin-top: 55px; padding-top: 5px; border-top: 1px solid #777; }
+        .footer { margin-top: 24px; border-top: 1px solid #ddd; padding-top: 8px; font-size: 7px; color: #666; }
     </style>
 </head>
-
 <body>
-
-    <table class="header">
+    @php
+        $isDistributor = $pengeluaran->tipe_penerima === 'distributor';
+        $recipientName = $isDistributor ? ($pengeluaran->distributor->nama_distributor ?? '-') : ($pengeluaran->nama_konsumen ?: '-');
+        $recipientAddress = $isDistributor ? ($pengeluaran->distributor->alamat ?? '-') : ($pengeluaran->alamat_konsumen ?: '-');
+        $recipientPhone = $isDistributor ? ($pengeluaran->distributor->telepon ?? '-') : ($pengeluaran->telepon_konsumen ?: '-');
+        $recipientEmail = $isDistributor ? ($pengeluaran->distributor->email ?? '-') : null;
+        $subtotal = $pengeluaran->details->sum('subtotal');
+        $total = $subtotal;
+    @endphp
+    <table class="masthead">
         <tr>
-            <td style="width: 50%;">
-                <img src="{{ public_path('image/garuda-fiber.png') }}" alt="Logo Perusahaan" class="logo"><br>
-                <div class="title">LAPORAN PENGELUARAN BARANG</div>
+            <td style="width: 61%;">
+                <img src="{{ public_path('image/garuda-fiber.png') }}" class="logo" alt="Logo Garuda Fiber">
+                <div class="muted">Administrasi Gudang &amp; Pengeluaran Barang</div>
             </td>
-            <td class="header-right" style="width: 50%;">
-                <strong>No Pengeluaran:</strong> <span style="color:#333;">{{ $pengeluaran->no_pengeluaran }}</span><br>
-                <strong>Tanggal Keluar:</strong>
-                {{ \Carbon\Carbon::parse($pengeluaran->tanggal_pengeluaran)->format('d F Y') }}<br>
-                <strong>Dicetak Pada:</strong> {{ date('d/m/Y H:i') }}
+            <td style="width: 39%; padding-top: 12px;">
+                <div class="document-title">SURAT JALAN</div>
+                <div class="document-subtitle">PENGELUARAN BARANG<br><strong>{{ $pengeluaran->no_pengeluaran }}</strong></div>
             </td>
         </tr>
     </table>
 
-    <div class="section-title">Informasi Transaksi</div>
-
-    <table class="info-table">
+    <div class="section-bar">INFORMASI TRANSAKSI</div>
+    <table class="info">
         <tr>
-            <td style="width: 48%;">
-                <div class="info-block">
-                    <strong>Penerima Barang</strong><br>
-                    @if ($pengeluaran->tipe_penerima === 'distributor')
-                        **{{ optional($pengeluaran->distributor)->nama_distributor ?? 'N/A' }}**<br>
-                        Tipe: Distributor (Kode: {{ optional($pengeluaran->distributor)->kode_distributor ?? '-' }})
-                    @else
-                        **{{ $pengeluaran->nama_konsumen ?? 'N/A' }}**<br>
-                        Tipe: Konsumen<br>
-                        Telp: {{ $pengeluaran->telepon_konsumen ?? '-' }}<br>
-                        Alamat: {{ $pengeluaran->alamat_konsumen ?? '-' }}
-                    @endif
-                </div>
+            <td style="width: 55%;">
+                <div class="label">Penerima / {{ $isDistributor ? 'Distributor' : 'Konsumen' }}</div>
+                <div class="sender">{{ $recipientName }}</div>
+                <div>{{ $recipientAddress }}</div>
+                <div>Telepon: {{ $recipientPhone }}</div>
+                @if ($recipientEmail)<div>Email: {{ $recipientEmail }}</div>@endif
             </td>
-
-            <td style="width: 4%;">
-            </td>
-
-            <td style="width: 48%;">
-                <div class="info-block">
-                    <strong>Keterangan Pengeluaran</strong><br>
-                    {{ $pengeluaran->keterangan ?? 'Tidak ada keterangan tambahan.' }}
-                </div>
+            <td class="split" style="width: 45%;">
+                <table class="meta">
+                    <tr><td style="width: 40%;">Tanggal kirim</td><td>: {{ \Carbon\Carbon::parse($pengeluaran->tanggal_pengeluaran)->format('d/m/Y') }}</td></tr>
+                    <tr><td>No. referensi</td><td>: {{ $pengeluaran->referensi ?: '-' }}</td></tr>
+                    <tr><td>Status</td><td>: {{ ['completed' => 'Selesai', 'pending' => 'Draft / Pending', 'canceled' => 'Dibatalkan'][$pengeluaran->status] ?? $pengeluaran->status }}</td></tr>
+                    <tr><td>Pembayaran</td><td>: {{ ['paid' => 'Lunas', 'unpaid' => 'Belum dibayar', 'reversed' => 'Dibalik'][$pengeluaran->payment_status] ?? 'Belum dibayar' }}</td></tr>
+                    <tr><td>Petugas</td><td>: {{ $pengeluaran->user->name ?? 'System' }}</td></tr>
+                </table>
             </td>
         </tr>
     </table>
 
-    <div class="section-title">Detail Barang yang Dikeluarkan</div>
-
-    <table class="product-table">
+    <table class="items">
         <thead>
             <tr>
-                <th style="width: 25%;">Produk</th>
-                <th style="width: 15%;">Gudang</th>
-                <th style="width: 10%;">Area</th>
-                <th style="width: 10%;">Rak</th>
-                <th class="text-right" style="width: 10%;">Qty</th>
-                <th class="text-right" style="width: 15%;">Harga Satuan</th>
-                <th class="text-right" style="width: 15%;">Subtotal</th>
+                <th style="width: 5%;">No.</th>
+                <th style="width: 43%;">Deskripsi Barang / SKU</th>
+                <th style="width: 10%;">Kondisi</th>
+                <th style="width: 7%;">Qty</th>
+                <th style="width: 17%;">Harga Satuan (Rp)</th>
+                <th style="width: 18%;">Jumlah (Rp)</th>
             </tr>
         </thead>
         <tbody>
-            @php $total = 0; @endphp
-            @foreach ($pengeluaran->details as $d)
-                @php $total += $d->subtotal; @endphp
+            @forelse ($pengeluaran->details as $detail)
                 <tr>
-                    <td>{{ $d->produk->name ?? '-' }}</td>
-                    <td>{{ $d->gudang->nama_gudang ?? '-' }}</td>
-                    <td>{{ $d->area->nama_area ?? '-' }}</td>
-                    <td>{{ $d->rak->kode_rak ?? '-' }}</td>
-                    <td class="text-right">{{ $d->qty }}</td>
-                    <td class="text-right">Rp {{ number_format($d->harga, 0, ',', '.') }}</td>
-                    <td class="text-right">Rp {{ number_format($d->subtotal, 0, ',', '.') }}</td>
+                    <td class="center">{{ $loop->iteration }}</td>
+                    <td>
+                        <strong>{{ $detail->produk->name ?? 'Produk tidak tersedia' }}</strong>
+                        <div class="sku">SKU: {{ $detail->produk->sku ?? '-' }}</div>
+                        <div class="location">{{ $detail->gudang->nama_gudang ?? '-' }} / {{ $detail->area->kode_area ?? '-' }} / {{ $detail->rak->kode_rak ?? '-' }}</div>
+                    </td>
+                    <td class="center">{{ $detail->kondisi->nama_kondisi ?? '-' }}</td>
+                    <td class="right">{{ number_format($detail->qty, 0, ',', '.') }}</td>
+                    <td class="right">{{ number_format($detail->harga, 2, ',', '.') }}</td>
+                    <td class="right">{{ number_format($detail->subtotal, 2, ',', '.') }}</td>
                 </tr>
-            @endforeach
+            @empty
+                <tr><td colspan="6" class="center">Tidak ada detail barang.</td></tr>
+            @endforelse
         </tbody>
     </table>
 
-    <table class="total-box">
+    <table class="closing">
         <tr>
-            <td style="width: 70%;"></td>
-            <td class="total-label">TOTAL PENGELUARAN:</td>
-            <td class="total-value">Rp {{ number_format($total, 0, ',', '.') }}</td>
-        </tr>
-    </table>
-
-    <table style="width: 100%; margin-top: 50px;">
-        <tr>
-            <td style="width: 50%; text-align: center;">
-                <p>Disiapkan Oleh:</p>
-                <br><br><br>
-                <p>_________________________</p>
+            <td class="notes" style="width: 55%;">
+                <div class="label">Catatan Pengeluaran</div>
+                <div>{{ $pengeluaran->keterangan ?: 'Tidak ada catatan tambahan.' }}</div>
+                <p class="muted">Dokumen ini merupakan bukti pencatatan pengeluaran barang oleh PT Garuda Fiber.</p>
             </td>
-            <td style="width: 50%; text-align: center;">
-                <p>Disetujui Oleh:</p>
-                <br><br><br>
-                <p>_________________________</p>
+            <td style="width: 45%;">
+                <table class="totals">
+                    <tr><td>Subtotal</td><td class="right">Rp {{ number_format($subtotal, 2, ',', '.') }}</td></tr>
+                    <tr class="grand"><td>Total Bayar</td><td class="right">Rp {{ number_format($total, 2, ',', '.') }}</td></tr>
+                </table>
             </td>
         </tr>
     </table>
-
-    <div class="footer">
-        Laporan Pengeluaran ini otomatis dihasilkan oleh Sistem. Harap simpan sebagai bukti transaksi.<br>
-        Sistem Manajemen Informasi – PT Garuda Fiber
-    </div>
-
+    <table class="signatures">
+        <tr>
+            <td>Pengirim<div class="signature-name">{{ $pengeluaran->user->name ?? 'Petugas Gudang' }}</div></td>
+            <td>Diterima oleh<div class="signature-name">{{ $recipientName }}</div></td>
+            <td>Disetujui oleh<div class="signature-name">Manajer Keuangan</div></td>
+        </tr>
+    </table>
+    <div class="footer">PT GARUDA FIBER &nbsp; | &nbsp; {{ $pengeluaran->no_pengeluaran }} &nbsp; | &nbsp; Simpan dokumen ini sebagai arsip pengeluaran barang.</div>
 </body>
-
 </html>

@@ -59,7 +59,7 @@
                                     <p>Total Gudang</p>
                                 </div>
                                 <div class="icon"><i class="fas fa-warehouse"></i></div>
-                                <a href="{{ url('admin/gudang') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('administrator/gudang') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -71,7 +71,7 @@
                                     <p>Total Area</p>
                                 </div>
                                 <div class="icon"><i class="fas fa-th-large"></i></div>
-                                <a href="{{ url('admin/areaGudang') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('administrator/areaGudang') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -83,7 +83,7 @@
                                     <p>Total Rak</p>
                                 </div>
                                 <div class="icon"><i class="fas fa-layer-group"></i></div>
-                                <a href="{{ url('admin/rak-gudang') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('administrator/rak-gudang') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                                     <p>Total Real Stock (Items)</p>
                                 </div>
                                 <div class="icon"><i class="fas fa-boxes"></i></div>
-                                <a href="{{ url('admin/stok') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('administrator/stok') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>

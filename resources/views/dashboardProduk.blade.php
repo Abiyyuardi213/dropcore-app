@@ -51,7 +51,7 @@
                                     <p>Total Produk Tersedia</p>
                                 </div>
                                 <div class="icon"><i class="fas fa-box-open"></i></div>
-                                <a href="{{ url('admin/product') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('administrator/product') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -63,7 +63,7 @@
                                     <p>Total Stok Keseluruhan</p>
                                 </div>
                                 <div class="icon"><i class="fas fa-cubes"></i></div>
-                                <a href="{{ url('admin/stok') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('administrator/stok') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -156,7 +156,7 @@
                                     </ul>
                                 </div>
                                 <div class="card-footer text-center">
-                                    <a href="{{ url('admin/product') }}" class="uppercase">Lihat Semua Produk</a>
+                                    <a href="{{ url('administrator/product') }}" class="uppercase">Lihat Semua Produk</a>
                                 </div>
                             </div>
                         </div>

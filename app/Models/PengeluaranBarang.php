@@ -25,6 +25,9 @@ class PengeluaranBarang extends Model
         'referensi',
         'keterangan',
         'status',
+        'payment_status',
+        'paid_at',
+        'canceled_at',
     ];
 
     protected static function booted()
