@@ -12,12 +12,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->web(append: [\App\Http\Middleware\RestrictCashierArea::class]);
+        $middleware->redirectGuestsTo(fn ($request) => $request->is('kasir', 'kasir/*') ? route('kasir.login') : route('login'));
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
 
         $middleware->redirectUsersTo(function () {
             $user = auth()->user();
+            if ($user?->role?->isCashier()) return route('kasir.index');
             if ($user->role->role_name === 'customer') {
                 return route('homepage');
             }

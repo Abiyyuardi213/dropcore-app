@@ -2,31 +2,24 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class RoleSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        DB::table('role')->insert([
-            [
-                'id' => (string) Str::uuid(),
-                'role_name' => 'admin',
-                'role_description' => 'pengelola',
-                'role_status' => 1,
-            ],
-            [
-                'id' => (string) Str::uuid(),
-                'role_name' => 'distributor',
-                'role_description' => 'distributor',
-                'role_status' => 1,
-            ],
-        ]);
+        foreach (['admin' => Role::getAdminPermissionKeys(), 'distributor' => ['portal_distributor']] as $name => $permissions) {
+            if (DB::table('role')->whereRaw('LOWER(TRIM(role_name)) = ?', [$name])->exists()) continue;
+            DB::table('role')->insert([
+                'id' => (string) Str::uuid(), 'role_name' => $name,
+                'role_description' => $name === 'admin' ? 'Pengelola' : 'Distributor',
+                'role_status' => 1, 'permissions' => json_encode($permissions),
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+        }
+        $this->call(KasirRoleSeeder::class);
     }
 }

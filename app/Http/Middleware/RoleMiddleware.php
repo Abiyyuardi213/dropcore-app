@@ -21,7 +21,7 @@ class RoleMiddleware
         $user = $request->user();
 
         if (!$user || !$user->role) {
-            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+            return redirect()->route($request->is('kasir', 'kasir/*') ? 'kasir.login' : 'login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
         if (!$user->role->role_status) {
@@ -30,6 +30,10 @@ class RoleMiddleware
 
         $roleName = strtolower(trim($user->role->role_name));
         $normalizedRoles = array_map(fn($r) => strtolower(trim($r)), $roles);
+
+        if ($user->role->isCashier() && !in_array('kasir', $normalizedRoles, true)) {
+            abort(403, 'Akun kasir hanya dapat mengakses area kasir.');
+        }
 
         // 1. Jika route khusus portal distributor (role:distributor)
         if (in_array('distributor', $normalizedRoles, true) && !in_array('admin', $normalizedRoles, true)) {

@@ -31,6 +31,13 @@ class Role extends Model
     ];
 
     public const AVAILABLE_PERMISSIONS = [
+        'kasir' => [
+            'label' => 'Halaman Kasir',
+            'icon' => 'fas fa-cash-register',
+            'group' => 'Portal Khusus',
+            'desc' => 'Akses khusus area kasir tanpa akses administrator atau portal distributor',
+            'url' => '/kasir',
+        ],
         'dashboard' => [
             'label' => 'Dashboard Utama',
             'icon'  => 'fas fa-tachometer-alt',
@@ -167,7 +174,9 @@ class Role extends Model
                     if (in_array($nameLower, ['it', 'tim it', 'team it', 'it support'])) {
                         $hasItRole = true;
                     }
-                    if ($nameLower === 'distributor') {
+                    if ($nameLower === 'kasir') {
+                        DB::table('role')->where('id', $r->id)->update(['permissions' => json_encode(['kasir'])]);
+                    } elseif ($nameLower === 'distributor') {
                         DB::table('role')->where('id', $r->id)->update([
                             'permissions' => json_encode(['portal_distributor']),
                         ]);
@@ -221,6 +230,8 @@ class Role extends Model
                         if (empty($cleaned)) {
                             if ($nameLower === 'staff' || $nameLower === 'staf') {
                                 $cleaned = $operationalKeys;
+                            } elseif ($nameLower === 'kasir') {
+                                $cleaned = ['kasir'];
                             } elseif ($nameLower === 'distributor') {
                                 $cleaned = ['portal_distributor'];
                             } else {
@@ -271,11 +282,19 @@ class Role extends Model
 
     public static function getAdminPermissionKeys(): array
     {
-        return array_values(array_diff(array_keys(self::AVAILABLE_PERMISSIONS), ['portal_distributor']));
+        return array_values(array_diff(array_keys(self::AVAILABLE_PERMISSIONS), ['portal_distributor', 'kasir']));
+    }
+
+    public function isCashier(): bool
+    {
+        return strtolower(trim($this->role_name ?? '')) === 'kasir';
     }
 
     public function getEffectivePermissions(): array
     {
+        if ($this->isCashier()) {
+            return ['kasir'];
+        }
         $roleNameLower = strtolower(trim($this->role_name ?? ''));
 
         if (is_array($this->permissions)) {
@@ -321,12 +340,13 @@ class Role extends Model
 
     public function getFirstAllowedAdminUrl(): string
     {
+        if ($this->isCashier()) return '/kasir';
         $effective = $this->getEffectivePermissions();
         if (in_array('dashboard', $effective, true)) {
             return '/administrator/dashboard';
         }
         foreach (self::AVAILABLE_PERMISSIONS as $key => $info) {
-            if ($key !== 'portal_distributor' && in_array($key, $effective, true) && !empty($info['url'])) {
+            if (!in_array($key, ['portal_distributor', 'kasir'], true) && in_array($key, $effective, true) && !empty($info['url'])) {
                 return $info['url'];
             }
         }
@@ -451,7 +471,7 @@ class Role extends Model
     {
         self::ensureSchemaAndDefaults();
 
-        $permissions = $data['permissions'] ?? self::getAdminPermissionKeys();
+        $permissions = strtolower(trim($data['role_name'])) === 'kasir' ? ['kasir'] : ($data['permissions'] ?? self::getAdminPermissionKeys());
         if (!is_array($permissions)) {
             $permissions = self::getAdminPermissionKeys();
         }
@@ -482,6 +502,7 @@ class Role extends Model
             $updatePayload['permissions'] = $perms;
         }
 
+        if (strtolower(trim($data['role_name'])) === 'kasir') $updatePayload['permissions'] = ['kasir'];
         $this->update($updatePayload);
     }
 

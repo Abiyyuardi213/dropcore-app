@@ -53,6 +53,15 @@ Route::get('tentang', [HomepageController::class, 'about'])->name('distributor.a
 Route::get('berita', [HomepageController::class, 'news'])->name('distributor.news');
 
 
+Route::prefix('kasir')->name('kasir.')->group(function () {
+    Route::get('login', [\App\Http\Controllers\KasirAuthController::class, 'create'])->name('login')->middleware('guest');
+    Route::post('login', [\App\Http\Controllers\KasirAuthController::class, 'store'])->name('login.attempt')->middleware(['guest', 'throttle:5,1']);
+    Route::middleware(['auth', 'role:kasir'])->group(function () {
+        Route::view('/', 'kasir.index')->name('index');
+    });
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+});
+
 Route::get('/administrator/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/administrator/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');

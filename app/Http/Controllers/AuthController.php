@@ -25,6 +25,10 @@ class AuthController extends Controller
         $user = User::where($loginType, $request->login)->first();
 
         if ($user && Hash::check($request->password, $user->password)) {
+            if ($user->role?->isCashier()) {
+                return back()->withErrors(['login' => 'Akun kasir harus masuk melalui halaman login kasir.'])->withInput($request->only('login'));
+            }
+
 
             // Perketat keamanan: Cek status kepegawaian
             if ($user->status_kepegawaian !== 'aktif') {
@@ -72,7 +76,7 @@ class AuthController extends Controller
         if ($user && Hash::check($request->password, $user->password)) {
 
             // Cek jika bukan distributor
-            if (!$user->role || (strtolower($user->role->role_name) !== 'distributor' && !$user->role->hasPermission('portal_distributor'))) {
+            if (!$user->role || $user->role->isCashier() || (strtolower($user->role->role_name) !== 'distributor' && !$user->role->hasPermission('portal_distributor'))) {
                 return back()->withErrors([
                     'login' => 'Akun ini bukan akun distributor. Gunakan halaman login admin.',
                 ]);
@@ -99,11 +103,14 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $role = Auth::user() ? Auth::user()->role : null;
+        $isCashier = $role?->isCashier();
         $isDistributor = $role && strtolower($role->role_name) === 'distributor' && !$role->isAdminPanelRole();
 
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        if ($isCashier) return redirect()->route('kasir.login')->with('success', 'Anda berhasil keluar dari kasir.');
 
         if ($isDistributor) {
             return redirect('/login-distributor')->with('success', 'Logout berhasil! Sampai jumpa lagi.');

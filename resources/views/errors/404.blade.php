@@ -5,84 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Halaman Tidak Ditemukan</title>
     <link rel="icon" type="image/png" href="{{ asset('image/dropcore-icon.png') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
+        body.error-screen {
+            min-height: 100vh;
             margin: 0;
-            padding: 0;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            /* font-family: 'Source Sans Pro', sans-serif !important; */
-            background: url('{{ asset('image/wh1.jpg') }}') no-repeat center center fixed; /* Menambahkan gambar latar */
-            background-size: cover;
-            height: 100vh;
+            padding: 24px 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #333;
+            font-family: 'Source Sans Pro', sans-serif;
+            background: url('{{ asset('image/wh2.jpg') }}') no-repeat center center fixed;
+            background-size: cover;
         }
-
-        .container {
-            text-align: center;
-            max-width: 600px;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.8); /* Background transparan agar teks lebih terbaca */
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            animation: fadeIn 1s ease-out;
+        .error-card {
+            width: 100%;
+            max-width: 760px;
+            margin: 0;
+            background: rgba(255, 255, 255, .94);
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .container img {
-            width: 200px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-
-        p {
-            font-size: 18px;
-            color: #666;
-        }
-
-        a.button {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 12px 25px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-        }
-
-        a.button:hover {
-            background-color: #0056b3;
-        }
-
-        .emoji {
-            font-size: 60px;
-        }
-        .emoji img {
-            width: 150px; /* Ukuran lebar gambar */
-            height: auto; /* Menjaga rasio aspek gambar */
+        .error-logo { width: 160px; max-width: 100%; height: auto; }
+        .error-card .error-page { width: 100%; margin: 0; }
+        .error-card .headline { line-height: 1.1; }
+        .error-card .error-content h1 { font-size: 26px; font-weight: 600; }
+        .error-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+        @media (max-width: 767.98px) {
+            .error-card .error-page > .headline { float: none; text-align: center; }
+            .error-card .error-page > .error-content { margin-left: 0; text-align: center; }
+            .error-actions { justify-content: center; }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="emoji">
-            <img src="{{ asset('image/garuda-fiber.png') }}" alt="Not Found">
+<body class="hold-transition error-screen">
+    <main class="card card-outline card-primary shadow-lg error-card" aria-labelledby="error-title">
+        <div class="card-header text-center py-4 border-bottom-0">
+            <img src="{{ asset('image/garuda-fiber.png') }}" class="error-logo" alt="Logo Garuda Fiber">
         </div>
-        <h1>404 - Halaman Tidak Ditemukan</h1>
-        <p>Ups! Kami tidak dapat menemukan halaman yang Anda cari.<br> Mungkin sudah dihapus atau alamatnya salah.</p>
-        <a href="{{ url('/dashboard') }}" class="button">Kembali ke Beranda</a>
-    </div>
+        <div class="card-body px-4 pb-4">
+            <div class="error-page">
+                <div class="headline text-warning font-weight-bold" aria-hidden="true">404</div>
+                <div class="error-content">
+                    <h1 id="error-title"><i class="fas fa-exclamation-triangle text-warning mr-1" aria-hidden="true"></i> Halaman tidak ditemukan</h1>
+                    <p class="text-muted mb-4">Halaman yang Anda cari tidak tersedia. Periksa kembali alamatnya, atau kembali ke beranda untuk melanjutkan.</p>
+                    <div class="error-actions">
+                        <a href="{{ route('homepage') }}" class="btn btn-primary"><i class="fas fa-home mr-2" aria-hidden="true"></i>Kembali ke Beranda</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-center text-muted small">Garuda Fiber &middot; Sistem Manajemen Gudang</div>
+    </main>
 </body>
 </html>
