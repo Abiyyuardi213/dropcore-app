@@ -19,12 +19,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalPeran = Role::count();
         $totalPengguna = User::count();
-        $totalProduk = Products::count();
+        $totalPesananDistributor = Order::count();
         $totalStok = Stok::sum('quantity');
         $totalPenerimaan = PenerimaanBarang::count();
-        $totalPengeluaran = PengeluaranBarang::count();
+        $totalPengeluaran = PengeluaranBarang::where('status', 'completed')->count();
 
         // Extra stats for fuller dashboard
         $lowStockProducts = Products::with('stok')
@@ -49,41 +48,15 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        // Monthly Sales Trend (Last 6 Months)
-        $salesChartLabels = [];
-        $salesChartData = [];
-        $pengeluaranChartData = [];
-
-        for ($i = 5; $i >= 0; $i--) {
-            $month = now()->subMonths($i);
-            $monthName = $month->translatedFormat('M Y');
-            $salesChartLabels[] = $monthName;
-
-            // Total sales amount from Orders
-            $orderTotal = Order::whereMonth('created_at', $month->month)
-                ->whereYear('created_at', $month->year)
-                ->where('status', '!=', 'cancelled')
-                ->sum('total_price');
-
-            $salesChartData[] = (float) $orderTotal;
-
-            // Total outgoing stock transaction count / value
-            $pengeluaranCount = PengeluaranBarang::whereMonth('tanggal_pengeluaran', $month->month)
-                ->whereYear('tanggal_pengeluaran', $month->year)
-                ->count();
-
-            $pengeluaranChartData[] = $pengeluaranCount;
-        }
-
-        $totalPenjualanBulanIni = Order::whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->where('status', '!=', 'cancelled')
-            ->sum('total_price');
+        $trend = app(\App\Services\DashboardSalesService::class)->trend();
+        $salesChartLabels = $trend['salesChartLabels'];
+        $salesChartData = $trend['salesChartData'];
+        $pengeluaranChartData = $trend['pengeluaranChartData'];
+        $totalPenjualanBulanIni = $trend['totalPenjualanBulanIni'];
 
         return view('dashboard', compact(
-            'totalPeran',
             'totalPengguna',
-            'totalProduk',
+            'totalPesananDistributor',
             'totalStok',
             'totalPenerimaan',
             'totalPengeluaran',

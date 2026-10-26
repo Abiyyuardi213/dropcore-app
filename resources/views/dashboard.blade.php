@@ -15,6 +15,20 @@
         body {
             font-family: 'Source Sans Pro', sans-serif !important;
         }
+        .dashboard-summary-box { border-radius: 7px; overflow: hidden; }
+        .dashboard-summary-box .inner { min-height: 130px; padding: 15px; }
+        .dashboard-summary-box .inner h3 { position: relative; z-index: 1; font-size: 2.2rem; overflow-wrap: anywhere; }
+        .dashboard-summary-box .inner p { position: relative; z-index: 1; margin-bottom: 0; }
+        .dashboard-summary-box .icon > i { font-size: 60px; top: 24px; right: 15px; }
+        .dashboard-summary-box .small-box-footer { padding: 8px 0; }
+        .sales-trend-card { border: 1px solid #d3d6da; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+        .sales-trend-card .card-header { padding: 1.25rem 1.25rem .75rem; }
+        .sales-trend-card .card-title { font-size: 1.2rem; font-weight: 400; margin-right: 1rem; }
+        .sales-trend-card .card-body { padding: 1.25rem; }
+        .sales-report-link { white-space: nowrap; border-bottom: 1px solid #cce0ff; }
+        .sales-summary { gap: 1rem; font-size: 1.05rem; }
+        .sales-chart-area { height: 320px; position: relative; }
+        @media (max-width: 575.98px) { .sales-chart-area { height: 280px; } }
     </style>
 </head>
 
@@ -42,76 +56,67 @@
 
             <section class="content">
                 <div class="container-fluid">
-                    <!-- Info Boxes -->
+                    <!-- Rekap Dashboard -->
                     <div class="row">
-                        <div class="col-12 col-sm-6 col-md-3">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-info elevation-1"><i class="fas fa-users"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Peran</span>
-                                    <span class="info-box-number">{{ $totalPeran ?? 0 }}</span>
+                        @foreach ([
+                            ['Pengguna', $totalPengguna, 'bg-primary', 'fas fa-user-friends', 'user.index', 'Akun pengguna terdaftar'],
+                            ['Transaksi Keluar', $totalPengeluaran, 'bg-warning', 'fas fa-truck-loading', 'pengeluaran-barang.index', 'Transaksi pengeluaran selesai'],
+                            ['Pesanan Distributor', $totalPesananDistributor, 'bg-danger', 'fas fa-shopping-cart', 'admin.orders.index', 'Seluruh pesanan distributor'],
+                            ['Total Stok Tersisa', $totalStok, 'bg-navy', 'fas fa-cubes', 'stok.index', 'Jumlah unit tersisa di seluruh lokasi'],
+                        ] as [$label, $value, $color, $icon, $destination, $description])
+                            <div class="col-12 col-sm-6 col-xl">
+                                <div class="small-box {{ $color }} dashboard-summary-box shadow-sm">
+                                    <div class="inner">
+                                        <h3>{{ number_format($value ?? 0, 0, ',', '.') }}</h3>
+                                        <p>{{ $label }}</p>
+                                    </div>
+                                    <div class="icon"><i class="{{ $icon }}" aria-hidden="true"></i></div>
+                                    <a href="{{ route($destination) }}" class="small-box-footer" title="{{ $description }}" aria-label="Lihat detail {{ $label }}">
+                                        Lihat Detail <i class="fas fa-arrow-circle-right ml-1" aria-hidden="true"></i>
+                                    </a>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-12 col-sm-6 col-md-3">
-                            <div class="info-box mb-3">
-                                <span class="info-box-icon bg-success elevation-1"><i
-                                        class="fas fa-user-friends"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Pengguna</span>
-                                    <span class="info-box-number">{{ $totalPengguna ?? 0 }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6 col-md-3">
-                            <div class="info-box mb-3">
-                                <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-box"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Produk</span>
-                                    <span class="info-box-number">{{ $totalProduk ?? 0 }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6 col-md-3">
-                            <div class="info-box mb-3">
-                                <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-cubes"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Total Stok</span>
-                                    <span class="info-box-number">{{ number_format($totalStok ?? 0) }}</span>
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
 
-                    <!-- Visualisasi perkembangan penjualan produk (Modern AdminLTE Chart Card) -->
+                    <!-- Grafik penjualan bergaya AdminLTE -->
+                    @php
+                        $previousMonthSales = (float) ($salesChartData[4] ?? 0);
+                        $currentMonthSales = (float) ($totalPenjualanBulanIni ?? 0);
+                        $salesChange = $previousMonthSales > 0 ? (($currentMonthSales - $previousMonthSales) / $previousMonthSales) * 100 : null;
+                    @endphp
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="card card-outline card-primary shadow-sm">
-                                <div class="card-header border-0">
-                                    <div class="d-flex justify-content-between">
-                                        <h3 class="card-title font-weight-bold">
-                                            <i class="fas fa-chart-line text-primary mr-2"></i> Perkembangan Penjualan & Transaksi Produk
-                                        </h3>
-                                        <div class="card-tools">
-                                            <span class="badge badge-success px-2 py-1 mr-2">
-                                                <i class="fas fa-arrow-up mr-1"></i> Rp {{ number_format($totalPenjualanBulanIni ?? 0, 0, ',', '.') }} (Bulan Ini)
-                                            </span>
-                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                        </div>
+                        <div class="col-12">
+                            <div class="card sales-trend-card">
+                                <div class="card-header border-0 bg-transparent">
+                                    <div class="d-flex justify-content-between align-items-start flex-wrap">
+                                        <h3 class="card-title">Perkembangan Penjualan &amp; Transaksi Produk</h3>
+                                        @if(auth()->user()->role?->hasPermission('transaksi'))
+                                            <a href="{{ route('dashboard-transaksi') }}" class="sales-report-link">Lihat Rekap</a>
+                                        @endif
                                     </div>
                                 </div>
-                                <div class="card-body">
-                                    <div class="d-flex mb-3">
-                                        <p class="d-flex flex-column mb-0">
-                                            <span class="text-bold text-lg">Tren 6 Bulan Terakhir</span>
-                                            <span class="text-muted text-sm">Grafik nilai penjualan order (Rp) & frekuensi pengeluaran barang</span>
-                                        </p>
+                                <div class="card-body pt-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap sales-summary">
+                                        <div>
+                                            <span class="d-block text-bold text-lg">Rp {{ number_format($currentMonthSales, 0, ',', '.') }}</span>
+                                            <span class="d-block">Penjualan Bulan Ini</span>
+                                        </div>
+                                        <div class="text-right">
+                                            @if($salesChange !== null)
+                                                <span class="d-block {{ $salesChange >= 0 ? 'text-success' : 'text-danger' }}">
+                                                    <i class="fas fa-arrow-{{ $salesChange >= 0 ? 'up' : 'down' }} mr-1" aria-hidden="true"></i>{{ number_format(abs($salesChange), 1, ',', '.') }}%
+                                                </span>
+                                            @else
+                                                <span class="d-block text-muted">Belum ada pembanding</span>
+                                            @endif
+                                            <span class="d-block text-muted">Dibanding bulan lalu</span>
+                                        </div>
                                     </div>
-                                    <div class="position-relative mb-2" style="height: 300px;">
-                                        <canvas id="salesTrendsChart"></canvas>
+                                    <div class="sales-chart-area">
+                                        <canvas id="salesTrendsChart" role="img" aria-label="Grafik nilai penjualan dan jumlah transaksi pengeluaran selesai selama enam bulan terakhir"></canvas>
                                     </div>
+                                    <p class="text-muted small mb-0 mt-2">Tren 6 bulan terakhir. Penjualan mencakup pesanan aktif dan pengeluaran barang selesai, tanpa menghitung pesanan dua kali.</p>
                                 </div>
                             </div>
                         </div>
@@ -302,34 +307,31 @@
 
             var ctx = document.getElementById('salesTrendsChart').getContext('2d');
 
-            var gradientSales = ctx.createLinearGradient(0, 0, 0, 300);
-            gradientSales.addColorStop(0, 'rgba(0, 123, 255, 0.4)');
-            gradientSales.addColorStop(1, 'rgba(0, 123, 255, 0.05)');
-
             var salesChart = new Chart(ctx, {
-                type: 'line',
+                type: 'bar',
                 data: {
                     labels: {!! json_encode($salesChartLabels) !!},
                     datasets: [
                         {
                             label: 'Nominal Penjualan (Rp)',
-                            backgroundColor: gradientSales,
+                            backgroundColor: '#007bff',
+                            borderRadius: { topLeft: 5, topRight: 5 },
+                            maxBarThickness: 22,
+                            categoryPercentage: 0.6,
+                            barPercentage: 0.8,
                             borderColor: '#007bff',
-                            pointRadius: 5,
-                            pointHoverRadius: 7,
-                            pointBackgroundColor: '#007bff',
-                            pointBorderColor: '#fff',
-                            fill: true,
                             data: {!! json_encode($salesChartData) !!},
                             yAxisID: 'y'
                         },
                         {
                             label: 'Jumlah Transaksi Pengeluaran',
                             type: 'bar',
-                            backgroundColor: '#28a745',
-                            borderColor: '#28a745',
-                            barThickness: 16,
-                            borderRadius: 4,
+                            backgroundColor: '#20c997',
+                            borderColor: '#20c997',
+                            maxBarThickness: 22,
+                            categoryPercentage: 0.6,
+                            barPercentage: 0.8,
+                            borderRadius: { topLeft: 5, topRight: 5 },
                             data: {!! json_encode($pengeluaranChartData) !!},
                             yAxisID: 'y1'
                         }
@@ -345,7 +347,9 @@
                     plugins: {
                         legend: {
                             display: true,
-                            position: 'top'
+                            position: 'bottom',
+                            align: 'end',
+                            labels: { boxWidth: 16, boxHeight: 16, padding: 20, color: '#343a40' }
                         },
                         tooltip: {
                             callbacks: {
@@ -371,6 +375,8 @@
                             }
                         },
                         y: {
+                            beginAtZero: true,
+                            grid: { color: '#e9ecef', drawBorder: false },
                             type: 'linear',
                             display: true,
                             position: 'left',
@@ -388,6 +394,7 @@
                             }
                         },
                         y1: {
+                            beginAtZero: true,
                             type: 'linear',
                             display: true,
                             position: 'right',
