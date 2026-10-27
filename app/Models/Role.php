@@ -36,7 +36,7 @@ class Role extends Model
             'icon' => 'fas fa-cash-register',
             'group' => 'Portal Khusus',
             'desc' => 'Akses khusus area kasir tanpa akses administrator atau portal distributor',
-            'url' => '/kasir',
+            'url' => '/kasir/dashboard',
         ],
         'dashboard' => [
             'label' => 'Dashboard Utama',
@@ -340,7 +340,7 @@ class Role extends Model
 
     public function getFirstAllowedAdminUrl(): string
     {
-        if ($this->isCashier()) return '/kasir';
+        if ($this->isCashier()) return '/kasir/dashboard';
         $effective = $this->getEffectivePermissions();
         if (in_array('dashboard', $effective, true)) {
             return '/administrator/dashboard';

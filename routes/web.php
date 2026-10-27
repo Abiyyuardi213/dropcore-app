@@ -57,7 +57,19 @@ Route::prefix('kasir')->name('kasir.')->group(function () {
     Route::get('login', [\App\Http\Controllers\KasirAuthController::class, 'create'])->name('login')->middleware('guest');
     Route::post('login', [\App\Http\Controllers\KasirAuthController::class, 'store'])->name('login.attempt')->middleware(['guest', 'throttle:5,1']);
     Route::middleware(['auth', 'role:kasir'])->group(function () {
-        Route::view('/', 'kasir.index')->name('index');
+        Route::get('/', fn () => redirect()->route('kasir.index'))->name('root');
+        Route::get('dashboard', [\App\Http\Controllers\KasirDashboardController::class, 'index'])->name('index');
+        Route::get('penjualan', [\App\Http\Controllers\KasirSaleController::class, 'create'])->name('penjualan');
+        Route::get('penjualan/produk', [\App\Http\Controllers\KasirSaleController::class, 'products'])->name('penjualan.produk');
+        Route::post('penjualan', [\App\Http\Controllers\KasirSaleController::class, 'store'])->name('penjualan.store');
+        Route::get('penjualan/{id}/struk', [\App\Http\Controllers\KasirSaleController::class, 'receipt'])->name('penjualan.struk');
+        Route::get('penjualan/{id}/invoice', [\App\Http\Controllers\KasirSaleController::class, 'invoice'])->name('penjualan.invoice');
+        Route::get('penjualan/{id}', [\App\Http\Controllers\KasirSaleController::class, 'show'])->name('penjualan.show');
+        Route::get('produk', [\App\Http\Controllers\KasirProductController::class, 'index'])->name('produk');
+        Route::get('pelanggan', [\App\Http\Controllers\KasirCustomerController::class, 'index'])->name('pelanggan');
+        Route::get('laporan', [\App\Http\Controllers\KasirReportController::class, 'index'])->name('laporan');
+        Route::get('password', [\App\Http\Controllers\KasirPasswordController::class, 'edit'])->name('password');
+        Route::put('password', [\App\Http\Controllers\KasirPasswordController::class, 'update'])->name('password.update')->middleware('throttle:6,1');
     });
     Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 });
