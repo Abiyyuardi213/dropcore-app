@@ -9,6 +9,11 @@
     .pos-sheet label { font-size: .875rem; margin-bottom: .3rem; }
     .pos-sheet .form-control, .pos-sheet .btn { border-radius: 2px; }
     .pos-sheet .form-control[readonly] { background-color: #e9ecef; }
+    .pos-sheet .sale-success-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .pos-sheet .alert-success .sale-document-button,
+    .pos-sheet .alert-success .sale-document-button:visited { color: #001f3f; background: #fff; border-color: #fff; text-decoration: none; font-weight: 600; }
+    .pos-sheet .alert-success .sale-document-button:hover,
+    .pos-sheet .alert-success .sale-document-button:focus { color: #001f3f; background: #e9ecef; border-color: #001f3f; text-decoration: none; }
     .pos-section-title { font-size: 1.4rem; font-weight: 400; margin-bottom: .75rem; }
     .pos-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: max-content 1fr; grid-template-areas: 'entry payment' 'list payment'; gap: 1rem 1.5rem; margin: 0; align-items: start; }
     .pos-workspace > * { width: 100%; max-width: none; min-width: 0; padding: 0; }
@@ -54,8 +59,8 @@
     @if(session('success'))
         <div class="alert alert-success" role="status">{{ session('success') }}
             @if(session('completed_sale_id'))
-                <div class="mt-2"><a class="btn btn-light btn-sm" target="_blank" rel="noopener" href="{{ route('kasir.penjualan.struk', session('completed_sale_id')) }}">Cetak Struk (80 mm)</a>
-                <a class="btn btn-light btn-sm" href="{{ route('kasir.penjualan.invoice', session('completed_sale_id')) }}">Simpan Invoice (PDF)</a></div>
+                <div class="mt-2 sale-success-actions"><a class="btn btn-light btn-sm sale-document-button" target="_blank" rel="noopener" href="{{ route('kasir.penjualan.struk', session('completed_sale_id')) }}"><i class="fas fa-print mr-1" aria-hidden="true"></i>Cetak Struk (80 mm)</a>
+                <a class="btn btn-light btn-sm sale-document-button" href="{{ route('kasir.penjualan.invoice', session('completed_sale_id')) }}"><i class="fas fa-file-pdf mr-1" aria-hidden="true"></i>Simpan Invoice (PDF)</a></div>
             @endif
         </div>
     @endif
