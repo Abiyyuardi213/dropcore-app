@@ -37,6 +37,7 @@ class KasirSaleService
                 $inventory->validateLocation($stock->only(['gudang_id', 'area_id', 'rak_id']));
                 $product = $stock->produk;
                 $price = (int) round((float) $product->price * 100);
+                if (isset($data['expected_prices']) && ($data['expected_prices'][$stock->id] ?? null) !== $price) $this->fail('Harga produk berubah. Muat ulang Proses Bayar dan periksa total terbaru sebelum menyelesaikan pembayaran.');
                 if ($price < 0) $this->fail('Harga produk tidak valid.');
                 $netPrice = (int) round($price * (100 - (float) $data['discount']) / 100);
                 $subtotal += $price * $qty; $total += $netPrice * $qty;

@@ -62,6 +62,8 @@ Route::prefix('kasir')->name('kasir.')->group(function () {
         Route::get('penjualan', [\App\Http\Controllers\KasirSaleController::class, 'create'])->name('penjualan');
         Route::get('penjualan/produk', [\App\Http\Controllers\KasirSaleController::class, 'products'])->name('penjualan.produk');
         Route::post('penjualan', [\App\Http\Controllers\KasirSaleController::class, 'store'])->name('penjualan.store');
+        Route::post('penjualan/proses-bayar', [\App\Http\Controllers\KasirSaleController::class, 'prepare'])->name('penjualan.prepare');
+        Route::get('penjualan/proses-bayar/{key}', [\App\Http\Controllers\KasirSaleController::class, 'checkout'])->whereUuid('key')->name('penjualan.bayar');
         Route::get('penjualan/{id}/struk', [\App\Http\Controllers\KasirSaleController::class, 'receipt'])->name('penjualan.struk');
         Route::get('penjualan/{id}/invoice', [\App\Http\Controllers\KasirSaleController::class, 'invoice'])->name('penjualan.invoice');
         Route::get('penjualan/{id}', [\App\Http\Controllers\KasirSaleController::class, 'show'])->name('penjualan.show');

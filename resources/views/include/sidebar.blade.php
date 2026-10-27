@@ -359,6 +359,48 @@
                     </li>
                 @endif
 
+                @php
+                    $isTransaksi =
+                        request()->is('administrator/dashboard-transaksi') ||
+                        request()->is('administrator/penerimaan-barang*') ||
+                        request()->is('administrator/pengeluaran-barang*');
+                @endphp
+
+                @if ($canAccess('transaksi'))
+                    <li class="nav-item has-treeview {{ $isTransaksi ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isTransaksi ? 'active' : '' }} font-weight-bold">
+                            <i class="nav-icon fas fa-exchange-alt"></i>
+                            <p>
+                                Transaksi
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview" style="{{ $isTransaksi ? 'display: block;' : '' }}">
+                            <li class="nav-item">
+                                <a href="{{ route('dashboard-transaksi') }}" class="nav-link text-sm pl-4 {{ Request::is('administrator/dashboard-transaksi') ? 'active' : '' }}">
+                                    <i class="fas fa-chart-line nav-icon"></i><p>Dashboard Transaksi</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('penerimaan-barang.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('administrator/penerimaan-barang*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-truck-loading"></i>
+                                    <p>Penerimaan Barang</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('pengeluaran-barang.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('administrator/pengeluaran-barang*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-dolly"></i>
+                                    <p>Pengeluaran Barang</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+
                 @if ($canAccess('orders'))
                     <li class="nav-item">
                         <a href="{{ route('admin.orders.index') }}"
@@ -414,48 +456,6 @@
                             <i class="nav-icon fas fa-truck-loading"></i>
                             <p>Log Aktivitas</p>
                         </a>
-                    </li>
-                @endif
-
-                @php
-                    $isTransaksi =
-                        request()->is('administrator/dashboard-transaksi') ||
-                        request()->is('administrator/penerimaan-barang*') ||
-                        request()->is('administrator/pengeluaran-barang*');
-                @endphp
-
-                @if ($canAccess('transaksi'))
-                    <li class="nav-item has-treeview {{ $isTransaksi ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ $isTransaksi ? 'active' : '' }} font-weight-bold">
-                            <i class="nav-icon fas fa-exchange-alt"></i>
-                            <p>
-                                Transaksi
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-
-                        <ul class="nav nav-treeview" style="{{ $isTransaksi ? 'display: block;' : '' }}">
-                            <li class="nav-item">
-                                <a href="{{ route('dashboard-transaksi') }}" class="nav-link text-sm pl-4 {{ Request::is('administrator/dashboard-transaksi') ? 'active' : '' }}">
-                                    <i class="fas fa-chart-line nav-icon"></i><p>Dashboard Transaksi</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('penerimaan-barang.index') }}"
-                                    class="nav-link text-sm pl-4 {{ Request::is('administrator/penerimaan-barang*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-truck-loading"></i>
-                                    <p>Penerimaan Barang</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('pengeluaran-barang.index') }}"
-                                    class="nav-link text-sm pl-4 {{ Request::is('administrator/pengeluaran-barang*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-dolly"></i>
-                                    <p>Pengeluaran Barang</p>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                 @endif
 

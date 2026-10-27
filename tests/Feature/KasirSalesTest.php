@@ -14,7 +14,7 @@ class KasirSalesTest extends TestCase
         parent::setUp();
         config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:', 'session.driver' => 'array']);
         DB::purge('sqlite');
-        $this->withoutMiddleware();
+        $this->withoutMiddleware([\App\Http\Middleware\RoleMiddleware::class, \App\Http\Middleware\RestrictCashierArea::class]);
         \Illuminate\Support\Facades\View::share('errors', new \Illuminate\Support\ViewErrorBag());
         foreach (['products', 'suppliers', 'distributor', 'gudang', 'kondisi_barang'] as $name) {
             Schema::create($name, function (Blueprint $t) use ($name) {
@@ -77,6 +77,65 @@ class KasirSalesTest extends TestCase
     }
 
 
+    private function completeSale(array $data)
+    {
+        session()->forget('errors');
+        if (KasirSale::where('user_id', $this->cashier->id)->where('submission_key', $data['submission_key'])->exists()) {
+            return $this->post('/kasir/penjualan', $data);
+        }
+        $prepare = $this->post('/kasir/penjualan/proses-bayar', $data);
+        if (session('errors')?->any()) return $prepare;
+        $checkout = $this->get('/kasir/penjualan/proses-bayar/'.$data['submission_key']);
+        if (session('errors')?->any()) return $checkout;
+        return $this->post('/kasir/penjualan', $data);
+    }
+    public function test_checkout_does_not_change_stock_or_cash_until_finished_and_returns_to_empty_sale_form(): void
+    {
+        $data = $this->payload();
+        $this->post('/kasir/penjualan/proses-bayar', $data)->assertRedirect(route('kasir.penjualan.bayar', $data['submission_key']));
+        $this->get('/kasir/penjualan/proses-bayar/'.$data['submission_key'])->assertOk()->assertSee('Pilih Metode Pembayaran')->assertSee('Bank Test')->assertSee('Rp 360,00');
+        $this->assertEquals(0, KasirSale::count()); $this->assertEquals(0, PengeluaranBarang::count()); $this->assertEquals(0, Keuangan::count());
+        $this->assertEquals(10, DB::table('stok')->value('quantity')); $this->assertEquals(1000, DB::table('sumber_keuangan')->value('saldo'));
+        $this->get('/kasir/penjualan?draft='.$data['submission_key'])->assertOk()->assertViewHas('draft', fn ($draft) => $draft['items'][0]['quantity'] === 2);
+        $this->post('/kasir/penjualan', ['submission_key' => $data['submission_key'], 'sumber_id' => 'bank', 'paid_amount' => '400'])->assertRedirect(route('kasir.penjualan'))->assertSessionHas('completed_sale_id');
+        $this->get('/kasir/penjualan')->assertOk()->assertSee('Cetak Struk (80 mm)')->assertViewHas('draft', []);
+        $this->assertEquals(1, KasirSale::count());
+    }
+    public function test_payment_cannot_bypass_checkout_or_use_another_cashiers_draft(): void
+    {
+        $data = $this->payload();
+        $this->post('/kasir/penjualan', $data)->assertSessionHasErrors('transaksi');
+        session()->forget('errors');
+        $this->post('/kasir/penjualan/proses-bayar', $data)->assertSessionHasNoErrors();
+        $other = User::create(['name' => 'Other', 'username' => 'other', 'password' => Hash::make('password')]);
+        $this->actingAs($other)->get('/kasir/penjualan/proses-bayar/'.$data['submission_key'])->assertRedirect(route('kasir.penjualan'));
+        $this->post('/kasir/penjualan', $data)->assertSessionHasErrors('transaksi');
+        $this->assertEquals(0, KasirSale::count());
+    }
+    public function test_price_and_stock_changes_during_payment_are_rejected_without_side_effects(): void
+    {
+        $data = $this->payload();
+        $this->post('/kasir/penjualan/proses-bayar', $data);
+        $this->get('/kasir/penjualan/proses-bayar/'.$data['submission_key'])->assertOk();
+        DB::table('products')->update(['price' => 201]);
+        $this->post('/kasir/penjualan', $data)->assertSessionHasErrors('transaksi');
+        session()->forget('errors');
+        $this->get('/kasir/penjualan/proses-bayar/'.$data['submission_key'])->assertOk();
+        DB::table('stok')->update(['quantity' => 1]);
+        $this->post('/kasir/penjualan', $data)->assertSessionHasErrors('transaksi');
+        $this->assertEquals(0, KasirSale::count()); $this->assertEquals(0, Keuangan::count());
+    }
+    public function test_final_payment_ignores_tampered_cart_and_shows_only_active_admin_accounts(): void
+    {
+        $data = $this->payload();
+        DB::table('sumber_keuangan')->insert(['id' => 'inactive', 'nama_sumber' => 'Hidden Account', 'saldo' => 0, 'jenis' => 'bank', 'is_active' => false]);
+        $this->post('/kasir/penjualan/proses-bayar', $data);
+        $this->get('/kasir/penjualan/proses-bayar/'.$data['submission_key'])->assertOk()->assertSee('Bank Test')->assertDontSee('Hidden Account');
+        $data['items'][0]['quantity'] = 9; $data['discount'] = 100;
+        $this->post('/kasir/penjualan', $data)->assertSessionHasNoErrors();
+        $this->assertEquals(360, KasirSale::firstOrFail()->total);
+        $this->assertEquals(8, DB::table('stok')->value('quantity'));
+    }
     private function payload(): array
     {
         return ['submission_key' => (string) Str::uuid(), 'customer_name' => 'Customer POS', 'customer_phone' => '081234',
@@ -90,7 +149,7 @@ class KasirSalesTest extends TestCase
         $data['items'][0]['quantity'] = 1;
         $data['discount'] = 0;
         $data['paid_amount'] = '1200000';
-        $this->post('/kasir/penjualan', $data)->assertSessionHasNoErrors()->assertRedirect();
+        $this->completeSale($data)->assertSessionHasNoErrors()->assertRedirect();
         $sale = KasirSale::firstOrFail();
         $this->assertEquals('1200000.00', number_format($sale->paid_amount, 2, '.', ''));
         $this->assertEquals('5000.00', number_format($sale->change_amount, 2, '.', ''));
@@ -98,7 +157,7 @@ class KasirSalesTest extends TestCase
     }
     public function test_receipt_80mm_and_downloadable_invoice_are_available_only_to_the_owner(): void
     {
-        $this->post('/kasir/penjualan', $this->payload())->assertSessionHasNoErrors();
+        $this->completeSale($this->payload())->assertSessionHasNoErrors();
         $sale = KasirSale::firstOrFail();
         $this->get('/kasir/penjualan/'.$sale->id)->assertOk()->assertSee('Simpan Invoice (PDF)')->assertSee('Cetak Struk (80 mm)');
         $this->get('/kasir/penjualan/'.$sale->id.'/struk')->assertOk()->assertSee('80mm', false)->assertSee($sale->invoice);
@@ -110,17 +169,32 @@ class KasirSalesTest extends TestCase
         $this->get('/kasir/penjualan/'.$sale->id.'/struk')->assertNotFound();
         $this->get('/kasir/penjualan/'.$sale->id.'/invoice')->assertNotFound();
     }
+    public function test_report_shows_sale_snapshot_cost_and_gross_profit(): void
+    {
+        $this->completeSale($this->payload())->assertSessionHasNoErrors();
+        DB::table('products')->where('id', 'p')->update(['price' => 999, 'purchase_price' => 999]);
+        $this->get('/kasir/laporan')->assertOk()->assertSee('Sub Total')->assertSee('Diskon (%)')
+            ->assertSee('Modal')->assertSee('Laba')->assertSee('Kasir Test')
+            ->assertSee('Rp 400,00')->assertSee('10,00%')->assertSee('Rp 360,00')
+            ->assertSee('Rp 200,00')->assertSee('Rp 160,00');
+    }
+    public function test_report_marks_cost_and_profit_unavailable_when_purchase_price_was_missing(): void
+    {
+        DB::table('products')->where('id', 'p')->update(['purchase_price' => null]);
+        $this->completeSale($this->payload())->assertSessionHasNoErrors();
+        $this->get('/kasir/laporan')->assertOk()->assertSee('Belum tersedia');
+    }
     public function test_sale_creates_invoice_stock_issue_payment_and_change_once(): void
     {
         $data = $this->payload();
-        $this->post('/kasir/penjualan', $data)->assertSessionHasNoErrors()->assertRedirect();
+        $this->completeSale($data)->assertSessionHasNoErrors()->assertRedirect();
         $sale = KasirSale::firstOrFail();
         $this->assertEquals(400, $sale->subtotal); $this->assertEquals(40, $sale->discount_amount);
         $this->assertEquals(360, $sale->total); $this->assertEquals(40, $sale->change_amount);
         $this->assertEquals(160, $sale->profit); $this->assertEquals(8, DB::table('stok')->value('quantity'));
         $this->assertEquals(1360, DB::table('sumber_keuangan')->value('saldo'));
         $this->assertEquals(360, Keuangan::first()->jumlah);
-        $this->post('/kasir/penjualan', $data)->assertRedirect(route('kasir.penjualan.show', $sale->id));
+        $this->completeSale($data)->assertRedirect(route('kasir.penjualan'));
         $this->assertEquals(1, KasirSale::count()); $this->assertEquals(1, Keuangan::count());
         $this->get('/kasir/penjualan/'.$sale->id)->assertOk()->assertSee($sale->invoice);
         $this->get('/kasir/laporan')->assertOk()->assertViewHas('count', 1)->assertViewHas('total', 360);
@@ -129,32 +203,32 @@ class KasirSalesTest extends TestCase
     public function test_insufficient_stock_and_underpayment_roll_back_everything(): void
     {
         $data = $this->payload(); $data['items'][0]['quantity'] = 11;
-        $this->post('/kasir/penjualan', $data)->assertSessionHasErrors('transaksi');
+        $this->completeSale($data)->assertSessionHasErrors('items');
         $data = $this->payload(); $data['paid_amount'] = 1;
-        $this->post('/kasir/penjualan', $data)->assertSessionHasErrors('transaksi');
+        $this->completeSale($data)->assertSessionHasErrors('transaksi');
         $this->assertEquals(0, KasirSale::count()); $this->assertEquals(0, PengeluaranBarang::count());
         $this->assertEquals(10, DB::table('stok')->value('quantity')); $this->assertEquals(1000, DB::table('sumber_keuangan')->value('saldo'));
     }
     public function test_non_cash_requires_exact_amount_and_unknown_cost_does_not_fake_profit(): void
     {
         DB::table('sumber_keuangan')->update(['jenis' => 'bank']);
-        $data = $this->payload(); $this->post('/kasir/penjualan', $data)->assertSessionHasErrors('transaksi');
+        $data = $this->payload(); $this->completeSale($data)->assertSessionHasErrors('transaksi');
         DB::table('products')->update(['purchase_price' => null]); $data['paid_amount'] = 360; session()->forget('errors');
-        $this->post('/kasir/penjualan', $data)->assertSessionHasNoErrors();
+        $this->completeSale($data)->assertSessionHasNoErrors();
         $this->assertNull(KasirSale::firstOrFail()->profit); $this->assertEquals(0, KasirSale::first()->change_amount);
     }
     public function test_prices_are_server_authoritative_and_duplicate_stock_lines_rejected(): void
     {
         $data = $this->payload(); $data['items'][0]['price'] = 1; $data['total'] = 2;
-        $this->post('/kasir/penjualan', $data)->assertSessionHasNoErrors();
+        $this->completeSale($data)->assertSessionHasNoErrors();
         $this->assertEquals(360, KasirSale::firstOrFail()->total);
         $data = $this->payload(); $data['items'][] = $data['items'][0];
-        $this->post('/kasir/penjualan', $data)->assertSessionHasErrors('items.0.stock_id');
+        $this->completeSale($data)->assertSessionHasErrors('items.0.stock_id');
         $this->assertEquals(1, KasirSale::count());
     }
     public function test_cancel_reverses_cash_and_stock_and_removes_sale_from_report(): void
     {
-        $this->post('/kasir/penjualan', $this->payload())->assertSessionHasNoErrors();
+        $this->completeSale($this->payload())->assertSessionHasNoErrors();
         $sale = KasirSale::firstOrFail(); app(InventoryPaymentService::class)->cancel($sale->outgoing);
         $this->assertEquals(10, DB::table('stok')->value('quantity')); $this->assertEquals(1000, DB::table('sumber_keuangan')->value('saldo'));
         $this->get('/kasir/laporan')->assertOk()->assertViewHas('count', 0);
@@ -163,7 +237,7 @@ class KasirSalesTest extends TestCase
     public function test_stock_lookup_and_receipt_scope_are_safe(): void
     {
         $this->getJson('/kasir/penjualan/produk?search=Produk')->assertOk()->assertJsonPath('0.price', 200)->assertJsonMissingPath('0.purchase_price')->assertJsonPath('0.stocks.0.quantity', 10);
-        $this->post('/kasir/penjualan', $this->payload())->assertSessionHasNoErrors(); $sale = KasirSale::firstOrFail();
+        $this->completeSale($this->payload())->assertSessionHasNoErrors(); $sale = KasirSale::firstOrFail();
         $other = User::create(['name'=>'Other', 'username'=>'other', 'password'=>Hash::make('password')]);
         $this->actingAs($other)->get('/kasir/penjualan/'.$sale->id)->assertNotFound();
         $this->get('/kasir/laporan')->assertOk()->assertViewHas('count', 0);
@@ -172,18 +246,18 @@ class KasirSalesTest extends TestCase
     public function test_invalid_discount_inactive_account_and_missing_stock_cannot_save(): void
     {
         $data = $this->payload(); $data['discount'] = 101;
-        $this->post('/kasir/penjualan', $data)->assertSessionHasErrors('discount');
+        $this->completeSale($data)->assertSessionHasErrors('discount');
         $data = $this->payload(); $data['items'][0]['stock_id'] = 'missing';
-        $this->post('/kasir/penjualan', $data)->assertSessionHasErrors('items.0.stock_id');
+        $this->completeSale($data)->assertSessionHasErrors('items.0.stock_id');
         $data = $this->payload(); DB::table('sumber_keuangan')->update(['is_active' => false]);
-        $this->post('/kasir/penjualan', $data)->assertSessionHasErrors('transaksi');
+        $this->completeSale($data)->assertSessionHasErrors('transaksi');
         $this->assertEquals(0, KasirSale::count()); $this->assertEquals(0, Keuangan::count());
         $this->assertEquals(10, DB::table('stok')->value('quantity'));
     }
     public function test_price_snapshot_does_not_change_when_master_is_updated(): void
     {
         $data = $this->payload(); $data['discount'] = 12.5;
-        $this->post('/kasir/penjualan', $data)->assertSessionHasNoErrors();
+        $this->completeSale($data)->assertSessionHasNoErrors();
         $sale = KasirSale::firstOrFail(); $this->assertEquals(350, $sale->total);
         DB::table('products')->update(['price' => 999, 'purchase_price' => 888]);
         $this->assertEquals(200, $sale->items->first()->unit_price);

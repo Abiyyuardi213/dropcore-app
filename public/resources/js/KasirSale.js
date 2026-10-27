@@ -49,12 +49,7 @@
         cart.forEach(line => { const price = cents(line.product.price); gross += price * line.quantity; net += Math.round(price * (100 - discount) / 100) * line.quantity; quantity += line.quantity; });
         el('cartQuantity').textContent = quantity; el('cartGross').textContent = money(gross);
         el('subtotal').textContent = money(gross); el('discountAmount').textContent = money(gross - net); el('grandTotal').textContent = money(net);
-        const accountType = el('account').selectedOptions[0]?.dataset.type;
-        el('paidAmount').readOnly = !!accountType && accountType !== 'tunai';
-        if (el('paidAmount').readOnly) el('paidAmount').value = (net / 100).toFixed(2);
-        el('paidAmount').min = (net / 100).toFixed(2);
-        el('change').textContent = money(Math.max(0, cents(el('paidAmount').value) - net));
-        el('saveSale').disabled = !cart.size || sending || restoring || el('account').options.length < 2;
+        el('saveSale').disabled = !cart.size || sending || restoring || !cfg.hasAccounts;
         return net;
     }
     function renderCart() {
@@ -114,12 +109,11 @@
         message(''); renderCart(); el('productCode').focus(); el('productCode').select();
     }
     el('addItem').addEventListener('click', addSelectedItem);
-    el('discount').addEventListener('input', totals); el('account').addEventListener('change', totals); el('paidAmount').addEventListener('input', totals);
+    el('discount').addEventListener('input', totals);
     el('resetSale').addEventListener('click', () => { if (cart.size && !window.confirm('Kosongkan transaksi yang belum disimpan?')) return; cart.clear(); form.reset(); message(''); renderCart(); });
     form.addEventListener('submit', e => {
         if (sending || restoring || !cart.size) {e.preventDefault(); message('Tambahkan barang sebelum menyimpan transaksi.'); return;}
-        const net=totals(); if (cents(el('paidAmount').value) < net || !el('account').value) { e.preventDefault(); message('Pilih akun penerimaan dan isi nominal pembayaran yang mencukupi.'); return; }
-        sending=true; el('saveSale').disabled=true; el('saveSale').textContent='Menyimpan...';
+        sending=true; el('saveSale').disabled=true; el('saveSale').textContent='Membuka Proses Bayar...';
     });
     async function restore() {
         if (!cfg.oldItems?.length) return;

@@ -51,17 +51,25 @@
 
 @section('content')
 <div class="card card-outline card-primary shadow-sm pos-sheet"><div class="card-body">
+    @if(session('success'))
+        <div class="alert alert-success" role="status">{{ session('success') }}
+            @if(session('completed_sale_id'))
+                <div class="mt-2"><a class="btn btn-light btn-sm" target="_blank" rel="noopener" href="{{ route('kasir.penjualan.struk', session('completed_sale_id')) }}">Cetak Struk (80 mm)</a>
+                <a class="btn btn-light btn-sm" href="{{ route('kasir.penjualan.invoice', session('completed_sale_id')) }}">Simpan Invoice (PDF)</a></div>
+            @endif
+        </div>
+    @endif
     @if ($errors->any())<div class="alert alert-danger" role="alert"><ul class="mb-0 pl-3">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     <div id="saleMessage" class="alert alert-warning" role="status" hidden></div>
     @if($accounts->isEmpty())<div class="alert alert-warning">Belum ada akun penerimaan aktif. Administrator perlu menambahkan akun keuangan sebelum transaksi dapat disimpan.</div>@endif
-    <form id="saleForm" action="{{ route('kasir.penjualan.store') }}" method="POST">
+    <form id="saleForm" action="{{ route('kasir.penjualan.prepare') }}" method="POST">
         @csrf
         <input type="hidden" name="submission_key" value="{{ $submissionKey }}">
         <div class="row">
             <div class="col-md-3 form-group"><label for="cashierName">Kasir</label><input id="cashierName" class="form-control form-control-sm" value="{{ auth()->user()->name }}" readonly></div>
             <div class="col-md-3 form-group"><label for="invoiceNumber">No. Invoice</label><input id="invoiceNumber" class="form-control form-control-sm" value="Otomatis saat disimpan" readonly></div>
             <div class="col-md-3 form-group"><label for="invoiceDate">Tanggal Invoice</label><input id="invoiceDate" class="form-control form-control-sm" value="{{ now('Asia/Jakarta')->format('d/m/Y') }}" readonly></div>
-            <div class="col-md-3 form-group"><label for="customerName">Pelanggan</label><input id="customerName" name="customer_name" class="form-control form-control-sm" placeholder="Pelanggan Umum" maxlength="255" value="{{ old('customer_name') }}"></div>
+            <div class="col-md-3 form-group"><label for="customerName">Pelanggan</label><input id="customerName" name="customer_name" class="form-control form-control-sm" placeholder="Pelanggan Umum" maxlength="255" value="{{ old('customer_name', $draft['customer_name'] ?? '') }}"></div>
         </div>
         <hr class="mt-2 mb-4">
         <div class="row pos-workspace">
@@ -87,26 +95,23 @@
                     <div class="pos-summary-details">
                         <table class="table table-sm mb-3"><tbody>
                             <tr><th>Subtotal</th><td id="subtotal" class="text-right">Rp 0</td></tr>
-                            <tr><th><label for="discount">Diskon (%)</label></th><td><input id="discount" name="discount" type="number" min="0" max="100" step="0.01" value="{{ old('discount', 0) }}" class="form-control form-control-sm" required></td></tr>
+                            <tr><th><label for="discount">Diskon (%)</label></th><td><input id="discount" name="discount" type="number" min="0" max="100" step="0.01" value="{{ old('discount', $draft['discount'] ?? 0) }}" class="form-control form-control-sm" required></td></tr>
                             <tr><th>Potongan</th><td id="discountAmount" class="text-right">Rp 0</td></tr>
                         </tbody></table>
-                        <div class="form-group"><label for="customerPhone">Telepon Pelanggan (opsional)</label><input id="customerPhone" name="customer_phone" class="form-control form-control-sm" maxlength="30" value="{{ old('customer_phone') }}"></div>
-                        <div class="form-group"><label for="account">Akun Penerimaan</label><select id="account" name="sumber_id" class="form-control form-control-sm" required><option value="">Pilih akun penerimaan</option>@foreach($accounts as $account)<option value="{{ $account->id }}" data-type="{{ $account->jenis }}" @selected(old('sumber_id') == $account->id)>{{ $account->nama_sumber }} ({{ $account->jenis }})</option>@endforeach</select></div>
-                        <div class="form-group"><label for="paidAmount">Nominal Dibayar</label><input id="paidAmount" name="paid_amount" type="text" inputmode="decimal" pattern="[0-9]+([.][0-9]{1,2})?" placeholder="Contoh: 1200000" class="form-control form-control-sm" required value="{{ old('paid_amount') }}"><small class="form-text text-muted">Nontunai dicatat sesuai total tagihan.</small></div>
-                        <div class="d-flex justify-content-between border-top pt-3 mb-3 font-weight-bold"><span>Kembalian</span><span id="change" class="text-right ml-2" role="status" aria-live="polite">Rp 0</span></div>
+                        <div class="form-group"><label for="customerPhone">Telepon Pelanggan (opsional)</label><input id="customerPhone" name="customer_phone" class="form-control form-control-sm" maxlength="30" value="{{ old('customer_phone', $draft['customer_phone'] ?? '') }}"></div>
                         <small class="text-muted">Harga mengikuti master produk. Diskon dihitung per satuan; total tidak ditambah pajak terpisah.</small>
                     </div>
                 </div>
             </aside>
         </div>
-        <hr class="my-4"><div class="pos-bottom"><button id="resetSale" type="button" class="btn btn-danger btn-sm">Batalkan Transaksi</button><button id="saveSale" type="submit" class="btn btn-success btn-sm" disabled>Buat Transaksi</button></div>
+        <hr class="my-4"><div class="pos-bottom"><button id="resetSale" type="button" class="btn btn-danger btn-sm">Batalkan Transaksi</button><button id="saveSale" type="submit" class="btn btn-success btn-sm" disabled>Proses Bayar <i class="fas fa-arrow-right ml-1" aria-hidden="true"></i></button></div>
     </form>
 </div></div>
 @endsection
 @push('scripts')
-@php $oldItems = old('items', []); @endphp
+@php $oldItems = old('items', $draft['items'] ?? []); @endphp
 <script>
-window.cashierSaleConfig = { productsUrl: @json(route('kasir.penjualan.produk')), oldItems: @json($oldItems) };
+window.cashierSaleConfig = { hasAccounts: @json($accounts->isNotEmpty()), productsUrl: @json(route('kasir.penjualan.produk')), oldItems: @json($oldItems) };
 </script>
 <script src="{{ asset('resources/js/KasirSale.js') }}" defer></script>
 @endpush

@@ -32,9 +32,25 @@
             <div class="col-md-4"><div class="info-box shadow-none border"><span class="info-box-icon bg-success"><i class="fas fa-coins" aria-hidden="true"></i></span><div class="info-box-content"><span class="info-box-text">Total Penjualan</span><span class="info-box-number">Rp {{ number_format($total, 2, ',', '.') }}</span></div></div></div>
             <div class="col-md-4"><div class="info-box shadow-none border"><span class="info-box-icon bg-info"><i class="fas fa-box" aria-hidden="true"></i></span><div class="info-box-content"><span class="info-box-text">Unit Terjual</span><span class="info-box-number">{{ $quantity }}</span></div></div></div>
         </div>
-        <div class="table-responsive"><table class="table table-bordered table-striped"><thead><tr><th>No.</th><th>Invoice</th><th>Tanggal</th><th>Pelanggan</th><th class="text-right">Jumlah Barang</th><th class="text-right">Total</th></tr></thead><tbody>
-            @forelse($transactions as $transaction)<tr><td>{{ $transactions->firstItem() + $loop->index }}</td><td><a href="{{ route('kasir.penjualan.show', $transaction->id) }}">{{ $transaction->invoice }}</a></td><td>{{ $transaction->sale_date->format('d/m/Y') }}</td><td>{{ $transaction->customer_name }}</td><td class="text-right">{{ $transaction->items_sum_quantity }}</td><td class="text-right">Rp {{ number_format($transaction->total, 2, ',', '.') }}</td></tr>
-            @empty<tr><td colspan="6" class="text-center text-muted py-4"><i class="fas fa-file-invoice fa-2x mb-3 d-block" aria-hidden="true"></i>Belum ada transaksi kasir pada periode ini.</td></tr>@endforelse
+        <div class="table-responsive"><table class="table table-bordered table-striped"><thead><tr><th>No.</th><th>No. Invoice</th><th>Tanggal</th><th>Pelanggan</th><th>Kasir</th><th class="text-right">Sub Total</th><th class="text-right">Diskon (%)</th><th class="text-right">Total Bayar</th><th class="text-right" title="Total harga beli barang saat transaksi dikali jumlah terjual">Modal</th><th class="text-right" title="Total bayar setelah diskon dikurangi modal; belum dikurangi biaya operasional">Laba</th></tr></thead><tbody>
+            @forelse($transactions as $transaction)<tr>
+                <td>{{ $transactions->firstItem() + $loop->index }}</td>
+                <td><a href="{{ route('kasir.penjualan.show', $transaction->id) }}">{{ $transaction->invoice }}</a></td>
+                <td>{{ $transaction->sale_date->format('d/m/Y') }}</td>
+                <td>{{ $transaction->customer_name }}</td>
+                <td>{{ $transaction->cashier_name }}</td>
+                <td class="text-right text-nowrap">Rp {{ number_format($transaction->subtotal, 2, ',', '.') }}</td>
+                <td class="text-right">{{ number_format($transaction->discount_percent, 2, ',', '.') }}%</td>
+                <td class="text-right text-nowrap">Rp {{ number_format($transaction->total, 2, ',', '.') }}</td>
+                @if($transaction->profit !== null)
+                    <td class="text-right text-nowrap">Rp {{ number_format($transaction->total - $transaction->profit, 2, ',', '.') }}</td>
+                    <td class="text-right text-nowrap">Rp {{ number_format($transaction->profit, 2, ',', '.') }}</td>
+                @else
+                    <td class="text-right" title="Harga beli sebagian barang belum tersedia saat transaksi">Belum tersedia</td>
+                    <td class="text-right" title="Harga beli sebagian barang belum tersedia saat transaksi">Belum tersedia</td>
+                @endif
+            </tr>
+            @empty<tr><td colspan="10" class="text-center text-muted py-4"><i class="fas fa-file-invoice fa-2x mb-3 d-block" aria-hidden="true"></i>Belum ada transaksi kasir pada periode ini.</td></tr>@endforelse
         </tbody></table></div>
         <div class="report-controls">{{ $transactions->links('pagination::bootstrap-4') }}</div>
         <p class="text-muted small mb-0">Laporan penjualan selesai milik akun kasir ini. Transaksi yang dibatalkan tidak termasuk.</p>
