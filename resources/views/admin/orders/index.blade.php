@@ -9,6 +9,17 @@
                         <h4 class="card-title">Daftar Pesanan Distributor</h4>
                     </div>
                     <div class="card-body">
+                        @if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
+                        <form method="GET" action="{{ route('admin.orders.index') }}" class="d-flex flex-wrap align-items-end mb-3" style="gap:.75rem;">
+                            <div class="form-group mb-0"><label for="orderDateFrom">Dari Tanggal</label><input type="date" id="orderDateFrom" name="date_from" class="form-control form-control-sm" value="{{ $filters['date_from'] ?? '' }}"></div>
+                            <div class="form-group mb-0"><label for="orderDateTo">Sampai Tanggal</label><input type="date" id="orderDateTo" name="date_to" class="form-control form-control-sm" value="{{ $filters['date_to'] ?? '' }}"></div>
+                            <div class="form-group mb-0"><label for="orderDistributor">Distributor</label><select id="orderDistributor" name="distributor" class="form-control form-control-sm" style="max-width:240px;"><option value="">Semua Distributor</option>@foreach($distributors as $distributor)<option value="{{ $distributor->id }}" @selected(($filters['distributor'] ?? '') === (string)$distributor->id)>{{ $distributor->name }}</option>@endforeach</select></div>
+                            <div class="form-group mb-0"><label for="orderStatus">Status Pesanan</label><select id="orderStatus" name="status" class="form-control form-control-sm"><option value="">Semua Status</option>@foreach($statuses as $value=>$label)<option value="{{ $value }}" @selected(($filters['status'] ?? '') === $value)>{{ $label }}</option>@endforeach</select></div>
+                            <div class="form-group mb-0"><label for="orderProof">Bukti Pembayaran</label><select id="orderProof" name="proof" class="form-control form-control-sm"><option value="">Semua</option><option value="uploaded" @selected(($filters['proof'] ?? '') === 'uploaded')>Sudah Diunggah</option><option value="missing" @selected(($filters['proof'] ?? '') === 'missing')>Belum Diunggah</option></select></div>
+                            <button type="submit" class="btn btn-primary btn-sm">Terapkan Filter</button>
+                            <a href="{{ route('admin.orders.index') }}" class="btn btn-default btn-sm">Reset</a>
+                        </form>
+                        <p class="text-muted text-sm">{{ $orders->count() }} pesanan sesuai filter. Rentang tanggal berdasarkan tanggal pesanan dibuat; bukti yang diunggah belum tentu sudah diverifikasi.</p>
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped" id="example1">
                                 <thead>

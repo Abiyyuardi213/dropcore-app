@@ -1,0 +1,10 @@
+.warehouse-card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr)); gap:1rem; align-items:start; }
+        .warehouse-card { margin:0; min-width:0; overflow-wrap:anywhere; }
+        .warehouse-card .card-footer { display:flex; flex-wrap:wrap; gap:.5rem; }
+        .warehouse-card-icon { width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-radius:.4rem; flex-shrink:0; }
+        .warehouse-card[hidden] { display:none!important; }
+        .warehouse-card summary { cursor:pointer; }
+        .warehouse-area-card { background:#f8f9fa; border:1px solid #dee2e6; border-radius:.25rem; padding:.85rem; margin-top:.75rem; }
+        .warehouse-rack-links { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.5rem; margin-top:.75rem; }
+        .warehouse-rack-link { background:#fff; border:1px solid #dee2e6; border-radius:.25rem; padding:.65rem; color:#343a40; }
+        .warehouse-rack-link:hover { text-decoration:none; border-color:#007bff; }

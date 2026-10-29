@@ -2,9 +2,9 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Logo -->
     <a href="#" class="brand-link d-flex flex-column align-items-center p-2" style="overflow: hidden;">
-        <img src="{{ asset('image/gfi-putih.png') }}" alt="Logo Dropcore" class="img-fluid d-none d-md-block"
-            style="max-height: 40px; object-fit: contain;">
-        <img src="{{ asset('image/gfi-putih.png') }}" alt="Logo Mini Dropcore" class="img-fluid d-block d-md-none"
+        <img src="{{ asset('image/logo-sidebar.png') }}" alt="Logo Garuda Fiber" class="img-fluid d-none d-md-block"
+            style="max-height: 50px; object-fit: contain;">
+        <img src="{{ asset('image/logo-sidebar.png') }}" alt="Logo Garuda Fiber" class="img-fluid d-block d-md-none"
             style="max-height: 100px; object-fit: contain;">
     </a>
 
@@ -169,7 +169,7 @@
                     $isGudang =
                         request()->is('administrator/dashboardGudang*') ||
                         request()->is('administrator/gudang*') ||
-                        request()->is('administrator/areaGudang*') ||
+                        request()->is('administrator/area-gudang*') ||
                         request()->is('administrator/rak-gudang*');
                 @endphp
 
@@ -202,8 +202,8 @@
                             </li>
 
                             <li class="nav-item">
-                                <a href="{{ route('areaGudang.index') }}"
-                                    class="nav-link text-sm pl-4 {{ Request::is('administrator/areaGudang*') ? 'active' : '' }}">
+                                <a href="{{ route('area-gudang.index') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('administrator/area-gudang*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-th-large"></i>
                                     <p>Area Gudang</p>
                                 </a>
@@ -223,8 +223,8 @@
 
                 @php
                     $isProduk =
-                        request()->is('administrator/dashboardProduk*') ||
-                        request()->is('administrator/product*') ||
+                        request()->is('administrator/dashboard-produk*') ||
+                        request()->is('administrator/produk*') ||
                         request()->is('administrator/category*') ||
                         request()->is('administrator/stok*');
                 @endphp
@@ -242,8 +242,8 @@
                         <ul class="nav nav-treeview" style="{{ $isProduk ? 'display: block;' : '' }}">
 
                             <li class="nav-item">
-                                <a href="{{ route('dashboardProduk') }}"
-                                    class="nav-link text-sm pl-4 {{ Request::is('administrator/dashboardProduk*') ? 'active' : '' }}">
+                                <a href="{{ route('dashboard-produk') }}"
+                                    class="nav-link text-sm pl-4 {{ Request::is('administrator/dashboard-produk*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-tachometer-alt"></i>
                                     <p>Dashboard Produk</p>
                                 </a>
@@ -251,7 +251,7 @@
 
                             <li class="nav-item">
                                 <a href="{{ route('product.index') }}"
-                                    class="nav-link text-sm pl-4 {{ Request::is('administrator/product*') ? 'active' : '' }}">
+                                    class="nav-link text-sm pl-4 {{ Request::is('administrator/produk*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-box"></i>
                                     <p>Produk</p>
                                 </a>

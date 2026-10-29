@@ -8,10 +8,14 @@ use App\Models\AreaGudang;
 
 class AreaGudangController extends Controller
 {
-    public function index()
+    public function index(\App\Services\WarehouseCapacityService $capacityService)
     {
-        $areas = AreaGudang::orderBy('created_at', 'asc')->get();
-        return view('areaGudang.index', compact('areas'));
+        $gudangs = $capacityService->warehouses();
+        $areas = $gudangs->flatMap(fn ($warehouse) => $warehouse['areas']->map(fn ($area) => array_merge($area, [
+            'warehouse_id' => $warehouse['id'], 'warehouse_name' => $warehouse['name'],
+            'warehouse_code' => $warehouse['code'], 'warehouse_active' => $warehouse['active'],
+        ])))->sortBy('code')->values();
+        return view('areaGudang.index', compact('areas', 'gudangs'));
     }
 
     public function create()
@@ -37,7 +41,7 @@ class AreaGudangController extends Controller
 
         AreaGudang::createArea($request->all());
 
-        return redirect()->route('areaGudang.index')->with('success', 'Area gudang berhasil ditambahkan.');
+        return redirect()->route('area-gudang.index')->with('success', 'Area gudang berhasil ditambahkan.');
     }
 
     public function show($id)
@@ -71,7 +75,7 @@ class AreaGudangController extends Controller
         $area = AreaGudang::findOrFail($id);
         $area->updateArea($request->all());
 
-        return redirect()->route('areaGudang.index')->with('success', 'Area gudang berhasil diperbarui.');
+        return redirect()->route('area-gudang.index')->with('success', 'Area gudang berhasil diperbarui.');
     }
 
     public function destroy($id)
@@ -79,7 +83,7 @@ class AreaGudangController extends Controller
         $area = AreaGudang::findOrFail($id);
         $area->deleteArea();
 
-        return redirect()->route('areaGudang.index')->with('success', 'Area gudang berhasil dihapus.');
+        return redirect()->route('area-gudang.index')->with('success', 'Area gudang berhasil dihapus.');
     }
 
     public function toggleStatus($id)
@@ -90,6 +94,7 @@ class AreaGudangController extends Controller
 
             return response()->json([
                 'success' => true,
+                'active' => (bool) $area->area_status,
                 'message' => 'Status area gudang berhasil diperbarui.'
             ]);
         } catch (\Exception $e) {

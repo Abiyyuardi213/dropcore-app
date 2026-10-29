@@ -9,10 +9,31 @@ use App\Models\Order;
 
 class AdminOrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('user')->latest()->get();
-        return view('admin.orders.index', compact('orders'));
+        $statuses = [
+            'pending'=>'Pending', 'waiting_payment'=>'Menunggu Pembayaran',
+            'waiting_confirmation'=>'Menunggu Konfirmasi', 'processing'=>'Diproses',
+            'shipped'=>'Dikirim', 'completed'=>'Selesai',
+            'cancel_requested'=>'Pengajuan Pembatalan', 'cancelled'=>'Dibatalkan',
+        ];
+        $filters = $request->validate([
+            'date_from'=>'nullable|date_format:Y-m-d',
+            'date_to'=>'nullable|date_format:Y-m-d'.($request->filled('date_from') ? '|after_or_equal:date_from' : ''),
+            'status'=>['nullable', \Illuminate\Validation\Rule::in(array_keys($statuses))],
+            'distributor'=>'nullable|string|max:255',
+            'proof'=>'nullable|in:uploaded,missing',
+        ]);
+        $query = Order::with('user');
+        if ($request->filled('date_from')) $query->whereDate('created_at','>=',$filters['date_from']);
+        if ($request->filled('date_to')) $query->whereDate('created_at','<=',$filters['date_to']);
+        if ($request->filled('status')) $query->where('status',$filters['status']);
+        if ($request->filled('distributor')) $query->where('user_id',$filters['distributor']);
+        if (($filters['proof'] ?? '') === 'uploaded') $query->whereNotNull('proof_of_payment')->where('proof_of_payment','<>','');
+        if (($filters['proof'] ?? '') === 'missing') $query->where(fn ($q) => $q->whereNull('proof_of_payment')->orWhere('proof_of_payment',''));
+        $orders = $query->latest()->get();
+        $distributors = \App\Models\User::whereIn('id',Order::select('user_id')->whereNotNull('user_id'))->orderBy('name')->get(['id','name']);
+        return view('admin.orders.index', compact('orders','filters','statuses','distributors'));
     }
 
     public function show($id)

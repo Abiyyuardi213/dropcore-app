@@ -16,19 +16,37 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class MutasiStokController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $mutasi = MutasiStok::with([
+        $filters = $request->validate([
+            'date_from'=>'nullable|date_format:Y-m-d',
+            'date_to'=>'nullable|date_format:Y-m-d'.($request->filled('date_from') ? '|after_or_equal:date_from' : ''),
+            'jenis_mutasi'=>'nullable|in:masuk,keluar,pindah',
+            'produk_id'=>'nullable|string|max:255',
+            'gudang_asal_id'=>'nullable|string|max:255',
+            'gudang_tujuan_id'=>'nullable|string|max:255',
+            'kondisi_id'=>'nullable|string|max:255',
+        ]);
+        $query = MutasiStok::with([
             'produk',
             'gudangAsal',
             'areaAsal',
             'rakAsal',
             'gudangTujuan',
             'areaTujuan',
-            'rakTujuan'
-        ])->latest()->get();
+            'rakTujuan', 'user'
+        ]);
+        if ($request->filled('date_from')) $query->whereDate('tanggal_mutasi','>=',$filters['date_from']);
+        if ($request->filled('date_to')) $query->whereDate('tanggal_mutasi','<=',$filters['date_to']);
+        foreach (['jenis_mutasi','produk_id','gudang_asal_id','gudang_tujuan_id','kondisi_id'] as $field) {
+            if ($request->filled($field)) $query->where($field,$filters[$field]);
+        }
+        $mutasi = $query->orderByDesc('tanggal_mutasi')->latest()->get();
+        $products = Products::orderBy('name')->get(['id','name','sku']);
+        $gudangs = Gudang::orderBy('nama_gudang')->get(['id','nama_gudang']);
+        $kondisis = KondisiBarang::orderBy('nama_kondisi')->get(['id','nama_kondisi']);
 
-        return view('mutasi-stok.index', compact('mutasi'));
+        return view('mutasi-stok.index', compact('mutasi','filters','products','gudangs','kondisis'));
     }
 
     // public function create()

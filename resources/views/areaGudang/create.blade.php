@@ -42,7 +42,7 @@
                                 <div class="alert alert-danger">{{ session('error') }}</div>
                             @endif
 
-                            <form action="{{ route('areaGudang.store') }}" method="POST">
+                            <form action="{{ route('area-gudang.store') }}" method="POST">
                                 @csrf
 
                                 <ul class="nav nav-tabs" id="areaGudangTabs" role="tablist">
@@ -222,7 +222,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-save"></i> Simpan Area
                                     </button>
-                                    <a href="{{ route('areaGudang.index') }}" class="btn btn-default">Batal</a>
+                                    <a href="{{ route('area-gudang.index') }}" class="btn btn-default">Batal</a>
                                 </div>
                             </form>
                         </div>

@@ -106,7 +106,12 @@ Route::middleware(['role:admin,staff'])->prefix('administrator')->group(function
 
     Route::resource('category', CategoryController::class);
 
-    Route::resource('product', ProductController::class);
+    Route::resource('produk', ProductController::class)->names('product')->parameters(['produk'=>'product']);
+    Route::any('product/{path?}', function (\Illuminate\Http\Request $request, ?string $path = null) {
+        $url = url('administrator/produk'.($path ? '/'.$path : ''));
+        if ($request->getQueryString()) $url .= '?'.$request->getQueryString();
+        return redirect()->to($url, in_array($request->method(), ['GET','HEAD']) ? 301 : 308);
+    })->where('path', '.*');
 
     Route::get('dashboard-keuangan', [DashboardKeuanganController::class, 'index'])->name('dashboard-keuangan');
 
@@ -142,15 +147,21 @@ Route::middleware(['role:admin,staff'])->prefix('administrator')->group(function
     //Route::post('distributor/{id}/toggle-status', [DistributorController::class, 'toggleStatus'])->name('distributor.toggleStatus');
     Route::resource('distributor', DistributorController::class);
 
-    Route::post('areaGudang/{id}/toggle-status', [AreaGudangController::class, 'toggleStatus'])->name('areaGudang.toggleStatus');
-    Route::resource('areaGudang', AreaGudangController::class);
+    Route::post('area-gudang/{id}/toggle-status', [AreaGudangController::class, 'toggleStatus'])->name('area-gudang.toggleStatus');
+    Route::resource('area-gudang', AreaGudangController::class);
+    Route::match(['get', 'head', 'post', 'put', 'patch', 'delete'], 'areaGudang/{path?}', function (\Illuminate\Http\Request $request, $path = null) {
+        $target = url('administrator/area-gudang'.($path ? '/'.$path : ''));
+        if ($request->getQueryString()) $target .= '?'.$request->getQueryString();
+        return redirect()->to($target, $request->isMethod('GET') || $request->isMethod('HEAD') ? 301 : 308);
+    })->where('path', '.*');
 
     Route::get('dashboardGudang', [DashboardGudangController::class, 'index'])->name('dashboardGudang');
 
     Route::post('rak-gudang/{id}/toggle-status', [RakController::class, 'toggleStatus'])->name('rak-gudang.toggleStatus');
     Route::resource('rak-gudang', RakController::class);
 
-    Route::get('dashboardProduk', [DashboardProdukController::class, 'index'])->name('dashboardProduk');
+    Route::get('dashboard-produk', [DashboardProdukController::class, 'index'])->name('dashboard-produk');
+    Route::get('dashboardProduk', fn (\Illuminate\Http\Request $request) => redirect()->route('dashboard-produk', $request->query(), 301));
 
     Route::post('/stok/update-kondisi/{id}', [StokController::class, 'updateKondisi'])->name('stok.update-kondisi');
     Route::resource('stok', StokController::class);

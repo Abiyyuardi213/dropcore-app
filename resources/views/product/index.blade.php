@@ -67,16 +67,16 @@
                                                 <td>Rp {{ number_format($product->price, 0, ',', '.') }}</td>
 
                                                 <td class="text-center">
-                                                    <div class="btn-group">
+                                                    <div class="d-flex justify-content-center flex-wrap" style="gap: .5rem;">
                                                         <a href="{{ route('product.show', $product->id) }}"
-                                                            class="btn btn-info btn-sm">
+                                                            class="btn btn-info btn-sm" title="Detail" aria-label="Detail produk">
                                                             <i class="fas fa-eye"></i>
                                                         </a>
                                                         <a href="{{ route('product.edit', $product->id) }}"
-                                                            class="btn btn-warning btn-sm">
+                                                            class="btn btn-warning btn-sm" title="Edit" aria-label="Edit produk">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
-                                                        <button class="btn btn-danger btn-sm delete-product-btn"
+                                                        <button type="button" class="btn btn-danger btn-sm delete-product-btn" title="Hapus" aria-label="Hapus produk"
                                                             data-product-id="{{ $product->id }}">
                                                             <i class="fas fa-trash"></i>
                                                         </button>

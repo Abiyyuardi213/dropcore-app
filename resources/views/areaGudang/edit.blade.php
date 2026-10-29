@@ -42,7 +42,7 @@
                                 <div class="alert alert-danger">{{ session('error') }}</div>
                             @endif
 
-                            <form action="{{ route('areaGudang.update', $area->id) }}" method="POST">
+                            <form action="{{ route('area-gudang.update', $area->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
 
@@ -225,7 +225,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-save"></i> Simpan Perubahan
                                     </button>
-                                    <a href="{{ route('areaGudang.index') }}" class="btn btn-default">Batal</a>
+                                    <a href="{{ route('area-gudang.index') }}" class="btn btn-default">Batal</a>
                                 </div>
                             </form>
                         </div>

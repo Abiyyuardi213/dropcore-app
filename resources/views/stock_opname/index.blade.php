@@ -42,6 +42,18 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            @if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
+                            <form method="GET" action="{{ route('stock-opname.index') }}" class="d-flex flex-wrap align-items-end mb-3" style="gap:.75rem;">
+                                <div class="form-group mb-0"><label for="opnameFrom">Dari Tanggal</label><input type="date" id="opnameFrom" name="date_from" class="form-control form-control-sm" value="{{ $filters['date_from'] ?? '' }}"></div>
+                                <div class="form-group mb-0"><label for="opnameTo">Sampai Tanggal</label><input type="date" id="opnameTo" name="date_to" class="form-control form-control-sm" value="{{ $filters['date_to'] ?? '' }}"></div>
+                                <div class="form-group mb-0"><label for="opnameWarehouse">Gudang</label><select id="opnameWarehouse" name="gudang_id" class="form-control form-control-sm" style="max-width:240px;"><option value="">Semua Gudang</option>@foreach($gudangs as $gudang)<option value="{{ $gudang->id }}" @selected(($filters['gudang_id'] ?? '') === (string)$gudang->id)>{{ $gudang->nama_gudang }}</option>@endforeach</select></div>
+                                <div class="form-group mb-0"><label for="opnameOfficer">Petugas</label><select id="opnameOfficer" name="user_id" class="form-control form-control-sm" style="max-width:240px;"><option value="">Semua Petugas</option>@foreach($petugas as $user)<option value="{{ $user->id }}" @selected(($filters['user_id'] ?? '') === (string)$user->id)>{{ $user->name }}</option>@endforeach</select></div>
+                                <div class="form-group mb-0"><label for="opnameStatus">Status</label><select id="opnameStatus" name="status" class="form-control form-control-sm"><option value="">Semua Status</option><option value="draft" @selected(($filters['status'] ?? '') === 'draft')>Draft / Sedang Berjalan</option><option value="processed" @selected(($filters['status'] ?? '') === 'processed')>Selesai</option></select></div>
+                                <div class="form-group mb-0"><label for="opnameResult">Hasil Pemeriksaan</label><select id="opnameResult" name="result" class="form-control form-control-sm"><option value="">Semua Hasil</option><option value="difference" @selected(($filters['result'] ?? '') === 'difference')>Ada Selisih</option><option value="matched" @selected(($filters['result'] ?? '') === 'matched')>Sesuai (Semua Item)</option><option value="incomplete" @selected(($filters['result'] ?? '') === 'incomplete')>Belum Selesai Dihitung</option></select></div>
+                                <button type="submit" class="btn btn-primary btn-sm">Terapkan Filter</button><a href="{{ route('stock-opname.index') }}" class="btn btn-default btn-sm">Reset</a>
+                            </form>
+                            <p class="text-muted text-sm">{{ $data->count() }} sesi opname sesuai filter. Tanggal mengikuti tanggal opname. “Ada selisih” mencakup sesi dengan item berbeda dari stok sistem; “sesuai” hanya untuk sesi yang seluruh itemnya sudah dihitung dan cocok.</p>
+                            <div class="table-responsive">
                             <table id="opnameTable" class="table table-hover text-nowrap">
                                 <thead>
                                     <tr>
@@ -83,6 +95,7 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     </div>
                 </div>

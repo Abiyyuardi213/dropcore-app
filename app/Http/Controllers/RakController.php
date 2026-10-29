@@ -9,10 +9,17 @@ use App\Models\AreaGudang;
 
 class RakController extends Controller
 {
-    public function index()
+    public function index(\App\Services\WarehouseCapacityService $capacityService)
     {
-        $raks = RakGudang::orderBy('created_at', 'asc')->get();
-        return view('rak-gudang.index', compact('raks'));
+        $gudangs = $capacityService->warehouses();
+        $areas = $gudangs->flatMap(fn ($warehouse) => $warehouse['areas']->map(fn ($area) => [
+            'id'=>$area['id'], 'code'=>$area['code'], 'name'=>$area['name'], 'warehouse_id'=>$warehouse['id'],
+        ]))->values();
+        $raks = $gudangs->flatMap(fn ($warehouse) => $warehouse['areas']->flatMap(fn ($area) => $area['racks']->map(fn ($rack) => array_merge($rack, [
+            'warehouse_id'=>$warehouse['id'], 'warehouse_name'=>$warehouse['name'], 'warehouse_active'=>$warehouse['active'],
+            'area_id'=>$area['id'], 'area_name'=>$area['name'], 'area_code'=>$area['code'], 'area_active'=>$area['active'],
+        ]))))->sortBy('code')->values();
+        return view('rak-gudang.index', compact('raks', 'gudangs', 'areas'));
     }
 
     public function create()
@@ -93,6 +100,7 @@ class RakController extends Controller
 
             return response()->json([
                 'success' => true,
+                'active' => (bool) $rak->rak_status,
                 'message' => 'Status rak gudang berhasil diperbarui.'
             ]);
         } catch (\Exception $e) {

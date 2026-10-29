@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 
 class GudangController extends Controller
 {
-    public function index()
+    public function index(\App\Services\WarehouseCapacityService $capacityService)
     {
-        $gudangs = Gudang::orderBy('created_at', 'asc')->get();
+        $gudangs = $capacityService->warehouses();
         return view('gudang.index', compact('gudangs'));
     }
 
@@ -85,6 +85,7 @@ class GudangController extends Controller
 
             return response()->json([
                 'success' => true,
+                'active' => (bool) $gudang->gudang_status,
                 'message' => 'Status gudang berhasil diperbarui.'
             ]);
         } catch (\Exception $e) {

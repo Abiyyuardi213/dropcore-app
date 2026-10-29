@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardGudangController extends Controller
 {
-    public function index()
+    public function index(\App\Services\WarehouseCapacityService $capacityService)
     {
         $totalGudang = Gudang::count();
         $totalAreaGudang = AreaGudang::count();
@@ -30,13 +30,24 @@ class DashboardGudangController extends Controller
             ->take(5)
             ->get();
 
+        $warehouseMap = $capacityService->warehouses();
+        $rackCapacities = $warehouseMap->flatMap(fn ($warehouse) => $warehouse['areas']->flatMap(fn ($area) => $area['racks']->pluck('capacity')));
+        $capacitySummary = [
+            'free' => $rackCapacities->where('status', 'free')->count(),
+            'near' => $rackCapacities->where('status', 'near')->count(),
+            'full' => $rackCapacities->where('status', 'full')->count(),
+            'unknown' => $rackCapacities->where('known', false)->count(),
+        ];
+
         return view('dashboardGudang', compact(
             'totalGudang',
             'totalAreaGudang',
             'totalRakGudang',
             'totalStokReal',
             'stokPerGudang',
-            'recentMutations'
+            'recentMutations',
+            'warehouseMap',
+            'capacitySummary'
         ));
     }
 }

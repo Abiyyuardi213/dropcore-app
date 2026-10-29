@@ -23,6 +23,13 @@
         .fc-daygrid-day {
             border: none !important;
         }
+        .warehouse-rack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .85rem; }
+        .warehouse-rack-node { background: #fff; transition: box-shadow .15s; overflow-wrap: anywhere; text-decoration: none!important; }
+        .warehouse-rack-node:hover { box-shadow: 0 3px 10px rgba(0,0,0,.12); }
+        .warehouse-rack-node:focus-visible, .warehouse-area-node summary:focus-visible { outline: 2px solid #007bff; outline-offset: 2px; }
+        .warehouse-area-node summary { cursor: pointer; background: #f8f9fa; }
+        .warehouse-capacity-map [hidden] { display: none!important; }
+        @media(max-width:575.98px) { .warehouse-rack-grid { grid-template-columns: minmax(0,1fr); } }
     </style>
 </head>
 
@@ -36,11 +43,11 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Dashboard</h1>
+                            <h1 class="m-0">Dashboard Gudang</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="{{ url('dashboardGudang') }}">Home</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
                                 <li class="breadcrumb-item active">Dashboard Gudang</li>
                             </ol>
                         </div>
@@ -71,7 +78,7 @@
                                     <p>Total Area</p>
                                 </div>
                                 <div class="icon"><i class="fas fa-th-large"></i></div>
-                                <a href="{{ url('administrator/areaGudang') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('administrator/area-gudang') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -100,6 +107,8 @@
                             </div>
                         </div>
                     </div>
+
+                    @include('gudang.capacity-map')
 
                     <!-- Main Content -->
                     <div class="row">
@@ -199,6 +208,7 @@
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="{{ asset('resources/js/ToastScript.js') }}"></script>
+    <script src="{{ asset('resources/js/WarehouseCapacityMap.js') }}" defer></script>
 
     <script>
         $(document).ready(function() {

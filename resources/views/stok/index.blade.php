@@ -188,7 +188,7 @@
                                                 </select>
                                             </td>
                                             <td class="text-center">
-                                                <div class="btn-group">
+                                                <div class="d-flex justify-content-center flex-wrap" style="gap: .5rem;">
                                                     <a href="{{ route('stok.show', $stok->id) }}"
                                                         class="btn btn-info btn-sm" title="Detail">
                                                         <i class="fas fa-eye"></i>

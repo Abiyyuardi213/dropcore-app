@@ -64,9 +64,9 @@
                                         </li>
                                     </ul>
 
-                                    <a href="{{ route('areaGudang.edit', $area->id) }}"
+                                    <a href="{{ route('area-gudang.edit', $area->id) }}"
                                         class="btn btn-warning btn-block"><b>Edit Area</b></a>
-                                    <a href="{{ route('areaGudang.index') }}"
+                                    <a href="{{ route('area-gudang.index') }}"
                                         class="btn btn-default btn-block"><b>Kembali</b></a>
                                 </div>
                             </div>

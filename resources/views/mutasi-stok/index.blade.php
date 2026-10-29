@@ -39,6 +39,19 @@
                             </a>
                         </div>
                         <div class="card-body">
+                            @if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
+                            <form method="GET" action="{{ route('mutasi-stok.index') }}" class="d-flex flex-wrap align-items-end mb-3" style="gap:.75rem;">
+                                <div class="form-group mb-0"><label for="mutationFrom">Dari Tanggal</label><input type="date" id="mutationFrom" name="date_from" class="form-control form-control-sm" value="{{ $filters['date_from'] ?? '' }}"></div>
+                                <div class="form-group mb-0"><label for="mutationTo">Sampai Tanggal</label><input type="date" id="mutationTo" name="date_to" class="form-control form-control-sm" value="{{ $filters['date_to'] ?? '' }}"></div>
+                                <div class="form-group mb-0"><label for="mutationType">Jenis Mutasi</label><select id="mutationType" name="jenis_mutasi" class="form-control form-control-sm"><option value="">Semua Jenis</option>@foreach(['masuk'=>'Masuk','keluar'=>'Keluar','pindah'=>'Pindah'] as $value=>$label)<option value="{{ $value }}" @selected(($filters['jenis_mutasi'] ?? '') === $value)>{{ $label }}</option>@endforeach</select></div>
+                                <div class="form-group mb-0"><label for="mutationProduct">Produk / SKU</label><select id="mutationProduct" name="produk_id" class="form-control form-control-sm" style="max-width:280px;"><option value="">Semua Produk</option>@foreach($products as $product)<option value="{{ $product->id }}" @selected(($filters['produk_id'] ?? '') === (string)$product->id)>{{ $product->sku ? $product->sku.' — ' : '' }}{{ $product->name }}</option>@endforeach</select></div>
+                                @foreach(['gudang_asal_id'=>'Gudang Asal','gudang_tujuan_id'=>'Gudang Tujuan'] as $field=>$label)
+                                    <div class="form-group mb-0"><label for="mutation_{{ $field }}">{{ $label }}</label><select id="mutation_{{ $field }}" name="{{ $field }}" class="form-control form-control-sm" style="max-width:230px;"><option value="">Semua Gudang</option>@foreach($gudangs as $gudang)<option value="{{ $gudang->id }}" @selected(($filters[$field] ?? '') === (string)$gudang->id)>{{ $gudang->nama_gudang }}</option>@endforeach</select></div>
+                                @endforeach
+                                <div class="form-group mb-0"><label for="mutationCondition">Kondisi Barang</label><select id="mutationCondition" name="kondisi_id" class="form-control form-control-sm"><option value="">Semua Kondisi</option>@foreach($kondisis as $kondisi)<option value="{{ $kondisi->id }}" @selected(($filters['kondisi_id'] ?? '') === (string)$kondisi->id)>{{ $kondisi->nama_kondisi }}</option>@endforeach</select></div>
+                                <button type="submit" class="btn btn-primary btn-sm">Terapkan Filter</button><a href="{{ route('mutasi-stok.index') }}" class="btn btn-default btn-sm">Reset</a>
+                            </form>
+                            <p class="text-muted text-sm">{{ $mutasi->count() }} mutasi sesuai filter. Rentang tanggal berdasarkan tanggal mutasi; gudang asal dan tujuan dapat difilter bersamaan untuk menelusuri perpindahan.</p>
                             <div class="table-responsive">
                                 <table id="mutasiStokTable" class="table table-bordered table-striped table-hover">
                                     <thead>
@@ -58,7 +71,7 @@
                                         @foreach ($mutasi as $index => $m)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($m->tanggal_mutasi)->format('d M Y') }}
+                                                <td data-order="{{ \Carbon\Carbon::parse($m->tanggal_mutasi)->format('Y-m-d H:i:s') }}">{{ \Carbon\Carbon::parse($m->tanggal_mutasi)->format('d M Y') }}
                                                 </td>
                                                 <td class="text-center">
                                                     @if ($m->jenis_mutasi == 'masuk')
@@ -141,7 +154,8 @@
                 "ordering": true,
                 "info": true,
                 "autoWidth": false,
-                "responsive": true
+                "responsive": true,
+                "order": [[1, 'desc']]
             });
 
             // SweetAlert for Session Messages

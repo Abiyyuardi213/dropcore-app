@@ -85,7 +85,7 @@ class Role extends Model
             'icon'  => 'fas fa-boxes',
             'group' => 'Pergudangan & Produk',
             'desc'  => 'Dashboard Produk, Katalog Produk, Kategori Produk, dan Stok Produk',
-            'url'   => '/administrator/dashboardProduk',
+            'url'   => '/administrator/dashboard-produk',
         ],
         'mutasi_stok' => [
             'label' => 'Mutasi Stok',
@@ -406,6 +406,7 @@ class Role extends Model
         if (
             $request->is('administrator/dashboardGudang*') ||
             $request->is('administrator/gudang*') ||
+            $request->is('administrator/area-gudang*') ||
             $request->is('administrator/areaGudang*') ||
             $request->is('administrator/rak-gudang*')
         ) {
@@ -413,7 +414,9 @@ class Role extends Model
         }
 
         if (
+            $request->is('administrator/dashboard-produk*') ||
             $request->is('administrator/dashboardProduk*') ||
+            $request->is('administrator/produk*') ||
             $request->is('administrator/product*') ||
             $request->is('administrator/category*') ||
             $request->is('administrator/stok*')

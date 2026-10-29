@@ -36,6 +36,17 @@
                             <h3 class="card-title">Daftar Log Aktivitas</h3>
                         </div>
                         <div class="card-body">
+                            @if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
+                            <form method="GET" action="{{ route('riwayat-log.index') }}" class="d-flex flex-wrap align-items-end mb-3" style="gap:.75rem;">
+                                <div class="form-group mb-0"><label for="logFrom">Dari Tanggal</label><input type="date" id="logFrom" name="date_from" class="form-control form-control-sm" value="{{ $filters['date_from'] ?? '' }}"></div>
+                                <div class="form-group mb-0"><label for="logTo">Sampai Tanggal</label><input type="date" id="logTo" name="date_to" class="form-control form-control-sm" value="{{ $filters['date_to'] ?? '' }}"></div>
+                                <div class="form-group mb-0"><label for="logModule">Modul</label><select id="logModule" name="module" class="form-control form-control-sm" style="max-width:220px;"><option value="">Semua Modul</option>@foreach($modules as $module)<option value="{{ $module }}" @selected(($filters['module'] ?? '') === $module)>{{ ucwords(str_replace('_',' ',$module)) }}</option>@endforeach</select></div>
+                                <div class="form-group mb-0"><label for="logAction">Jenis Aksi</label><select id="logAction" name="action" class="form-control form-control-sm" style="max-width:220px;"><option value="">Semua Aksi</option>@foreach($actions as $action)<option value="{{ $action }}" @selected(($filters['action'] ?? '') === $action)>{{ ucwords(str_replace('_',' ',$action)) }}</option>@endforeach</select></div>
+                                <div class="form-group mb-0"><label for="logUser">Pengguna</label><select id="logUser" name="user_id" class="form-control form-control-sm" style="max-width:240px;"><option value="">Semua Pengguna</option><option value="__system" @selected(($filters['user_id'] ?? '') === '__system')>System / Guest / Pengguna Tidak Tersedia</option>@foreach($users as $user)<option value="{{ $user->id }}" @selected(($filters['user_id'] ?? '') === (string)$user->id)>{{ $user->name }}</option>@endforeach</select></div>
+                                <div class="form-group mb-0"><label for="logSearch">Cari Deskripsi</label><input type="search" id="logSearch" name="q" maxlength="255" class="form-control form-control-sm" placeholder="Kata kunci aktivitas..." value="{{ $filters['q'] ?? '' }}"></div>
+                                <button type="submit" class="btn btn-primary btn-sm">Terapkan Filter</button><a href="{{ route('riwayat-log.index') }}" class="btn btn-default btn-sm">Reset</a>
+                            </form>
+                            <p class="text-muted text-sm">{{ number_format($logs->total(),0,',','.') }} log sesuai filter. Menampilkan {{ $logs->firstItem() ?? 0 }}–{{ $logs->lastItem() ?? 0 }}. Rentang tanggal berdasarkan waktu log dicatat.</p>
                             <div class="table-responsive">
                                 <table id="logTable" class="table table-bordered table-striped">
                                     <thead>
@@ -52,8 +63,8 @@
                                     <tbody>
                                         @foreach ($logs as $index => $log)
                                             <tr>
-                                                <td class="text-center">{{ $index + 1 }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($log->created_at)->format('d M Y H:i') }}
+                                                <td class="text-center">{{ $logs->firstItem() + $index }}</td>
+                                                <td data-order="{{ \Carbon\Carbon::parse($log->created_at)->format('Y-m-d H:i:s') }}">{{ \Carbon\Carbon::parse($log->created_at)->format('d M Y H:i') }}
                                                 </td>
                                                 <td>
                                                     <span
@@ -140,7 +151,8 @@
                 ordering: true,
                 info: false,
                 autoWidth: false,
-                responsive: true
+                responsive: true,
+                order: [[1, 'desc']]
             });
         });
     </script>

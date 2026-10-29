@@ -12,10 +12,33 @@ use Illuminate\Support\Facades\Auth;
 
 class StockOpnameController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = StockOpname::with(['gudang', 'user'])->latest()->get();
-        return view('stock_opname.index', compact('data'));
+        $filters = $request->validate([
+            'date_from'=>'nullable|date_format:Y-m-d',
+            'date_to'=>'nullable|date_format:Y-m-d'.($request->filled('date_from') ? '|after_or_equal:date_from' : ''),
+            'gudang_id'=>'nullable|string|max:255',
+            'user_id'=>'nullable|string|max:255',
+            'status'=>'nullable|in:draft,processed',
+            'result'=>'nullable|in:difference,matched,incomplete',
+        ]);
+        $query = StockOpname::with(['gudang','user']);
+        if ($request->filled('date_from')) $query->whereDate('tanggal','>=',$filters['date_from']);
+        if ($request->filled('date_to')) $query->whereDate('tanggal','<=',$filters['date_to']);
+        foreach (['gudang_id','user_id','status'] as $field) {
+            if ($request->filled($field)) $query->where($field,$filters[$field]);
+        }
+        if (($filters['result'] ?? '') === 'difference') {
+            $query->whereHas('details',fn ($q) => $q->whereNotNull('qty_fisik')->whereColumn('qty_fisik','<>','qty_sistem'));
+        } elseif (($filters['result'] ?? '') === 'matched') {
+            $query->has('details')->whereDoesntHave('details',fn ($q) => $q->whereNull('qty_fisik')->orWhereColumn('qty_fisik','<>','qty_sistem'));
+        } elseif (($filters['result'] ?? '') === 'incomplete') {
+            $query->where(fn ($q) => $q->doesntHave('details')->orWhereHas('details',fn ($detail) => $detail->whereNull('qty_fisik')));
+        }
+        $data = $query->orderByDesc('tanggal')->latest()->get();
+        $gudangs = Gudang::orderBy('nama_gudang')->get(['id','nama_gudang']);
+        $petugas = \App\Models\User::whereIn('id',StockOpname::select('user_id')->whereNotNull('user_id'))->orderBy('name')->get(['id','name']);
+        return view('stock_opname.index', compact('data','filters','gudangs','petugas'));
     }
 
     public function create()
