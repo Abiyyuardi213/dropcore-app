@@ -62,7 +62,7 @@
                                         @endif
 
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <div class="col-md-12">
                                                 <div class="form-group">
                                                     <label>Nama Lengkap <span class="text-danger">*</span></label>
                                                     <div class="input-group">
@@ -75,24 +75,6 @@
                                                             name="name" value="{{ old('name') }}"
                                                             placeholder="Contoh: John Doe" required>
                                                         @error('name')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>NIK</label>
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text"><i
-                                                                    class="fas fa-id-card"></i></span>
-                                                        </div>
-                                                        <input type="text"
-                                                            class="form-control @error('nik') is-invalid @enderror"
-                                                            name="nik" value="{{ old('nik') }}"
-                                                            placeholder="Nomor Induk Kependudukan">
-                                                        @error('nik')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
@@ -204,11 +186,11 @@
                                 </div>
                             </div>
 
-                            <!-- Right Column: Employment & Photo -->
+                            <!-- Right Column: Access & Photo -->
                             <div class="col-md-4">
                                 <div class="card card-info card-outline">
                                     <div class="card-header">
-                                        <h3 class="card-title"><i class="fas fa-briefcase mr-1"></i> Kepegawaian</h3>
+                                        <h3 class="card-title"><i class="fas fa-briefcase mr-1"></i> Akses Pengguna</h3>
                                     </div>
                                     <div class="card-body">
                                         <div class="form-group">
@@ -229,32 +211,6 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label>Divisi</label>
-                                            <select name="divisi_id" class="form-control">
-                                                <option value="">-- Pilih Divisi --</option>
-                                                @foreach ($divisis as $divisi)
-                                                    <option value="{{ $divisi->id }}"
-                                                        {{ old('divisi_id') == $divisi->id ? 'selected' : '' }}>
-                                                        {{ $divisi->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label>Jabatan</label>
-                                            <select name="jabatan_id" class="form-control">
-                                                <option value="">-- Pilih Jabatan --</option>
-                                                @foreach ($jabatans as $jabatan)
-                                                    <option value="{{ $jabatan->id }}"
-                                                        {{ old('jabatan_id') == $jabatan->id ? 'selected' : '' }}>
-                                                        {{ $jabatan->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group">
                                             <label>Tanggal Bergabung</label>
                                             <input type="date"
                                                 class="form-control @error('tanggal_bergabung') is-invalid @enderror"
@@ -265,7 +221,7 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label>Status Kepegawaian</label>
+                                            <label>Status Akun</label>
                                             <select name="status_kepegawaian" class="form-control">
                                                 <option value="aktif"
                                                     {{ old('status_kepegawaian') == 'aktif' ? 'selected' : '' }}>Aktif

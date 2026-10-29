@@ -53,10 +53,10 @@ class Role extends Model
             'url'   => '/administrator/role',
         ],
         'master_hr' => [
-            'label' => 'Master SDM (Pengguna, Divisi, Jabatan)',
+            'label' => 'Manajemen Pengguna',
             'icon'  => 'fas fa-users-cog',
             'group' => 'Master Data',
-            'desc'  => 'Mengelola data pengguna/karyawan, struktur divisi, dan jabatan',
+            'desc'  => 'Mengelola akun pengguna, peran, dan status akses sistem gudang',
             'url'   => '/administrator/user',
         ],
         'master_wilayah' => [

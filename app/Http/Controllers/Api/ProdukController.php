@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Products;
 use App\Models\Category;
-use App\Models\MetodePembayaran;
+use App\Models\SumberKeuangan;
 use App\Models\JasaPengiriman;
 use Illuminate\Http\Request;
 
@@ -74,10 +74,14 @@ class ProdukController extends Controller
      */
     public function paymentMethods()
     {
-        $methods = MetodePembayaran::where('status', true)->get();
+        $methods = SumberKeuangan::webPaymentAccounts()->orderBy('nama_sumber')->get(['id', 'nama_sumber', 'nomor_rekening', 'atas_nama']);
         return response()->json([
             'status' => 'success',
-            'data'   => $methods
+            'data'   => $methods->map(fn ($account) => [
+                'id' => $account->id, 'nama_bank' => $account->nama_sumber,
+                'nomor_rekening' => $account->nomor_rekening, 'atas_nama' => $account->atas_nama,
+                'status' => true,
+            ])
         ]);
     }
 

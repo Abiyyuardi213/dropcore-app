@@ -41,6 +41,18 @@
                             </a>
                         </div>
                         <div class="card-body">
+                            @if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
+                            <form id="userRoleFilter" action="{{ route('user.index') }}" method="GET" class="mb-3">
+                                <label for="filterRole">Filter Peran</label>
+                                <div class="d-flex flex-wrap align-items-center" style="gap:.5rem">
+                                    <select id="filterRole" name="role_id" class="form-control form-control-sm" style="width:220px;max-width:100%">
+                                        <option value="">Semua Peran</option>
+                                        @foreach($roles as $role)<option value="{{ $role->id }}" @selected($selectedRole === $role->id)>{{ $role->role_name }}</option>@endforeach
+                                    </select>
+                                    <button type="submit" class="btn btn-primary btn-sm">Tampilkan</button>
+                                    @if($selectedRole !== '')<a href="{{ route('user.index') }}" class="btn btn-default btn-sm">Reset</a>@endif
+                                </div>
+                            </form>
                             <div class="table-responsive">
                                 <table id="userTable" class="table table-bordered table-striped">
                                     <thead>
@@ -100,11 +112,11 @@
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
     <script>
         // Initialize DataTable
         $(document).ready(function() {
             $("#userTable").DataTable({
+                "dom": "<'row align-items-end mb-3'<'col-md-6 user-role-filter-slot'><'col-md-6'f>>rt<'row'<'col-sm-5'i><'col-sm-7'p>>",
                 "paging": true,
                 "lengthChange": false,
                 "searching": true,
@@ -113,6 +125,8 @@
                 "autoWidth": false,
                 "responsive": true
             });
+            $('#userRoleFilter').appendTo('.user-role-filter-slot').removeClass('mb-3');
+            $('#filterRole').on('change', function () { document.getElementById('userRoleFilter').requestSubmit(); });
 
             // Delete Confirmation with SweetAlert
             $(document).on('click', '.delete-user-btn', function() {

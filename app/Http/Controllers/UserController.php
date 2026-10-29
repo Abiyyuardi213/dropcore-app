@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Divisi;
-use App\Models\Jabatan;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
@@ -13,37 +11,35 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $validated = $request->validate(['role_id' => 'nullable|string|exists:role,id']);
+        $selectedRole = $validated['role_id'] ?? '';
+        $roles = Role::orderBy('role_name')->get();
         $users = User::orderBy('created_at', 'asc')
-            ->with(['role', 'divisi', 'jabatan'])
+            ->with('role')
+            ->when($selectedRole !== '', fn ($query) => $query->where('role_id', $selectedRole))
             ->get();
 
-        return view('user.userList', compact('users'));
+        return view('user.userList', compact('users', 'roles', 'selectedRole'));
     }
 
     public function create()
     {
         $roles = Role::all();
-        $divisis = Divisi::all();
-        $jabatans = Jabatan::all();
-
-        return view('user.create', compact('roles', 'divisis', 'jabatans'));
+        return view('user.create', compact('roles'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name'              => 'required|string|max:255',
             'username'          => 'required|string|max:255|unique:users,username',
             'email'             => 'nullable|email|max:255|unique:users,email',
             'no_telepon'        => 'nullable|string|max:20',
-            'nik'               => 'nullable|string|max:50',
             'alamat'            => 'nullable|string',
             'password'          => 'required|string|min:6',
             'role_id'           => 'required|exists:role,id',
-            'divisi_id'         => 'nullable|exists:divisi,id',
-            'jabatan_id'        => 'nullable|exists:jabatan,id',
             'tanggal_bergabung' => 'nullable|date',
             'jenis_kelamin'     => ['nullable', Rule::in(['L', 'P'])],
             'status_kepegawaian' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
@@ -51,8 +47,9 @@ class UserController extends Controller
             'cropped_image'     => 'nullable|string',
         ]);
 
-        $data = $request->all();
+        $data = \Illuminate\Support\Arr::except($validated, ['profile_picture', 'cropped_image']);
         $data['password'] = Hash::make($request->password);
+        $data['status_kepegawaian'] = $validated['status_kepegawaian'] ?? 'aktif';
 
         // Handle Cropped Image First
         if ($request->filled('cropped_image')) {
@@ -94,10 +91,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $roles = Role::all();
-        $divisi = Divisi::all();
-        $jabatan = Jabatan::all();
-
-        return view('user.edit', compact('user', 'roles', 'divisi', 'jabatan'));
+        return view('user.edit', compact('user', 'roles'));
     }
 
     // public function update(Request $request, $id)
@@ -151,12 +145,9 @@ class UserController extends Controller
             'username'          => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($user->id)],
             'email'             => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'no_telepon'        => 'nullable|string|max:20',
-            'nik'               => 'nullable|string|max:50',
             'alamat'            => 'nullable|string',
             'password'          => 'nullable|string|min:6',
             'role_id'           => 'required|exists:role,id',
-            'divisi_id'         => 'nullable|exists:divisi,id',
-            'jabatan_id'        => 'nullable|exists:jabatan,id',
             'tanggal_bergabung' => 'nullable|date',
             'jenis_kelamin'     => ['nullable', Rule::in(['L', 'P'])],
             'status_kepegawaian' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
@@ -171,8 +162,6 @@ class UserController extends Controller
             'no_telepon',
             'alamat',
             'role_id',
-            'divisi_id',
-            'jabatan_id',
             'tanggal_bergabung',
             'jenis_kelamin',
             'status_kepegawaian'
@@ -230,7 +219,7 @@ class UserController extends Controller
 
     public function show($id)
     {
-        $user = User::with(['role', 'divisi', 'jabatan'])->findOrFail($id);
+        $user = User::with('role')->findOrFail($id);
         return view('user.show', compact('user'));
     }
 

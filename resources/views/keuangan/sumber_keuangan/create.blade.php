@@ -83,7 +83,7 @@
                                                                 class="text-danger">*</span></label>
 
                                                         <!-- Hidden Input for Submission -->
-                                                        <input type="hidden" name="nama_sumber" id="real_nama_sumber">
+                                                        <input type="hidden" name="nama_sumber" id="real_nama_sumber" value="{{ old('nama_sumber') }}">
 
                                                         <!-- Input for Non-Bank -->
                                                         <div id="manual_input_container">
@@ -93,16 +93,20 @@
                                                                 value="{{ old('nama_sumber') }}">
                                                         </div>
 
-                                                        <!-- Select for Bank (API) -->
+                                                        <!-- Daftar lokal dari publikasi OJK -->
                                                         <div id="bank_select_container" style="display: none;">
                                                             <select id="bank_select" class="form-control select2bs4"
                                                                 style="width: 100%;">
-                                                                <option value="">-- Sedang Memuat Data Bank... --
-                                                                </option>
+                                                                <option value="">-- Pilih Bank --</option>
+                                                                @foreach($bankDirectory['banks'] as $bank)
+                                                                    <option value="{{ $bank['name'] }}" @selected(old('nama_sumber') === $bank['name'])>{{ $bank['name'] }}{{ isset($bank['alias']) ? ' / '.$bank['alias'] : '' }} ({{ $bank['code'] }})</option>
+                                                                @endforeach
+                                                                <option value="__manual__">Bank lainnya / BPR — isi nama manual</option>
                                                             </select>
                                                             <small class="text-muted mt-1 d-block">
-                                                                <i class="fas fa-cloud-download-alt mr-1"></i> Data
-                                                                diambil otomatis dari API Bank Indonesia
+                                                                {{ count($bankDirectory['banks']) }} bank umum dan syariah dari
+                                                                <a href="{{ $bankDirectory['source_url'] }}" target="_blank" rel="noopener">publikasi OJK {{ $bankDirectory['period'] }}</a>.
+                                                                Daftar tersimpan lokal, bukan API Bank Indonesia. Jika belum tercantum, pilih Bank lainnya / BPR.
                                                             </small>
                                                         </div>
 
@@ -204,70 +208,7 @@
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            // Initialize Select2
-            $('.select2bs4').select2({
-                theme: 'bootstrap4'
-            });
-
-            const bankApiUrl = 'https://raw.githubusercontent.com/guangrei/Json-Indonesia-Bank/master/all.json';
-            const jenisSelect = $('select[name="jenis"]');
-            const bankSelectContainer = $('#bank_select_container');
-            const manualInputContainer = $('#manual_input_container');
-            const bankSelect = $('#bank_select');
-            const realNameInput = $('#real_nama_sumber');
-            const manualNameInput = $('#manual_nama_sumber');
-
-            // Load Banks
-            $.getJSON(bankApiUrl, function(data) {
-                bankSelect.empty().append('<option value="">-- Pilih Bank --</option>');
-                $.each(data, function(key, entry) {
-                    bankSelect.append($('<option></option>').attr('value', entry.name).text(entry
-                        .name + ' (' + entry.code + ')'));
-                });
-            }).fail(function() {
-                console.error("Gagal mengambil data bank");
-                // Fallback if API fails
-                bankSelect.append('<option value="BCA">BANK BCA</option>');
-                bankSelect.append('<option value="MANDIRI">BANK MANDIRI</option>');
-                bankSelect.append('<option value="BRI">BANK BRI</option>');
-                bankSelect.append('<option value="BNI">BANK BNI</option>');
-            });
-
-            function updateUI() {
-                if (jenisSelect.val() === 'bank') {
-                    bankSelectContainer.show();
-                    manualInputContainer.hide();
-                    // Set value from bank select
-                    realNameInput.val(bankSelect.val());
-                } else {
-                    bankSelectContainer.hide();
-                    manualInputContainer.show();
-                    // Set value from manual input
-                    realNameInput.val(manualNameInput.val());
-                }
-            }
-
-            // Event Listeners
-            jenisSelect.change(updateUI);
-
-            bankSelect.change(function() {
-                if (jenisSelect.val() === 'bank') {
-                    realNameInput.val($(this).val());
-                }
-            });
-
-            manualNameInput.on('input', function() {
-                if (jenisSelect.val() !== 'bank') {
-                    realNameInput.val($(this).val());
-                }
-            });
-
-            // Initial Run
-            updateUI();
-        });
-    </script>
+    <script src="{{ asset('resources/js/BankAccountForm.js') }}" defer></script>
 </body>
 
 </html>

@@ -143,6 +143,112 @@ class KasirAuthenticationTest extends TestCase
         $this->get('/kasir/dashboard')->assertOk()->assertSee('Grafik Penjualan Harian')->assertDontSee('CONTOH-001');
     }
 
+    public function test_admin_bank_form_uses_complete_local_ojk_directory_instead_of_broken_remote_api(): void
+    {
+        $response = $this->actingAs($this->user('admin'))->get('/administrator/sumber-keuangan/create');
+        $response->assertOk()->assertSee('105 bank umum dan syariah')->assertSee('publikasi OJK Juni 2026')
+            ->assertSee('PT BANK SYARIAH INDONESIA Tbk')->assertSee('PT BANK JAGO TBK')
+            ->assertSee('PT BANK DIGITAL BCA')->assertSee('Bank lainnya / BPR')
+            ->assertDontSee('diambil otomatis dari API Bank Indonesia')->assertDontSee('raw.githubusercontent.com');
+        $response->assertViewHas('bankDirectory', function ($directory) {
+            $codes = array_column($directory['banks'], 'code');
+            return count($codes) === 105 && count(array_unique($codes)) === 105 && in_array('014', $codes, true);
+        });
+    }
+    private function addWarehouseUserFields(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            foreach (['no_telepon','alamat','jenis_kelamin','profile_picture','nip','nik','divisi_id','jabatan_id'] as $field) $table->string($field)->nullable();
+            $table->date('tanggal_bergabung')->nullable();
+        });
+    }
+
+    public function test_warehouse_user_pages_no_longer_depend_on_division_and_position_tables(): void
+    {
+        $this->addWarehouseUserFields();
+        $user = $this->user('admin');
+        $this->actingAs($user);
+        foreach (['/administrator/user/create', '/administrator/user/'.$user->id.'/edit', '/administrator/user/'.$user->id, '/administrator/pengguna/profil'] as $url) {
+            $this->get($url)->assertOk()->assertDontSee('name="nik"', false)->assertDontSee('name="divisi_id"', false)->assertDontSee('name="jabatan_id"', false)->assertDontSee('>NIK<', false)->assertDontSee('>Divisi<', false)->assertDontSee('>Jabatan<', false);
+        }
+        $this->get('/administrator/user')->assertOk()->assertSee($user->username, false);
+    }
+
+    public function test_admin_can_create_a_warehouse_user_without_hr_fields_and_injected_fields_are_ignored(): void
+    {
+        $this->addWarehouseUserFields();
+        $admin = $this->user('admin');
+        $this->actingAs($admin)->post('/administrator/user', [
+            'name'=>'Petugas Gudang Baru', 'username'=>'gudang-baru', 'email'=>'gudang@example.com', 'password'=>'password-test',
+            'role_id'=>$admin->role_id, 'nik'=>'injected', 'divisi_id'=>'missing', 'jabatan_id'=>'missing', 'nip'=>'injected',
+        ])->assertSessionHasNoErrors()->assertRedirect(route('user.index'));
+        $created = User::where('username','gudang-baru')->firstOrFail();
+        $this->assertTrue(Hash::check('password-test', $created->password));
+        foreach (['nik','divisi_id','jabatan_id','nip'] as $field) $this->assertNull($created->$field);
+        $this->assertEquals($admin->role_id, $created->role_id);
+        $this->assertEquals('aktif', $created->status_kepegawaian);
+    }
+
+    public function test_editing_warehouse_user_preserves_legacy_hr_data_and_existing_password(): void
+    {
+        $this->addWarehouseUserFields();
+        $admin = $this->user('admin');
+        $admin->update(['nik'=>'legacy-nik','divisi_id'=>'legacy-division','jabatan_id'=>'legacy-position']);
+        $password = $admin->password;
+        $this->actingAs($admin)->put('/administrator/user/'.$admin->id, [
+            'name'=>'Admin Gudang', 'username'=>$admin->username, 'email'=>$admin->email, 'role_id'=>$admin->role_id,
+            'nik'=>'changed', 'divisi_id'=>'changed', 'jabatan_id'=>'changed', 'password'=>'',
+        ])->assertSessionHasNoErrors()->assertRedirect(route('user.index'));
+        $admin->refresh();
+        $this->assertEquals('Admin Gudang', $admin->name); $this->assertEquals($password, $admin->password);
+        $this->assertEquals('legacy-nik', $admin->nik); $this->assertEquals('legacy-division', $admin->divisi_id); $this->assertEquals('legacy-position', $admin->jabatan_id);
+    }
+
+    public function test_division_and_position_management_is_disabled(): void
+    {
+        $this->actingAs($this->user('admin'));
+        foreach (['divisi','jabatan'] as $module) {
+            $this->get('/administrator/'.$module)->assertRedirect(route('user.index'));
+            $this->get('/administrator/'.$module.'/create')->assertRedirect(route('user.index'));
+            $this->post('/administrator/'.$module, ['name'=>'Disabled'])->assertStatus(410);
+            $this->put('/administrator/'.$module.'/legacy', ['name'=>'Disabled'])->assertStatus(410);
+            $this->delete('/administrator/'.$module.'/legacy')->assertStatus(410);
+        }
+    }
+
+    public function test_admin_can_filter_users_by_role_and_reset_to_all_roles(): void
+    {
+        $this->addWarehouseUserFields();
+        $admin = $this->user('admin');
+        $cashier = $this->user('kasir');
+        $this->actingAs($admin)->get('/administrator/user?role_id='.$cashier->role_id)->assertOk()->assertSee('Semua Peran')
+            ->assertViewHas('selectedRole', $cashier->role_id)
+            ->assertViewHas('users', fn ($users) => $users->pluck('id')->all() === [$cashier->id]);
+        $this->get('/administrator/user')->assertOk()->assertViewHas('users', fn ($users) => $users->count() === 2);
+        $this->get('/administrator/user?role_id=missing-role')->assertSessionHasErrors('role_id');
+    }
+
+    public function test_supplier_filters_support_status_origin_type_and_reset(): void
+    {
+        Schema::create('suppliers', function (Blueprint $table) {
+            $table->string('id')->primary();
+            foreach (['kode_supplier','nama_supplier','penanggung_jawab','no_telepon','logo','kota_id','asal_supplier','tipe_supplier'] as $field) $table->string($field)->nullable();
+            $table->boolean('status'); $table->timestamps();
+        });
+        Schema::create('kota', function (Blueprint $table) { $table->string('id')->primary(); $table->string('name'); });
+        foreach ([['a',true,'dalam_negeri','Principal'], ['b',false,'luar_negeri','Distributor'], ['c',false,null,'Principal']] as [$id,$active,$origin,$type]) {
+            DB::table('suppliers')->insert(['id'=>$id, 'nama_supplier'=>'Supplier '.$id, 'status'=>$active, 'asal_supplier'=>$origin, 'tipe_supplier'=>$type]);
+        }
+        $this->actingAs($this->user('admin'));
+        $this->get('/administrator/supplier?status=0')->assertOk()->assertViewHas('suppliers', fn ($rows) => $rows->pluck('id')->all() === ['b','c']);
+        $this->get('/administrator/supplier?status=0&asal_supplier=dalam_negeri&tipe_supplier=Principal')->assertOk()
+            ->assertViewHas('suppliers', fn ($rows) => $rows->pluck('id')->all() === ['c'])
+            ->assertSee('supplier-actions')->assertDontSee('class="btn-group"', false);
+        $this->get('/administrator/supplier?asal_supplier=luar_negeri')->assertOk()->assertViewHas('suppliers', fn ($rows) => $rows->pluck('id')->all() === ['b']);
+        $this->get('/administrator/supplier')->assertOk()->assertViewHas('suppliers', fn ($rows) => $rows->count() === 3)->assertViewHas('supplierTypes', fn ($types) => $types->count() === 2);
+        $this->get('/administrator/supplier?status=wrong')->assertSessionHasErrors('status');
+    }
+
     public function test_cashier_root_redirects_to_dashboard(): void
     {
         $this->actingAs($this->user())->get('/kasir')->assertRedirect('/kasir/dashboard');

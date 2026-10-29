@@ -11,10 +11,24 @@ use Illuminate\Support\Facades\Storage;
 
 class SupplierController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $suppliers = Supplier::orderBy('created_at', 'asc')->get();
-        return view('supplier.index', compact('suppliers'));
+        $filters = $request->validate([
+            'status' => 'nullable|in:0,1',
+            'asal_supplier' => 'nullable|in:dalam_negeri,luar_negeri',
+            'tipe_supplier' => 'nullable|string|max:255',
+        ]);
+        $query = Supplier::with('kota')->orderBy('created_at', 'asc');
+        if ($request->filled('status')) $query->where('status', $filters['status']);
+        if ($request->filled('tipe_supplier')) $query->where('tipe_supplier', $filters['tipe_supplier']);
+        if (($filters['asal_supplier'] ?? '') === 'dalam_negeri') {
+            $query->where(fn ($q) => $q->where('asal_supplier', 'dalam_negeri')->orWhereNull('asal_supplier')->orWhere('asal_supplier', ''));
+        } elseif (($filters['asal_supplier'] ?? '') === 'luar_negeri') {
+            $query->where('asal_supplier', 'luar_negeri');
+        }
+        $suppliers = $query->get();
+        $supplierTypes = Supplier::whereNotNull('tipe_supplier')->where('tipe_supplier', '!=', '')->distinct()->orderBy('tipe_supplier')->pluck('tipe_supplier');
+        return view('supplier.index', compact('suppliers', 'filters', 'supplierTypes'));
     }
 
     public function create()

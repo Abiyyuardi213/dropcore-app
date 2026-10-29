@@ -7,7 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Products;
 use App\Models\JasaPengiriman;
-use App\Models\MetodePembayaran;
+use App\Models\SumberKeuangan;
 use App\Models\Stok;
 use App\Models\MutasiStok;
 use App\Models\User;
@@ -28,7 +28,7 @@ class TransaksiController extends Controller
             'items.*.quantity'    => 'required|integer|min:1',
             'shipping_address'    => 'required|string',
             'shipping_service_id' => 'required|exists:jasa_pengiriman,id',
-            'payment_method_id'   => 'required|exists:metode_pembayaran,id',
+            'payment_method_id'   => ['required', \Illuminate\Validation\Rule::exists('sumber_keuangan', 'id')->where(fn ($query) => $query->where('is_active', true)->where('jenis', 'bank'))],
             'notes'               => 'nullable|string',
         ]);
 
@@ -73,7 +73,7 @@ class TransaksiController extends Controller
 
             $finalTotal = $productSubtotal + $taxAmount + $shippingCost;
 
-            $paymentMethod = MetodePembayaran::findOrFail($request->payment_method_id);
+            $paymentMethod = SumberKeuangan::webPaymentAccounts()->lockForUpdate()->findOrFail($request->payment_method_id);
 
             $order = Order::create([
                 'user_id'           => $user->id,
@@ -85,7 +85,7 @@ class TransaksiController extends Controller
                 'shipping_address'  => $request->shipping_address,
                 'notes'             => $request->notes,
                 'shipping_provider' => $shippingService->nama . ' - ' . $shippingService->kode,
-                'payment_method'    => $paymentMethod->nama_bank . ' - ' . $paymentMethod->nomor_rekening,
+                'payment_method'    => $paymentMethod->nama_sumber . ' - ' . $paymentMethod->nomor_rekening . ($paymentMethod->atas_nama ? ' a.n. '.$paymentMethod->atas_nama : ''),
             ]);
 
             foreach ($itemsData as $item) {

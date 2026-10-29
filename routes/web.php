@@ -37,8 +37,6 @@ use App\Http\Controllers\SumberKeuanganController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\StockOpnameController;
-use App\Http\Controllers\DivisiController;
-use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\CartController;
 use Whoops\Run;
 
@@ -246,9 +244,11 @@ Route::middleware(['role:admin,staff'])->prefix('administrator')->group(function
 
     Route::resource('laporan', LaporanController::class);
     Route::resource('stock-opname', StockOpnameController::class);
-    Route::resource('divisi', DivisiController::class);
-    Route::resource('divisi', DivisiController::class);
-    Route::resource('jabatan', JabatanController::class);
+    // Master divisi dan jabatan dinonaktifkan; data lama tetap dipertahankan.
+    foreach (['divisi', 'jabatan'] as $legacyModule) {
+        Route::get($legacyModule.'/{legacyPath?}', fn () => redirect()->route('user.index'))->where('legacyPath', '.*');
+        Route::match(['post', 'put', 'patch', 'delete'], $legacyModule.'/{legacyPath?}', fn () => abort(410, 'Modul ini sudah dinonaktifkan. Gunakan Manajemen Pengguna.'))->where('legacyPath', '.*');
+    }
 
     // Admin Order Management
     Route::get('orders', [\App\Http\Controllers\AdminOrderController::class, 'index'])->name('admin.orders.index');
@@ -262,12 +262,14 @@ Route::middleware(['role:admin,staff'])->prefix('administrator')->group(function
 
     Route::patch('orders/{id}/status', [\App\Http\Controllers\AdminOrderController::class, 'updateStatus'])->name('admin.orders.update-status');
 
-    // Jasa Pengiriman & Metode Pembayaran management
+    // Jasa Pengiriman management
     Route::post('jasa-pengiriman/{id}/toggle-status', [\App\Http\Controllers\JasaPengirimanController::class, 'toggleStatus'])->name('jasa-pengiriman.toggleStatus');
     Route::resource('jasa-pengiriman', \App\Http\Controllers\JasaPengirimanController::class);
 
-    Route::post('metode-pembayaran/{id}/toggle-status', [\App\Http\Controllers\MetodePembayaranController::class, 'toggleStatus'])->name('metode-pembayaran.toggleStatus');
-    Route::resource('metode-pembayaran', \App\Http\Controllers\MetodePembayaranController::class);
+    // Modul lama dinonaktifkan; data historis tetap disimpan.
+    Route::get('metode-pembayaran', fn () => redirect()->route('sumber-keuangan.index'))->name('metode-pembayaran.index');
+    Route::get('metode-pembayaran/{legacyPath}', fn () => redirect()->route('sumber-keuangan.index'))->where('legacyPath', '.*');
+    Route::match(['post', 'put', 'patch', 'delete'], 'metode-pembayaran/{legacyPath?}', fn () => abort(410, 'Modul Metode Pembayaran sudah dinonaktifkan. Gunakan Sumber Keuangan.'))->where('legacyPath', '.*');
 });
 
 Route::middleware(['role:distributor'])->group(function () {

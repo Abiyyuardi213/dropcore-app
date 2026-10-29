@@ -55,7 +55,7 @@
                                     <h3 class="profile-username text-center">{{ $user->name }}</h3>
 
                                     <p class="text-muted text-center">
-                                        {{ $user->jabatan->name ?? 'Jabatan tidak diatur' }}</p>
+                                        {{ $user->role->role_name ?? 'Peran belum diatur' }}</p>
 
                                     <ul class="list-group list-group-unbordered mb-3">
                                         <li class="list-group-item">
@@ -115,8 +115,8 @@
                             <div class="card">
                                 <div class="card-header p-2">
                                     <ul class="nav nav-pills">
-                                        <li class="nav-item"><a class="nav-link active" href="#kepegawaian"
-                                                data-toggle="tab">Kepegawaian</a></li>
+                                        <li class="nav-item"><a class="nav-link active" href="#informasi-pengguna"
+                                                data-toggle="tab">Informasi Pengguna</a></li>
                                         <li class="nav-item"><a class="nav-link" href="#akun" data-toggle="tab">Info
                                                 Akun</a></li>
                                     </ul>
@@ -124,22 +124,8 @@
                                 <div class="card-body">
                                     <div class="tab-content">
 
-                                        <div class="active tab-pane" id="kepegawaian">
+                                        <div class="active tab-pane" id="informasi-pengguna">
                                             <div class="form-horizontal">
-                                                <div class="form-group row">
-                                                    <label class="col-sm-2 col-form-label">Divisi</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control"
-                                                            value="{{ $user->divisi->name ?? '-' }}" readonly>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label class="col-sm-2 col-form-label">Jabatan</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control"
-                                                            value="{{ $user->jabatan->name ?? '-' }}" readonly>
-                                                    </div>
-                                                </div>
                                                 <div class="form-group row">
                                                     <label class="col-sm-2 col-form-label">Role Sistem</label>
                                                     <div class="col-sm-10">
@@ -153,13 +139,6 @@
                                                         <input type="text" class="form-control"
                                                             value="{{ $user->tanggal_bergabung ? $user->tanggal_bergabung->format('d F Y') : '-' }}"
                                                             readonly>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label class="col-sm-2 col-form-label">NIK</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control"
-                                                            value="{{ $user->nik ?? '-' }}" readonly>
                                                     </div>
                                                 </div>
                                             </div>

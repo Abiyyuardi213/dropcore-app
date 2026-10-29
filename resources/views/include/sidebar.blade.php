@@ -66,10 +66,7 @@
                         request()->is('administrator/kelurahan*') ||
                         request()->is('administrator/supplier*') ||
                         request()->is('administrator/kondisi-barang*') ||
-                        request()->is('administrator/divisi*') ||
-                        request()->is('administrator/jasa-pengiriman*') ||
-                        request()->is('administrator/metode-pembayaran*') ||
-                        request()->is('administrator/jabatan*');
+                        request()->is('administrator/jasa-pengiriman*');
                 @endphp
 
                 @if ($canAnyMaster)
@@ -103,21 +100,6 @@
                             @endif
 
                             @if ($canAccess('master_hr'))
-                                <li class="nav-item">
-                                    <a href="{{ route('divisi.index') }}"
-                                        class="nav-link text-sm pl-4 {{ Request::is('administrator/divisi*') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-sitemap"></i>
-                                        <p>Master Divisi</p>
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a href="{{ route('jabatan.index') }}"
-                                        class="nav-link text-sm pl-4 {{ Request::is('administrator/jabatan*') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-id-badge"></i>
-                                        <p>Master Jabatan</p>
-                                    </a>
-                                </li>
 
                                 <li class="nav-item">
                                     <a href="{{ route('user.index') }}"
@@ -176,14 +158,6 @@
                                         class="nav-link text-sm pl-4 {{ Request::is('administrator/jasa-pengiriman*') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-shipping-fast"></i>
                                         <p>Jasa Pengiriman</p>
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a href="{{ route('metode-pembayaran.index') }}"
-                                        class="nav-link text-sm pl-4 {{ Request::is('administrator/metode-pembayaran*') ? 'active' : '' }}">
-                                        <i class="nav-icon fas fa-money-check-alt"></i>
-                                        <p>Metode Pembayaran</p>
                                     </a>
                                 </li>
                             @endif

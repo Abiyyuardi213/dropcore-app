@@ -211,7 +211,7 @@
                                     Pembayaran
                                 </h2>
                                 <div class="space-y-3 lg:ml-2 flex-1">
-                                    @foreach ($paymentMethods as $method)
+                                    @forelse ($paymentMethods as $method)
                                         <label class="group relative block cursor-pointer">
                                             <input type="radio" name="payment_method_id"
                                                 value="{{ $method->id }}" @checked(old('payment_method_id') == $method->id) class="peer sr-only" required="">
@@ -225,7 +225,7 @@
                                                     </div>
                                                     <div class="flex-1 min-w-0">
                                                         <p class="font-bold text-foreground text-sm truncate">
-                                                            {{ $method->nama_bank }}</p>
+                                                            {{ $method->nama_sumber }}</p>
                                                         <p class="text-xs text-muted-foreground font-mono mt-0.5 truncate">
                                                             {{ $method->nomor_rekening }}</p>
                                                     </div>
@@ -240,7 +240,7 @@
                                                 </div>
                                             </div>
                                         </label>
-                                    @endforeach
+                                    @empty<p class="text-sm text-muted-foreground" role="status">Belum ada rekening bank aktif untuk pembayaran. Silakan hubungi admin.</p>@endforelse
                                 </div>
                             </div>
                         </div>
@@ -291,7 +291,7 @@
                                 </div>
 
                                 <!-- Desktop Button -->
-                                <button type="submit"
+                                <button type="submit" @disabled($paymentMethods->isEmpty())
                                     class="hidden lg:block w-full mt-8 bg-primary hover:bg-primary/90 text-primary-foreground py-4 px-4 rounded-lg font-bold shadow-sm transition-all focus:ring-4 focus:ring-ring/30 text-sm tracking-wide">
                                     BUAT PESANAN SEKARANG
                                 </button>
@@ -334,7 +334,7 @@
                 <span class="text-lg font-bold text-primary leading-tight" id="mobileFinalTotal">Rp
                     {{ number_format($subtotal * 1.11, 0, ',', '.') }}</span>
             </div>
-            <button type="submit" form="checkoutForm"
+            <button type="submit" form="checkoutForm" @disabled($paymentMethods->isEmpty())
                 class="flex-1 max-w-[180px] bg-primary text-primary-foreground px-4 py-3 rounded-lg font-bold text-sm shadow-sm active:scale-95 transition-all">
                 Bayar Sekarang
             </button>

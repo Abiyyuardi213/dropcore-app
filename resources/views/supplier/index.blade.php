@@ -13,6 +13,12 @@
         rel="stylesheet">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .supplier-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: .4rem; }
+        .supplier-actions .btn { border-radius: .2rem; }
+        .supplier-filters { display: flex; flex-wrap: wrap; align-items: end; gap: .6rem; }
+        .supplier-filters .form-group { margin-bottom: 0; }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -41,6 +47,19 @@
                             </a>
                         </div>
                         <div class="card-body">
+                            @if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
+                            <form id="supplierFilters" method="GET" action="{{ route('supplier.index') }}" class="supplier-filters mb-3">
+                                <div class="form-group"><label for="filterSupplierStatus">Status</label><select id="filterSupplierStatus" class="form-control form-control-sm" name="status">
+                                    <option value="">Semua Status</option><option value="1" @selected((string)($filters['status'] ?? '') === '1')>Aktif</option><option value="0" @selected((string)($filters['status'] ?? '') === '0')>Nonaktif</option>
+                                </select></div>
+                                <div class="form-group"><label for="filterSupplierOrigin">Asal Supplier</label><select id="filterSupplierOrigin" class="form-control form-control-sm" name="asal_supplier">
+                                    <option value="">Semua Asal</option><option value="dalam_negeri" @selected(($filters['asal_supplier'] ?? '') === 'dalam_negeri')>Dalam Negeri</option><option value="luar_negeri" @selected(($filters['asal_supplier'] ?? '') === 'luar_negeri')>Luar Negeri</option>
+                                </select></div>
+                                <div class="form-group"><label for="filterSupplierType">Tipe Supplier</label><select id="filterSupplierType" class="form-control form-control-sm" name="tipe_supplier" style="max-width:220px">
+                                    <option value="">Semua Tipe</option>@foreach($supplierTypes as $type)<option value="{{ $type }}" @selected(($filters['tipe_supplier'] ?? '') === $type)>{{ $type }}</option>@endforeach
+                                </select></div>
+                                <button type="submit" class="btn btn-primary btn-sm">Tampilkan</button><a class="btn btn-default btn-sm" href="{{ route('supplier.index') }}">Reset</a>
+                            </form>
                             <div class="table-responsive">
                                 <table id="supplierTable" class="table table-bordered table-striped">
                                     <thead>
@@ -97,17 +116,17 @@
                                                     @endif
                                                 </td>
                                                 <td class="text-center">
-                                                    <div class="btn-group">
+                                                    <div class="supplier-actions">
                                                         <a href="{{ route('supplier.show', $supplier->id) }}"
-                                                            class="btn btn-info btn-sm" title="Detail">
+                                                            class="btn btn-info btn-sm" title="Detail" aria-label="Detail {{ $supplier->nama_supplier }}">
                                                             <i class="fas fa-eye"></i>
                                                         </a>
                                                         <a href="{{ route('supplier.edit', $supplier->id) }}"
-                                                            class="btn btn-warning btn-sm" title="Edit">
+                                                            class="btn btn-warning btn-sm" title="Edit" aria-label="Edit {{ $supplier->nama_supplier }}">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
                                                         <button class="btn btn-danger btn-sm delete-supplier-btn"
-                                                            data-supplier-id="{{ $supplier->id }}" title="Hapus">
+                                                            type="button" data-supplier-id="{{ $supplier->id }}" title="Hapus" aria-label="Hapus {{ $supplier->nama_supplier }}">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </div>
@@ -141,6 +160,7 @@
     <script>
         $(document).ready(function() {
             $("#supplierTable").DataTable({
+                "dom": "<'row align-items-end mb-3'<'col-lg-9 supplier-filter-slot'><'col-lg-3'f>>rt<'row'<'col-sm-5'i><'col-sm-7'p>>",
                 "paging": true,
                 "lengthChange": false,
                 "searching": true,
@@ -149,6 +169,7 @@
                 "autoWidth": false,
                 "responsive": true
             });
+            $('#supplierFilters').appendTo('.supplier-filter-slot').removeClass('mb-3');
 
             // Delete Confirmation with SweetAlert
             $(document).on('click', '.delete-supplier-btn', function() {

@@ -4,14 +4,19 @@
     .admin-module-results { position: absolute; top: calc(100% + 6px); left: 0; right: 0; max-height: 360px; overflow-y: auto; z-index: 1040; background: #fff; border: 1px solid #dee2e6; border-radius: .25rem; }
     .admin-module-results[hidden] { display: none !important; }
     .admin-module-results .list-group-item { border-left: 0; border-right: 0; }
-    .admin-navbar-user { flex-shrink: 0; }
-    .admin-navbar-username { display: inline-block; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+    .admin-navbar-user { flex-shrink: 0; align-items: center; gap: .75rem; }
+    .admin-navbar-user .nav-link { display: flex; align-items: center; gap: .65rem; height: auto; padding: .35rem .65rem; font-weight: 600; }
+    .admin-navbar-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #f4f6f9; }
+    .admin-navbar-username { display: inline-block; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+    .admin-navbar-role { text-transform: uppercase; }
+    .admin-module-search { min-width: 0; }
     body.swal2-toast-shown .swal2-container { pointer-events: none !important; }
     body.swal2-toast-shown .swal2-container .swal2-toast { pointer-events: auto; }
     body.layout-navbar-fixed.swal2-toast-shown .swal2-container.swal2-top-end { top: var(--admin-toast-top, 68px) !important; }
     @media (max-width: 575.98px) {
         .admin-module-search { width: 100%; }
-        .admin-navbar-username { display: none; }
+        .admin-navbar-username, .admin-navbar-logout-label { display: none; }
+        .admin-navbar-user { gap: 0; }
         .admin-module-results { width: min(320px, calc(100vw - 80px)); }
     }
 </style>
@@ -27,16 +32,14 @@
         <div id="adminModuleResults" class="admin-module-results list-group shadow" role="listbox" aria-label="Hasil pencarian modul" hidden></div>
     </form>
     <ul class="navbar-nav ml-auto admin-navbar-user">
-        <li class="nav-item dropdown" id="adminUserMenu">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-user-circle" aria-hidden="true"></i> <span class="admin-navbar-username">{{ Auth::user()->username }}</span><span class="sr-only">Menu profil pengguna</span>
+        <li class="nav-item" id="adminUserMenu">
+            <a class="nav-link" href="{{ route('user.profil') }}" aria-label="Buka profil {{ Auth::user()->name }}" title="{{ Auth::user()->name }} - {{ strtoupper(Auth::user()->role->role_name ?? 'Pengguna') }}">
+                <img class="admin-navbar-avatar" src="{{ Auth::user()->profile_picture ? asset('uploads/profile/'.Auth::user()->profile_picture) : asset('image/default-user.png') }}" alt="Foto profil" onerror="this.onerror=null;this.src='{{ asset('image/default-user.png') }}';">
+                <span class="admin-navbar-username">{{ Auth::user()->name }} - <span class="admin-navbar-role">{{ Auth::user()->role->role_name ?? 'Pengguna' }}</span></span>
             </a>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                <a class="dropdown-item" href="{{ route('dashboard') }}"><i class="fas fa-tachometer-alt mr-2" aria-hidden="true"></i>Dashboard</a>
-                <a class="dropdown-item" href="{{ route('user.profil') }}"><i class="fas fa-user mr-2" aria-hidden="true"></i>Profil</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-danger" href="#" onclick="confirmLogout(event)"><i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i>Logout</a>
-            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" onclick="confirmLogout(event)" aria-label="Logout dari sistem"><i class="fas fa-sign-out-alt" aria-hidden="true"></i><span class="admin-navbar-logout-label">LOGOUT</span></a>
         </li>
     </ul>
 </nav>

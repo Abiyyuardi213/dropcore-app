@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 
 use App\Models\JasaPengiriman;
-use App\Models\MetodePembayaran;
+use App\Models\SumberKeuangan;
 
 class OrderController extends Controller
 {
@@ -27,7 +27,7 @@ class OrderController extends Controller
         }
 
         $shippingServices = JasaPengiriman::where('status', true)->get();
-        $paymentMethods = MetodePembayaran::where('status', true)->get();
+        $paymentMethods = SumberKeuangan::webPaymentAccounts()->orderBy('nama_sumber')->get(['id', 'nama_sumber', 'nomor_rekening', 'atas_nama']);
 
         // Calculate Total Weight
         $totalWeight = $cartItems->sum(function ($item) {
@@ -54,7 +54,7 @@ class OrderController extends Controller
         $request->validate([
             'shipping_address' => 'required|string|max:1000',
             'shipping_service_id' => 'required|exists:jasa_pengiriman,id',
-            'payment_method_id' => 'required|exists:metode_pembayaran,id',
+            'payment_method_id' => ['required', \Illuminate\Validation\Rule::exists('sumber_keuangan', 'id')->where(fn ($query) => $query->where('is_active', true)->where('jenis', 'bank'))],
         ], [
             'shipping_address.required' => 'Alamat pengiriman wajib diisi.',
             'shipping_service_id.required' => 'Pilih jasa pengiriman.',
@@ -81,7 +81,7 @@ class OrderController extends Controller
 
             $finalTotal = $productSubtotal + $taxAmount + $shippingCost;
 
-            $paymentMethod = MetodePembayaran::findOrFail($request->payment_method_id);
+            $paymentMethod = SumberKeuangan::webPaymentAccounts()->lockForUpdate()->findOrFail($request->payment_method_id);
 
             $order = Order::create([
                 'user_id' => $user->id,
@@ -93,7 +93,7 @@ class OrderController extends Controller
                 'shipping_address' => $request->shipping_address,
                 'notes' => $request->notes,
                 'shipping_provider' => $shippingService->nama . ' - ' . $shippingService->kode, // Store name
-                'payment_method' => $paymentMethod->nama_bank . ' - ' . $paymentMethod->nomor_rekening, // Store name
+                'payment_method' => $paymentMethod->nama_sumber . ' - ' . $paymentMethod->nomor_rekening . ($paymentMethod->atas_nama ? ' a.n. '.$paymentMethod->atas_nama : ''), // Store name
             ]);
 
             foreach ($cartItems as $cartItem) {

@@ -16,7 +16,8 @@ class SumberKeuanganController extends Controller
 
     public function create()
     {
-        return view('keuangan.sumber_keuangan.create');
+        $bankDirectory = json_decode(file_get_contents(resource_path('data/banks-indonesia.json')), true, 512, JSON_THROW_ON_ERROR);
+        return view('keuangan.sumber_keuangan.create', compact('bankDirectory'));
     }
 
     public function store(Request $request)

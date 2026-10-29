@@ -23,6 +23,11 @@ class SumberKeuangan extends Model
         'is_active',
     ];
 
+    public function scopeWebPaymentAccounts($query)
+    {
+        return $query->where('is_active', true)->where('jenis', 'bank');
+    }
+
     protected static function boot()
     {
         parent::boot();
