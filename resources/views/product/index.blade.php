@@ -116,6 +116,19 @@
     <script>
         $(document).ready(function() {
             $("#productTable").DataTable({
+                // Restore pagination, search, sorting, and page size after returning from edit.
+                "stateSave": true,
+                "stateDuration": -1,
+                "stateSaveCallback": function(settings, data) {
+                    try {
+                        sessionStorage.setItem('productTableState:{{ auth()->id() }}', JSON.stringify(data));
+                    } catch (error) { /* The table remains usable when storage is unavailable. */ }
+                },
+                "stateLoadCallback": function(settings) {
+                    try {
+                        return JSON.parse(sessionStorage.getItem('productTableState:{{ auth()->id() }}'));
+                    } catch (error) { return null; }
+                },
                 "paging": true,
                 "lengthChange": true,
                 "searching": true,
