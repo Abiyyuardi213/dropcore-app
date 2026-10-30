@@ -20,7 +20,16 @@ class KasirDashboardController extends Controller
         foreach ($periods as $period => $dates) {
             $query = clone $base;
             if ($dates) $query->whereDate('sale_date', '>=', $dates[0])->whereDate('sale_date', '<=', $dates[1]);
-            $summary[$period] = ['total' => (float) (clone $query)->sum('total'), 'profit' => (clone $query)->whereNull('profit')->exists() ? null : (float) (clone $query)->sum('profit')];
+            $counts = (clone $query)->selectRaw('COUNT(*) AS sales_count, COUNT(profit) AS known_count, SUM(total) AS sales_total, SUM(profit) AS known_profit')->first();
+            $missing = (int)$counts->sales_count - (int)$counts->known_count;
+            $summary[$period] = [
+                'total'=>(float)$counts->sales_total,
+                'profit'=>$missing ? null : (float)$counts->known_profit,
+                'known_profit'=>(float)$counts->known_profit,
+                'known_count'=>(int)$counts->known_count,
+                'missing_count'=>$missing,
+                'sales_count'=>(int)$counts->sales_count,
+            ];
         }
         $items = KasirSaleItem::whereIn('sale_id', (clone $base)->select('kasir_sales.id'));
         $stats = [

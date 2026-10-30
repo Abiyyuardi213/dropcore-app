@@ -20,6 +20,9 @@
     .pos-entry { grid-area: entry; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr) minmax(0, 1.2fr) auto; column-gap: .75rem; align-items: start; }
     .pos-entry .form-group { margin-bottom: 0; min-width: 0; }
     .pos-entry .pos-section-title { font-size: 1.1rem; margin-bottom: .65rem; }
+    .pos-entry-header { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; margin-bottom: .65rem; }
+    .pos-entry .pos-entry-header .pos-section-title { margin-bottom: 0; }
+    .pos-entry-header .btn { flex-shrink: 0; }
     .pos-entry .pos-section-title, .pos-entry > small { grid-column: 1 / -1; }
     .pos-entry .btn-block { margin-top: 1.6rem; }
     .pos-entry > small { margin-top: .35rem; }
@@ -79,7 +82,10 @@
         <hr class="mt-2 mb-4">
         <div class="row pos-workspace">
             <section class="pos-entry" aria-labelledby="addItemTitle">
-                <h2 class="pos-section-title" id="addItemTitle">Tambah Barang</h2>
+                <div class="pos-entry-header">
+                    <h2 class="pos-section-title" id="addItemTitle">Tambah Barang</h2>
+                    <button type="button" id="browseProducts" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#productCatalogModal"><i class="fas fa-boxes mr-1" aria-hidden="true"></i>Lihat Barang</button>
+                </div>
                 <div class="form-group"><label for="productCode">Kode Produk / Nama</label><div class="pos-code-search"><input id="productCode" type="search" class="form-control form-control-sm" placeholder="Ketik SKU atau nama produk" aria-describedby="productSearchStatus" autocomplete="off"><button id="findProduct" class="btn btn-primary btn-sm" type="button"><i class="fas fa-search" aria-hidden="true"></i> Cari</button></div><small id="productSearchStatus" class="form-text text-muted" role="status" aria-live="polite">Ketik nama atau SKU, lalu Enter untuk menambahkan 1 barang. Jika hasil lebih dari satu, pilih produknya dahulu.</small></div>
                 <div class="form-group"><label for="productSelect">Produk</label><select id="productSelect" class="form-control form-control-sm"><option value="">Cari produk terlebih dahulu</option></select></div>
                 <div class="form-group"><label for="stockSelect">Lokasi / Kondisi Stok</label><select id="stockSelect" class="form-control form-control-sm" disabled><option value="">Pilih produk</option></select><small id="stockHint" class="form-text text-muted"></small></div>
@@ -112,6 +118,18 @@
         <hr class="my-4"><div class="pos-bottom"><button id="resetSale" type="button" class="btn btn-danger btn-sm">Batalkan Transaksi</button><button id="saveSale" type="submit" class="btn btn-success btn-sm" disabled>Proses Bayar <i class="fas fa-arrow-right ml-1" aria-hidden="true"></i></button></div>
     </form>
 </div></div>
+<div class="modal fade" id="productCatalogModal" tabindex="-1" role="dialog" aria-labelledby="productCatalogTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document"><div class="modal-content">
+        <div class="modal-header bg-navy"><h5 class="modal-title" id="productCatalogTitle"><i class="fas fa-boxes mr-2" aria-hidden="true"></i>Daftar Barang</h5><button type="button" class="close text-white" data-dismiss="modal" aria-label="Tutup"><span aria-hidden="true">&times;</span></button></div>
+        <div class="modal-body">
+            <label for="catalogSearch">Cari Produk / SKU</label><input type="search" id="catalogSearch" class="form-control mb-2" maxlength="100" placeholder="Ketik nama barang atau SKU..." autocomplete="off">
+            <p class="text-muted text-sm">Pilih lokasi jika stok ada di beberapa tempat, lalu klik Tambah. Setiap klik menambahkan 1 barang; jumlah dapat diubah di Daftar Belanja.</p>
+            <div id="catalogMessage" class="alert alert-info py-2" role="status" aria-live="polite" hidden></div>
+            <div class="table-responsive"><table class="table table-bordered table-striped table-sm"><thead><tr><th>SKU</th><th>Produk</th><th>Satuan</th><th class="text-right">Harga Jual</th><th class="text-right">Stok</th><th>Lokasi / Kondisi</th><th class="text-center">Aksi</th></tr></thead><tbody id="catalogBody"></tbody></table></div>
+        </div>
+        <div class="modal-footer justify-content-between"><small id="catalogPageInfo" class="text-muted" role="status"></small><div><button type="button" id="catalogPrevious" class="btn btn-default btn-sm" disabled>Sebelumnya</button><button type="button" id="catalogNext" class="btn btn-default btn-sm" disabled>Berikutnya</button><button type="button" class="btn btn-secondary btn-sm ml-2" data-dismiss="modal">Tutup</button></div></div>
+    </div></div>
+</div>
 @endsection
 @push('scripts')
 @php $oldItems = old('items', $draft['items'] ?? []); @endphp

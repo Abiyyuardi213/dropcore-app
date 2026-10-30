@@ -77,6 +77,32 @@ class KasirSalesTest extends TestCase
     }
 
 
+    public function test_dashboard_displays_known_profit_separately_from_sales_without_cost(): void
+    {
+        $this->completeSale($this->payload())->assertSessionHasNoErrors();
+        $known = KasirSale::firstOrFail();
+        DB::table('products')->update(['purchase_price'=>null]);
+        $this->completeSale($this->payload())->assertSessionHasNoErrors();
+        $this->get('/kasir/dashboard')->assertOk()->assertSee('Laba Kotor Hari Ini (Terhitung)')
+            ->assertSee('1 dari 2 transaksi terhitung')->assertSee('1 transaksi belum memiliki modal lengkap')
+            ->assertViewHas('summary', fn ($summary) => $summary['Hari Ini']['known_count']===1
+                && $summary['Hari Ini']['missing_count']===1
+                && $summary['Hari Ini']['known_profit']==$known->profit
+                && $summary['Hari Ini']['profit']===null);
+        $this->assertNull(KasirSale::where('id','<>',$known->id)->firstOrFail()->profit);
+    }
+
+    public function test_dashboard_distinguishes_unknown_profit_from_zero_and_negative_profit(): void
+    {
+        $this->get('/kasir/dashboard')->assertOk()->assertViewHas('summary',fn ($summary) => $summary['Hari Ini']['known_profit']===0.0 && $summary['Hari Ini']['sales_count']===0);
+        DB::table('products')->update(['purchase_price'=>null]);
+        $this->completeSale($this->payload())->assertSessionHasNoErrors();
+        $this->get('/kasir/dashboard')->assertOk()->assertSee('Belum tersedia');
+        DB::table('products')->update(['purchase_price'=>200]);
+        $this->completeSale($this->payload())->assertSessionHasNoErrors();
+        $this->get('/kasir/dashboard')->assertOk()->assertViewHas('summary',fn ($summary) => $summary['Hari Ini']['known_profit']<0 && $summary['Hari Ini']['known_count']===1);
+    }
+
     private function completeSale(array $data)
     {
         session()->forget('errors');
@@ -241,6 +267,19 @@ class KasirSalesTest extends TestCase
         $other = User::create(['name'=>'Other', 'username'=>'other', 'password'=>Hash::make('password')]);
         $this->actingAs($other)->get('/kasir/penjualan/'.$sale->id)->assertNotFound();
         $this->get('/kasir/laporan')->assertOk()->assertViewHas('count', 0);
+    }
+
+    public function test_product_browser_lists_all_products_with_pagination_and_without_purchase_cost(): void
+    {
+        for ($i=0;$i<24;$i++) DB::table('products')->insert(['id'=>'browse-'.$i,'name'=>'Barang '.str_pad((string)$i,2,'0',STR_PAD_LEFT),'sku'=>'SKU-'.$i,'price'=>150,'purchase_price'=>100]);
+        $this->get('/kasir/penjualan')->assertOk()->assertSee('Lihat Barang')->assertSee('productCatalogModal')->assertSee('catalogBody');
+        $this->getJson('/kasir/penjualan/produk?browse=1')->assertOk()->assertJsonPath('total',25)->assertJsonCount(20,'data')
+            ->assertJsonPath('data.0.name','Barang 00')->assertJsonPath('data.0.stocks',[])->assertJsonMissingPath('data.0.purchase_price');
+        $this->getJson('/kasir/penjualan/produk?browse=1&page=2')->assertOk()->assertJsonCount(5,'data');
+        $this->getJson('/kasir/penjualan/produk?browse=1&search=SKU-23')->assertOk()->assertJsonPath('total',1)->assertJsonPath('data.0.id','browse-23');
+        $this->getJson('/kasir/penjualan/produk?browse=1&search=Produk')->assertOk()->assertJsonPath('data.0.stocks.0.quantity',10)->assertJsonPath('data.0.price',200);
+        $this->getJson('/kasir/penjualan/produk?search=Barang')->assertOk()->assertExactJson([]);
+        $this->assertEquals(10,DB::table('stok')->value('quantity')); $this->assertEquals(0,KasirSale::count());
     }
 
     public function test_invalid_discount_inactive_account_and_missing_stock_cannot_save(): void

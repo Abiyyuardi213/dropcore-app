@@ -99,15 +99,64 @@
     el('productSelect').addEventListener('change', selectProduct); el('stockSelect').addEventListener('change', preview);
     for (const id of ['productSelect', 'stockSelect']) el(id).addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (!e.repeat) addSelectedItem(); } });
     function addSelectedItem() {
-        const product=selectedProduct(), stock=selectedStock(), qty=1;
+        const product=selectedProduct(), stock=selectedStock();
         if (!product) { message('Pilih salah satu produk dari hasil pencarian.'); el('productSelect').focus(); return; }
         if (!stock) { message('Pilih lokasi stok produk terlebih dahulu.'); el('stockSelect').focus(); return; }
-        if (!stock || !Number.isInteger(qty) || qty < 1 || qty + (cart.get(stock.id)?.quantity || 0) > Math.min(stock.quantity,100000)) { message('Pilih produk/lokasi dan jumlah sesuai stok tersedia.'); return; }
-        if (!cart.has(stock.id) && cart.size >= 100) { message('Maksimal 100 lokasi stok dalam satu transaksi.'); return; }
+        if (addProductToCart(product, stock)) { el('productCode').focus(); el('productCode').select(); }
+    }
+    function addProductToCart(product, stock) {
+        const qty=1;
+        if (restoring || sending) { message('Tunggu hingga proses keranjang selesai.'); return false; }
+        if (qty + (cart.get(stock.id)?.quantity || 0) > Math.min(stock.quantity,100000)) { message('Jumlah di keranjang sudah mencapai stok tersedia.'); return false; }
+        if (!cart.has(stock.id) && cart.size >= 100) { message('Maksimal 100 lokasi stok dalam satu transaksi.'); return false; }
         if (cart.has(stock.id)) cart.get(stock.id).quantity += qty;
         else cart.set(stock.id,{product,stock,quantity:qty});
-        message(''); renderCart(); el('productCode').focus(); el('productCode').select();
+        message(''); renderCart(); return true;
     }
+    let catalogPage=1, catalogLastPage=1, catalogRequest=0, catalogTimer, catalogController;
+    const catalogMessage = text => { el('catalogMessage').textContent=text; el('catalogMessage').hidden=!text; };
+    async function loadCatalog(page=1) {
+        clearTimeout(catalogTimer); catalogController?.abort(); catalogController=new AbortController();
+        const current=++catalogRequest;
+        el('catalogPrevious').disabled=true; el('catalogNext').disabled=true;
+        el('catalogBody').replaceChildren(); catalogMessage('Memuat daftar barang...');
+        el('catalogPageInfo').textContent='';
+        try {
+            const url=new URL(cfg.productsUrl); url.searchParams.set('browse','1'); url.searchParams.set('page',page); url.searchParams.set('search',el('catalogSearch').value.trim());
+            const response=await fetch(url,{headers:{'Accept':'application/json'},signal:catalogController.signal});
+            if (!response.ok) throw new Error('Daftar barang gagal dimuat. Coba buka kembali atau login ulang jika sesi berakhir.');
+            const result=await response.json(); if (current!==catalogRequest) return;
+            catalogPage=result.current_page; catalogLastPage=result.last_page; catalogMessage('');
+            if (!result.data.length) { const row=document.createElement('tr'); textCell(row,'Produk tidak ditemukan.','text-center text-muted py-3').colSpan=7; el('catalogBody').append(row); }
+            result.data.forEach(product => {
+                const row=document.createElement('tr');
+                textCell(row,product.sku || '-'); textCell(row,product.name); textCell(row,product.unit);
+                textCell(row,money(cents(product.price)),'text-right text-nowrap');
+                textCell(row,String(product.stocks.reduce((sum,stock)=>sum+stock.quantity,0)),'text-right');
+                const location=textCell(row,''); const select=document.createElement('select'); select.className='form-control form-control-sm'; select.style.minWidth='240px'; select.setAttribute('aria-label','Lokasi stok '+product.name);
+                select.append(new Option(product.stocks.length ? 'Pilih lokasi stok' : 'Stok habis',''));
+                product.stocks.forEach(stock=>select.append(new Option(stock.label+' (Stok: '+stock.quantity+')',stock.id)));
+                if (product.stocks.length===1) select.value=product.stocks[0].id;
+                select.disabled=!product.stocks.length; location.append(select);
+                const action=textCell(row,'','text-center'); const add=document.createElement('button'); add.type='button'; add.className='btn btn-success btn-sm'; add.textContent='Tambah'; add.setAttribute('aria-label','Tambah '+product.name); add.disabled=!select.value;
+                select.addEventListener('change',()=>{ add.disabled=!select.value; });
+                add.addEventListener('click',()=>{
+                    const stock=product.stocks.find(s=>s.id===select.value); if (!stock) return;
+                    if (addProductToCart(product,stock)) catalogMessage(product.name+' ditambahkan. Jumlah di lokasi ini: '+cart.get(stock.id).quantity+'.');
+                    else catalogMessage(el('saleMessage').textContent);
+                });
+                action.append(add); el('catalogBody').append(row);
+            });
+            el('catalogPageInfo').textContent=`${result.from || 0}–${result.to || 0} dari ${result.total} produk`;
+            el('catalogPrevious').disabled=catalogPage<=1; el('catalogNext').disabled=catalogPage>=catalogLastPage;
+        } catch(error) { if (current===catalogRequest && error.name!=='AbortError') catalogMessage(error.message); }
+    }
+    window.jQuery('#productCatalogModal').on('shown.bs.modal',()=>{ loadCatalog(1); el('catalogSearch').focus(); });
+    window.jQuery('#productCatalogModal').on('hidden.bs.modal',()=>{ clearTimeout(catalogTimer); catalogController?.abort(); ++catalogRequest; el('browseProducts').focus(); });
+    el('catalogSearch').addEventListener('input',()=>{ clearTimeout(catalogTimer); catalogController?.abort(); ++catalogRequest; catalogTimer=setTimeout(()=>loadCatalog(1),300); });
+    el('catalogSearch').addEventListener('keydown',event=>{ if (event.key==='Enter') { event.preventDefault(); loadCatalog(1); } });
+    el('catalogPrevious').addEventListener('click',()=>loadCatalog(catalogPage-1));
+    el('catalogNext').addEventListener('click',()=>loadCatalog(catalogPage+1));
     el('addItem').addEventListener('click', addSelectedItem);
     el('discount').addEventListener('input', totals);
     el('resetSale').addEventListener('click', () => { if (cart.size && !window.confirm('Kosongkan transaksi yang belum disimpan?')) return; cart.clear(); form.reset(); message(''); renderCart(); });

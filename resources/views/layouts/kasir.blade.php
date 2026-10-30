@@ -25,7 +25,15 @@
         .kasir-heading { font-size: 1.6rem !important; }
         .kasir-card { border-radius: 8px; }
         .kasir-card.card-outline { border-top-color: #001f3f; }
-        .kasir-brand-logo { width: 108px; height: auto; padding: 5px 8px; border-radius: 4px; background: #fff; }
+        .kasir-brand-logo { width: 108px; height: auto; }
+        .kasir-navbar-user { flex-shrink: 0; gap: .75rem; }
+        .kasir-navbar-user .nav-link { display: flex; align-items: center; gap: .65rem; height: auto; padding: .35rem .65rem; font-weight: 600; }
+        .kasir-navbar-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #f4f6f9; }
+        .kasir-account-name { display: inline-block; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+        .kasir-navbar-role { text-transform: uppercase; }
+        body.swal2-toast-shown .swal2-container { pointer-events: none !important; }
+        body.swal2-toast-shown .swal2-container .swal2-toast { pointer-events: auto; }
+        body.swal2-toast-shown .swal2-container.swal2-top-end { top: 68px !important; }
         @media (max-width: 575.98px) {
             .kasir-shortcuts-container,
         .content-wrapper > .content-header > .container-fluid,
@@ -34,7 +42,8 @@
                 padding-right: 16px !important;
             }
             .kasir-nav-container { padding-left: 1rem !important; padding-right: 1rem !important; }
-            .kasir-account-name { max-width: 105px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle; }
+            .kasir-account-name, .kasir-navbar-logout-label { display: none; }
+            .kasir-navbar-user { gap: 0; }
         }
     </style>
     @stack('styles')
@@ -44,8 +53,7 @@
     <nav class="main-header navbar navbar-expand navbar-dark navbar-navy border-bottom-0 shadow-sm fixed-top" aria-label="Navigasi kasir">
         <div class="container-fluid px-4 kasir-nav-container">
             <a href="{{ route('kasir.index') }}" class="navbar-brand brand-link-custom d-flex align-items-center">
-                <img src="{{ asset('image/garuda-fiber.png') }}" class="kasir-brand-logo mr-2" alt="Garuda Fiber">
-                <span>KASIR</span>
+                <img src="{{ asset('image/gfi-putih.png') }}" class="kasir-brand-logo" alt="Garuda Fiber">
             </a>
             <ul class="navbar-nav d-none d-xl-flex ml-3">
                 <li class="nav-item"><a href="{{ route('kasir.index') }}" class="nav-link {{ request()->routeIs('kasir.index') ? 'active' : '' }}"><i class="fas fa-home mr-1" aria-hidden="true"></i>Dashboard</a></li>
@@ -55,10 +63,11 @@
                 <li class="nav-item"><a href="{{ route('kasir.laporan') }}" class="nav-link {{ request()->routeIs('kasir.laporan') ? 'active' : '' }}"><i class="fas fa-file-lines mr-1" aria-hidden="true"></i>Laporan</a></li>
                 <li class="nav-item"><a href="{{ route('kasir.password') }}" class="nav-link {{ request()->routeIs('kasir.password') ? 'active' : '' }}"><i class="fas fa-lock mr-1" aria-hidden="true"></i>Password</a></li>
             </ul>
-            <ul class="navbar-nav ml-auto align-items-center">
+            <ul class="navbar-nav ml-auto align-items-center kasir-navbar-user">
                 <li class="nav-item dropdown">
-                    <button class="nav-link btn btn-link text-white font-weight-bold dropdown-toggle" type="button" id="kasirAccount" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-user-circle mr-1" aria-hidden="true"></i><span class="kasir-account-name">{{ auth()->user()->name }}</span>
+                    <button class="nav-link btn btn-link text-white" type="button" id="kasirAccount" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Buka menu akun {{ auth()->user()->name }}" title="{{ auth()->user()->name }} - KASIR">
+                        <img class="kasir-navbar-avatar" src="{{ auth()->user()->profile_picture ? asset('uploads/profile/'.auth()->user()->profile_picture) : asset('image/default-user.png') }}" alt="Foto profil" onerror="this.onerror=null;this.src='{{ asset('image/default-user.png') }}';">
+                        <span class="kasir-account-name">{{ auth()->user()->name }} - <span class="kasir-navbar-role">KASIR</span></span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right shadow" aria-labelledby="kasirAccount">
                         <span class="dropdown-header text-uppercase font-weight-bold">Role: Kasir</span>
@@ -68,12 +77,13 @@
                         <a class="dropdown-item" href="{{ route('kasir.pelanggan') }}">Pelanggan</a>
                         <a class="dropdown-item" href="{{ route('kasir.laporan') }}">Laporan</a>
                         <a class="dropdown-item" href="{{ route('kasir.password') }}">Ganti Password</a>
-                        <div class="dropdown-divider"></div>
-                        <form method="POST" action="{{ route('kasir.logout') }}">
-                            @csrf
-                            <button type="submit" class="dropdown-item text-danger font-weight-bold"><i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i>Logout / Keluar</button>
-                        </form>
                     </div>
+                </li>
+                <li class="nav-item">
+                    <form method="POST" action="{{ route('kasir.logout') }}" class="mb-0">
+                        @csrf
+                        <button type="submit" class="nav-link btn btn-link text-white" aria-label="Logout dari sistem kasir"><i class="fas fa-sign-out-alt" aria-hidden="true"></i><span class="kasir-navbar-logout-label">LOGOUT</span></button>
+                    </form>
                 </li>
             </ul>
         </div>

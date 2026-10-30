@@ -42,7 +42,7 @@
     <a class="cashier-shortcut" href="{{ route('kasir.laporan') }}"><i class="fas fa-file-lines" aria-hidden="true"></i><span>Laporan</span></a>
     <a class="cashier-shortcut" href="{{ route('kasir.password') }}"><i class="fas fa-lock" aria-hidden="true"></i><span>Password</span></a>
 </nav>
-<p class="text-muted small mb-3">Ringkasan penjualan selesai milik akun kasir ini. Laba ditampilkan bila seluruh harga beli barang tercatat.</p>
+<p class="text-muted small mb-3">Ringkasan penjualan selesai milik akun kasir ini. Laba kotor dihitung dari transaksi yang harga modalnya lengkap. Transaksi tanpa modal belum termasuk dalam nominal laba terhitung.</p>
 <div class="row">
     @foreach(['Hari Ini', 'Bulan Ini', 'Tahun Ini', 'Seluruh Periode'] as $index => $period)
         <div class="col-sm-6 col-xl-3"><div class="small-box cashier-metric {{ ['cashier-red', 'cashier-blue', 'cashier-orange', 'cashier-black'][$index] }}">
@@ -54,7 +54,12 @@
 <div class="row">
     @foreach(['Hari Ini', 'Bulan Ini', 'Tahun Ini', 'Seluruh Periode'] as $index => $period)
         <div class="col-sm-6 col-xl-3"><div class="small-box cashier-metric {{ ['cashier-red', 'cashier-blue', 'cashier-orange', 'cashier-black'][$index] }}">
-            <div class="inner"><h3>{{ $summary[$period]['profit'] === null ? '—' : 'Rp '.number_format($summary[$period]['profit'], 0, ',', '.') }}</h3><p>{{ $index === 3 ? 'Total Seluruh Laba' : 'Laba '.$period }}</p></div>
+            <div class="inner">
+                <h3 @if($summary[$period]['missing_count'] && !$summary[$period]['known_count']) style="font-size:1.5rem;" @endif>{{ $summary[$period]['missing_count'] && !$summary[$period]['known_count'] ? 'Belum tersedia' : 'Rp '.number_format($summary[$period]['known_profit'], 0, ',', '.') }}</h3>
+                <p>{{ $index === 3 ? 'Laba Kotor Seluruh Periode' : 'Laba Kotor '.$period }}{{ $summary[$period]['missing_count'] ? ' (Terhitung)' : '' }}</p>
+                <small class="d-block">{{ $summary[$period]['known_count'] }} dari {{ $summary[$period]['sales_count'] }} transaksi terhitung</small>
+                @if($summary[$period]['missing_count'])<small class="d-block font-weight-bold">{{ $summary[$period]['missing_count'] }} transaksi belum memiliki modal lengkap</small>@endif
+            </div>
             <div class="icon"><i class="fas fa-chart-column" aria-hidden="true"></i></div>
         </div></div>
     @endforeach

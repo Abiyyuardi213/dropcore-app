@@ -69,21 +69,27 @@ class KasirSaleController extends Controller
     }
     public function products(Request $request)
     {
-        $request->validate(['search' => 'nullable|string|max:100', 'stock_id' => 'nullable|string|max:36']);
+        $request->validate(['search' => 'nullable|string|max:100', 'stock_id' => 'nullable|string|max:36', 'browse'=>'nullable|boolean', 'page'=>'nullable|integer|min:1']);
         $query = Products::select(['id','name','sku','price','uom_id'])->with('uom:id,name')
-            ->with(['stok' => fn ($q) => $q->where('quantity', '>', 0)->with(['gudang', 'area', 'rak', 'kondisi'])->orderBy('id')])
-            ->whereHas('stok', fn ($q) => $q->where('quantity', '>', 0));
+            ->with(['stok' => fn ($q) => $q->where('quantity', '>', 0)->with(['gudang', 'area', 'rak', 'kondisi'])->orderBy('id')]);
+        if (!$request->boolean('browse')) $query->whereHas('stok', fn ($q) => $q->where('quantity', '>', 0));
         if ($request->filled('stock_id')) $query->whereHas('stok', fn ($q) => $q->where('id', $request->stock_id));
         if ($request->filled('search')) {
             $term = '%'.trim($request->search).'%';
             $query->where(fn ($q) => $q->where('name','like',$term)->orWhere('sku','like',$term));
         }
-        $products = $query->orderBy('name')->limit(20)->get()->map(fn ($p) => [
+        $mapProduct = fn ($p) => [
             'id' => $p->id, 'name' => $p->name, 'sku' => $p->sku, 'price' => (float) $p->price, 'unit' => $p->uom->name ?? 'Unit',
             'stocks' => $p->stok->map(fn ($s) => ['id' => $s->id, 'quantity' => (int) $s->quantity,
                 'label' => ($s->gudang->nama_gudang ?? '-').' / '.($s->area->kode_area ?? '-').' / '.($s->rak->kode_rak ?? '-').' / '.($s->kondisi->nama_kondisi ?? '-'),
             ])->values(),
-        ]);
+        ];
+        if ($request->boolean('browse')) {
+            $products = $query->orderBy('name')->orderBy('id')->paginate(20);
+            $products->getCollection()->transform($mapProduct);
+            return response()->json($products);
+        }
+        $products = $query->orderBy('name')->limit(20)->get()->map($mapProduct);
         return response()->json($products);
     }
     public function store(Request $request, KasirSaleService $service)
