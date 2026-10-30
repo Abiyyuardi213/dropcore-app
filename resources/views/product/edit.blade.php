@@ -135,23 +135,23 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="price">Harga Jual (Rp) <span
+                                            <label for="harga_jual">Harga Jual (Rp) <span
                                                     class="text-danger">*</span></label>
                                             <input type="number"
-                                                class="form-control @error('price') is-invalid @enderror"
-                                                name="price" value="{{ old('price', $product->price) }}" required
-                                                min="0">
-                                            @error('price')
+                                                class="form-control @error('harga_jual') is-invalid @enderror"
+                                                id="harga_jual" name="harga_jual" value="{{ old('harga_jual', $product->harga_jual) }}" required
+                                                min="0" step="0.01">
+                                            @error('harga_jual')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="purchase_price">Harga Beli (Rp)</label>
-                                            <input type="number" id="purchase_price" name="purchase_price" class="form-control"
-                                                min="0" step="0.01" value="{{ old('purchase_price', $product->purchase_price) }}" placeholder="Isi harga beli dari supplier">
-                                            <small class="text-muted">Harga acuan pembelian, terpisah dari harga jual. Dapat disesuaikan saat menerima barang.</small>
-                                            @error('purchase_price')<div class="text-danger">{{ $message }}</div>@enderror
+                                            <label for="harga_beli">Harga Beli (Rp)</label>
+                                            <input type="number" id="harga_beli" name="harga_beli" class="form-control @error('harga_beli') is-invalid @enderror"
+                                                min="0" step="0.01" value="{{ old('harga_beli', $product->harga_beli) }}" placeholder="Isi harga beli dari supplier">
+                                            <small class="text-muted">Harga modal/acuan per satuan untuk transaksi baru. Kosong berarti belum diketahui; isi 0 hanya jika barang diperoleh tanpa biaya. Harga pembelian aktual dicatat saat penerimaan barang.</small>
+                                            @error('harga_beli')<div class="text-danger">{{ $message }}</div>@enderror
                                         </div>
 
                                         <div class="form-group">
@@ -212,7 +212,7 @@
                                                         class="form-control @error('min_stock') is-invalid @enderror"
                                                         name="min_stock"
                                                         value="{{ old('min_stock', $product->min_stock) }}"
-                                                        min="0">
+                                                        min="0" step="0.01">
                                                     @error('min_stock')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -225,7 +225,7 @@
                                                         class="form-control @error('max_stock') is-invalid @enderror"
                                                         name="max_stock"
                                                         value="{{ old('max_stock', $product->max_stock) }}"
-                                                        min="0">
+                                                        min="0" step="0.01">
                                                     @error('max_stock')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror

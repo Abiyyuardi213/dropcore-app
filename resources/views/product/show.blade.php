@@ -45,8 +45,11 @@
 
                                     <ul class="list-group list-group-unbordered mb-3">
                                         <li class="list-group-item">
-                                            <b>Harga</b> <a class="float-right text-success">Rp
-                                                {{ number_format($product->price, 0, ',', '.') }}</a>
+                                            <b>Harga Jual</b> <span class="float-right text-success">Rp
+                                                {{ number_format($product->harga_jual, 2, ',', '.') }}</span>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <b>Harga Beli</b> <span class="float-right">{{ $product->harga_beli !== null ? 'Rp '.number_format($product->harga_beli, 2, ',', '.') : 'Belum diisi' }}</span>
                                         </li>
                                         <li class="list-group-item">
                                             <b>Kategori</b> <a

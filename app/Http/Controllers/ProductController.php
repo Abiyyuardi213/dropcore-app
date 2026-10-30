@@ -30,23 +30,22 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $this->normalizePrices($request);
+        $data = $request->validate([
             'sku'           => 'nullable|string|unique:products,sku',
             'name'          => 'required|string|max:255',
             'merk'          => 'nullable|string|max:100',
             'description'   => 'nullable|string|max:255',
             'dimensi'       => 'nullable|string|max:50',
             'weight'        => 'nullable|numeric|min:0',
-            'price'         => 'required|numeric|min:0',
-            'purchase_price' => 'nullable|numeric|min:0|decimal:0,2',
+            'harga_jual' => 'required|numeric|min:0|max:99999999.99|decimal:0,2',
+            'harga_beli' => 'nullable|numeric|min:0|max:9999999999999.99|decimal:0,2',
             'min_stock'     => 'nullable|integer|min:0',
             'max_stock'     => 'nullable|integer|min:0',
             'category_id'   => 'required|exists:product_category,id',
             'uom_id'        => 'required|exists:uoms,id',
             'image'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
-
-        $data = $request->all();
 
         if ($request->hasFile('image')) {
             $file      = $request->file('image');
@@ -81,23 +80,22 @@ class ProductController extends Controller
     {
         $product = Products::findOrFail($id);
 
-        $request->validate([
+        $this->normalizePrices($request);
+        $data = $request->validate([
             'sku'           => 'nullable|string|unique:products,sku,' . $id,
             'name'          => 'required|string|max:255',
             'merk'          => 'nullable|string|max:100',
             'description'   => 'nullable|string|max:255',
             'dimensi'       => 'nullable|string|max:50',
             'weight'        => 'nullable|numeric|min:0',
-            'price'         => 'required|numeric|min:0',
-            'purchase_price' => 'nullable|numeric|min:0|decimal:0,2',
+            'harga_jual' => 'required|numeric|min:0|max:99999999.99|decimal:0,2',
+            'harga_beli' => 'nullable|numeric|min:0|max:9999999999999.99|decimal:0,2',
             'min_stock'     => 'nullable|integer|min:0',
             'max_stock'     => 'nullable|integer|min:0',
             'category_id'   => 'required|exists:product_category,id',
             'uom_id'        => 'required|exists:uoms,id',
             'image'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
-
-        $data = $request->all();
 
         if ($request->hasFile('image')) {
             $file      = $request->file('image');
@@ -124,6 +122,14 @@ class ProductController extends Controller
         $product = Products::with('category')->with('uom')->findOrFail($id);
 
         return view('product.show', compact('product'));
+    }
+
+    private function normalizePrices(Request $request): void
+    {
+        // Keep compatibility with older forms while prioritizing the explicit new names.
+        foreach (['harga_jual'=>'price','harga_beli'=>'purchase_price'] as $field=>$legacy) {
+            if (!$request->exists($field) && $request->exists($legacy)) $request->merge([$field=>$request->input($legacy)]);
+        }
     }
 
     public function destroy($id)

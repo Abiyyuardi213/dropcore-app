@@ -47,7 +47,8 @@
                                             <th>SKU</th>
                                             <th>Nama Produk</th>
                                             <th>Kategori</th>
-                                            <th>Harga</th>
+                                            <th>Harga Beli</th>
+                                            <th>Harga Jual</th>
 
                                             <th style="width: 15%" class="text-center">Aksi</th>
                                         </tr>
@@ -64,7 +65,8 @@
                                                     <small class="text-muted">{{ $product->merk ?? '-' }}</small>
                                                 </td>
                                                 <td>{{ $product->category->category_name ?? '-' }}</td>
-                                                <td>Rp {{ number_format($product->price, 0, ',', '.') }}</td>
+                                                <td class="text-right text-nowrap" data-order="{{ $product->harga_beli ?? -1 }}">@if($product->harga_beli !== null)Rp {{ number_format($product->harga_beli, 2, ',', '.') }}@else<span class="badge badge-warning">Belum diisi</span>@endif</td>
+                                                <td class="text-right text-nowrap" data-order="{{ $product->harga_jual }}">Rp {{ number_format($product->harga_jual, 2, ',', '.') }}</td>
 
                                                 <td class="text-center">
                                                     <div class="d-flex justify-content-center flex-wrap" style="gap: .5rem;">

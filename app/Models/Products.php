@@ -22,6 +22,8 @@ class Products extends Model
         'berat',
         'price',
         'purchase_price',
+        'harga_beli',
+        'harga_jual',
         'min_stock',
         'max_stock',
         'category_id',
@@ -66,6 +68,27 @@ class Products extends Model
         // or we handle it differently. For now, removing this prevents the crash.
     }
 
+    // Indonesian attribute names share the existing storage used by inventory and POS.
+    public function getHargaBeliAttribute()
+    {
+        return $this->purchase_price;
+    }
+
+    public function setHargaBeliAttribute($value): void
+    {
+        $this->attributes['purchase_price'] = $value;
+    }
+
+    public function getHargaJualAttribute()
+    {
+        return $this->price;
+    }
+
+    public function setHargaJualAttribute($value): void
+    {
+        $this->attributes['price'] = $value;
+    }
+
     public static function generateSKU($productName)
     {
         $words = explode(" ", $productName);
@@ -105,8 +128,8 @@ class Products extends Model
             'dimensi'     => $data['dimensi'] ?? null,
             'berat'       => $data['weight'] ?? null, // Sync both for now or legacy
             'weight'      => $data['weight'] ?? null,
-            'purchase_price' => $data['purchase_price'] ?? null,
-            'price'       => str_replace(',', '', $data['price']),
+            'harga_beli' => array_key_exists('harga_beli',$data) ? $data['harga_beli'] : ($data['purchase_price'] ?? null),
+            'harga_jual' => $data['harga_jual'] ?? $data['price'],
             'min_stock'   => $data['min_stock'] ?? 0,
             'max_stock'   => $data['max_stock'] ?? null,
             'category_id' => $data['category_id'],
@@ -130,8 +153,8 @@ class Products extends Model
             'dimensi'     => $data['dimensi']    ?? $this->dimensi,
             'berat'       => $data['weight']     ?? $this->berat,
             'weight'      => $data['weight']     ?? $this->weight,
-            'purchase_price' => array_key_exists('purchase_price', $data) ? $data['purchase_price'] : $this->purchase_price,
-            'price'       => isset($data['price']) ? str_replace(',', '', $data['price']) : $this->price,
+            'harga_beli' => array_key_exists('harga_beli',$data) ? $data['harga_beli'] : (array_key_exists('purchase_price', $data) ? $data['purchase_price'] : $this->purchase_price),
+            'harga_jual' => $data['harga_jual'] ?? $data['price'] ?? $this->price,
             'min_stock'   => $data['min_stock']  ?? $this->min_stock,
             'max_stock'   => $data['max_stock']  ?? $this->max_stock,
             'category_id' => $data['category_id'] ?? $this->category_id,
