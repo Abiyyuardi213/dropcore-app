@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -31,36 +30,21 @@
 
             <section class="content">
                 <div class="container-fluid">
-                    <div class="card card-primary card-outline card-tabs">
-                        <div class="card-header p-0 pt-1 border-bottom-0">
-                            <ul class="nav nav-tabs" id="productTabs" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" id="info-tab" data-toggle="pill" href="#info"
-                                        role="tab" aria-controls="info" aria-selected="true">Informasi Produk</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="specs-tab" data-toggle="pill" href="#specs" role="tab"
-                                        aria-controls="specs" aria-selected="false">Inventaris & Spesifikasi</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="image-tab" data-toggle="pill" href="#image-sect"
-                                        role="tab" aria-controls="image-sect" aria-selected="false">Gambar
-                                        Produk</a>
-                                </li>
-                            </ul>
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title">Form Tambah Produk</h3>
                         </div>
                         <div class="card-body">
                             @if (session('error'))
                                 <div class="alert alert-danger">{{ session('error') }}</div>
                             @endif
+                            @if($errors->any())<div class="alert alert-danger" role="alert">Periksa kembali isian yang ditandai pada form.</div>@endif
 
                             <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
-                                <div class="tab-content" id="productTabsContent">
+                                <div class="row">
 
-                                    <!-- Tab Informasi -->
-                                    <div class="tab-pane fade show active" id="info" role="tabpanel"
-                                        aria-labelledby="info-tab">
+                                    <div class="col-lg-8">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
@@ -160,11 +144,6 @@
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                    </div>
-
-                                    <!-- Tab Spesifikasi -->
-                                    <div class="tab-pane fade" id="specs" role="tabpanel"
-                                        aria-labelledby="specs-tab">
                                         <div class="form-group">
                                             <label for="sku">SKU (Stock Keeping Unit)</label>
                                             <input type="text"
@@ -178,19 +157,7 @@
                                         </div>
 
                                         <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="dimensi">Dimensi (PxLxT)</label>
-                                                    <input type="text"
-                                                        class="form-control @error('dimensi') is-invalid @enderror"
-                                                        name="dimensi" value="{{ old('dimensi') }}"
-                                                        placeholder="Contoh: 10x10x20 cm">
-                                                    @error('dimensi')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
+                                            <div class="col-12">
                                                 <div class="form-group">
                                                     <label for="weight">Berat (Kg)</label>
                                                     <input type="number" step="0.01"
@@ -211,7 +178,7 @@
                                                     <input type="number"
                                                         class="form-control @error('min_stock') is-invalid @enderror"
                                                         name="min_stock" value="{{ old('min_stock', 0) }}"
-                                                        min="0" step="0.01">
+                                                        min="0" step="1">
                                                     <small class="text-muted">Sistem akan memberi peringatan jika stok
                                                         di bawah angka ini.</small>
                                                     @error('min_stock')
@@ -225,7 +192,7 @@
                                                     <input type="number"
                                                         class="form-control @error('max_stock') is-invalid @enderror"
                                                         name="max_stock" value="{{ old('max_stock') }}"
-                                                        min="0" step="0.01">
+                                                        min="0" step="1">
                                                     <small class="text-muted">Opsional, untuk manajemen kapasitas
                                                         gudang.</small>
                                                     @error('max_stock')
@@ -236,30 +203,29 @@
                                         </div>
                                     </div>
 
-                                    <!-- Tab Gambar -->
-                                    <div class="tab-pane fade" id="image-sect" role="tabpanel"
-                                        aria-labelledby="image-tab">
-                                        <div class="row justify-content-center">
-                                            <div class="col-md-6 text-center">
+                                    <div class="col-lg-4 mt-3 mt-lg-0">
+                                        <div class="row">
+                                            <div class="col-12">
                                                 <div class="form-group">
                                                     <label for="image">Upload Gambar</label>
                                                     <div class="custom-file">
                                                         <input type="file"
                                                             class="custom-file-input @error('image') is-invalid @enderror"
-                                                            id="image" name="image" accept="image/*"
+                                                            id="image" name="image" accept="image/jpeg,image/png,image/webp"
                                                             onchange="previewImage()">
                                                         <label class="custom-file-label" for="image">Pilih
                                                             file</label>
                                                     </div>
+                                                    <small class="text-muted">JPG, JPEG, PNG, atau WEBP. Maksimal 5 MB.</small>
                                                     @error('image')
                                                         <div class="text-danger mt-2">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <div class="mt-3">
+                                                <div class="mt-3 text-center bg-light rounded border p-3">
                                                     <img id="imagePreview"
-                                                        src="https://via.placeholder.com/300?text=Preview+Gambar"
-                                                        alt="Preview" class="img-fluid rounded border shadow-sm"
-                                                        style="max-height: 300px;">
+                                                        src="{{ asset('image/logo-dropcore.jpg') }}"
+                                                        alt="Preview gambar produk" class="img-fluid rounded"
+                                                        style="width: 100%; max-height: 300px; object-fit: contain;">
                                                 </div>
                                             </div>
                                         </div>
@@ -294,7 +260,7 @@
             // We don't have bs-custom-file-input included in imports, so manual handling or just valid logic
             $('.custom-file-input').on('change', function() {
                 let fileName = $(this).val().split('\\').pop();
-                $(this).next('.custom-file-label').addClass("selected").html(fileName);
+                                                $(this).next('.custom-file-label').addClass("selected").text(fileName);
             });
         });
 
